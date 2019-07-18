@@ -1,25 +1,24 @@
-const JwtGateway = require('@barchart/tgam-jwt-js/lib/JwtGateway');
+const Timestamp = require('@barchart/common-js/lang/Timestamp');
 
-const Currency = require('@barchart/common-js/lang/Currency'),
-	Day = require('@barchart/common-js/lang/Day'),
-	Decimal = require('@barchart/common-js/lang/Decimal'),
-	Timezones = require('@barchart/common-js/lang/Timezones');
+const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+	EventType = require('@barchart/events-api-common/lib/data/EventType'),
+	ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
-const TransactionType = require('@barchart/portfolio-api-common/lib/data/TransactionType'),
-	ValuationType = require('@barchart/portfolio-api-common/lib/data/ValuationType');
+const Event = require('../lib/index');
+
+const packageJSON = require('../package');
 
 module.exports = (() => {
 	'use strict';
 
 	window.Barchart = window.Barchart || { };
-	window.Barchart.Jwt = window.Barchart.Jwt || { };
-	window.Barchart.Jwt.JwtProvider = JwtGateway;
-1
-	window.Barchart.Currency = Currency;
-	window.Barchart.Day = Day;
-	window.Barchart.Decimal = Decimal;
-	window.Barchart.Timezones = Timezones;
-	window.Barchart.TransactionType = TransactionType;
-	window.Barchart.ValuationType = ValuationType;
 
+	window.Barchart.Timestamp = Timestamp;
+	window.Barchart.CustomerType = CustomerType;
+	window.Barchart.EventType = EventType;
+	window.Barchart.ProductType = ProductType;
+
+	window.Barchart.Event = Event;
+
+	window.Barchart.ClientVersion = packageJSON.version;
 })();

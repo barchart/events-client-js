@@ -74,7 +74,7 @@ gulp.task('create-tag', (cb) => {
 });
 
 gulp.task('build-example-bundle', function() {
-	return browserify([ './lib/index.js' ], { standalone: 'Barchart.Event' })
+	return browserify([ './example/example.shim.js', './example/example.vue.js' ])
 		.bundle()
 		.pipe(source('example.js'))
 		.pipe(buffer())
