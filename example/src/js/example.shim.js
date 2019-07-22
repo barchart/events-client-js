@@ -4,9 +4,9 @@ const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'
 	EventType = require('@barchart/events-api-common/lib/data/EventType'),
 	ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
-const Event = require('../lib/index');
+const Event = require('../../../lib/index');
 
-const packageJSON = require('../package');
+const packageJSON = require('../../../package');
 
 module.exports = (() => {
 	'use strict';

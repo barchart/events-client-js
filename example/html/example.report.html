@@ -5,7 +5,7 @@
   <title>Title</title>
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  <link rel="stylesheet" href="example.css" type="text/css">
+  <link rel="stylesheet" href="../src/css/example.css" type="text/css">
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
@@ -18,7 +18,7 @@
   <div class="wrapper">
     <div class="header">
       <div class="float-left">
-        <h4 class="float-left">Barchart Event API</h4>
+        <h4 class="float-left">Barchart Report API</h4>
 
         <div class="float-left select-wrap">
           <div class="btn-group">
@@ -31,39 +31,19 @@
           </div>
 
           <div class="btn-group">
-            <select class="custom-select" v-model="selectedProduct">
-              <option disabled value="">Product</option>
-              <option v-for="product in config.products" v-bind:value="product.value" >
-                {{ product.text }}
-              </option>
-            </select>
+            <input class="form-control" type="text" v-model="startTime" placeholder="StartTime - optional">
           </div>
 
           <div class="btn-group">
-            <select class="custom-select" v-model="selectedType">
-              <option disabled value="">Type</option>
-              <option v-for="type in config.types" v-bind:value="type.value" >
-                {{ type.text }}
-              </option>
-            </select>
-          </div>
-
-          <div class="btn-group">
-            <input class="form-control" type="text" v-model="inputContext" placeholder="context_1,context_2">
+            <input class="form-control" type="text" v-model="endTime" placeholder="EndTime - optional">
           </div>
 
         </div>
 
         <div class="float-left btn-wrap">
           <div class="btn-group">
-            <button v-on:click="generate" class="btn btn-light">
-              Generate
-            </button>
-          </div>
-
-          <div class="btn-group">
-            <button v-on:click="send" class="btn btn-light">
-              Send
+            <button v-on:click="start" class="btn btn-light">
+              Start
             </button>
           </div>
 
@@ -74,21 +54,16 @@
           </div>
         </div>
 
-        <div class="float-left checkbox-wrap">
-          <input v-on:change="switchMode" type="checkbox" id="checkbox" class="checkbox-inline" v-model="auto">
-          <label for="checkbox">Auto mode</label>
-        </div>
-
       </div>
     </div>
 
     <div class="main row">
       <div class="event-wrap col-md-6">
-        <h4>Event Stack</h4>
+        <h4>Reports</h4>
 
-        <div class="event-stack">
-          <div class="event-item" v-for="(event, index) in events">
-            {{ index + 1 }}. {{ event }}
+        <div class="stack report-stack">
+          <div class="stack-item stack-report-item" v-for="(report, index) in reports">
+            <a v-bind:href="report.link" target="_blank">{{ index + 1 }}. {{ report.data }}</a>
           </div>
         </div>
       </div>
@@ -110,6 +85,6 @@
     </div>
   </div>
 
-  <script src="example.js"></script>
+  <script src="../example.report.js"></script>
 </body>
 </html>

@@ -1,4 +1,108 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = {
+	version: window.Barchart.ClientVersion,
+	customers: [{
+		text: window.Barchart.CustomerType.TGAM.description,
+		value: window.Barchart.CustomerType.TGAM.code
+	}],
+	products: [{
+		text: window.Barchart.ProductType.PORTFOLIO.description,
+		value: window.Barchart.ProductType.PORTFOLIO.code
+	}],
+	types: [{
+		text: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.description,
+		value: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.code
+	}]
+};
+
+},{}],2:[function(require,module,exports){
+'use strict';
+
+var _exampleConfig = require('./example.config.js');
+
+var _exampleConfig2 = _interopRequireDefault(_exampleConfig);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var app = new Vue({
+	el: '.wrapper',
+	created: function created() {
+		var _this = this;
+
+		window.Barchart.Event.ReportGateway.forStaging().then(function (gateway) {
+			_this.reportGateway = gateway;
+		});
+	},
+
+	data: {
+		selectedCustomer: '',
+		startTime: '',
+		endTime: '',
+
+		message: '',
+
+		reports: [],
+
+		reportGateway: null,
+
+		config: _exampleConfig2.default
+	},
+	methods: {
+		start: function start() {
+			var _this2 = this;
+
+			if (!validateFields.call(this)) {
+				this.message = 'Fill required fields';
+
+				return;
+			}
+
+			this.message = 'Sending...';
+
+			var filter = {
+				customer: this.selectedCustomer
+			};
+
+			if (this.startTime) {
+				filter.start = parseInt(this.startTime);
+			}
+
+			if (this.endTime) {
+				filter.end = parseInt(this.endTime);
+			}
+
+			this.reportGateway.startReport(filter).then(function (response) {
+				_this2.reports.push({
+					data: response.filter,
+					link: _this2.reportGateway.getReportUrl(response.source)
+				});
+
+				_this2.message = response;
+			}).catch(function (err) {
+				_this2.message = err;
+			});
+		},
+		clear: function clear() {
+			_clear.call(this);
+		}
+	}
+});
+
+function _clear() {
+	this.reports = [];
+	this.message = '';
+}
+
+function validateFields() {
+	return !!this.selectedCustomer;
+}
+
+},{"./example.config.js":1}],3:[function(require,module,exports){
 'use strict';
 
 var Timestamp = require('@barchart/common-js/lang/Timestamp');
@@ -7,9 +111,9 @@ var CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
     EventType = require('@barchart/events-api-common/lib/data/EventType'),
     ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
-var Event = require('../lib/index');
+var Event = require('../../../lib/index');
 
-var packageJSON = require('../package');
+var packageJSON = require('../../../package');
 
 module.exports = function () {
 	'use strict';
@@ -26,143 +130,7 @@ module.exports = function () {
 	window.Barchart.ClientVersion = packageJSON.version;
 }();
 
-},{"../lib/index":7,"../package":89,"@barchart/common-js/lang/Timestamp":36,"@barchart/events-api-common/lib/data/CustomerType":51,"@barchart/events-api-common/lib/data/EventType":53,"@barchart/events-api-common/lib/data/ProductType":54}],2:[function(require,module,exports){
-'use strict';
-
-var app = new Vue({
-	el: '.wrapper',
-	created: function created() {
-		var _this = this;
-
-		window.Barchart.Event.EventGateway.forStaging().then(function (gateway) {
-			_this.eventGateway = gateway;
-			_this.eventBatcher = new window.Barchart.Event.EventBatcher(gateway, callback.bind(_this));
-		});
-	},
-
-	data: {
-		selectedCustomer: '',
-		selectedProduct: '',
-		selectedType: '',
-		inputContext: '',
-
-		message: '',
-
-		events: [],
-
-		auto: false,
-
-		eventBatcher: null,
-		eventGateway: null,
-
-		config: {
-			version: window.Barchart.ClientVersion,
-			customers: [{
-				text: window.Barchart.CustomerType.TGAM.description,
-				value: window.Barchart.CustomerType.TGAM.code
-			}],
-			products: [{
-				text: window.Barchart.ProductType.PORTFOLIO.description,
-				value: window.Barchart.ProductType.PORTFOLIO.code
-			}],
-			types: [{
-				text: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.description,
-				value: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.code
-			}]
-		}
-	},
-	methods: {
-		generate: function generate() {
-			if (!validateDropdowns.call(this)) {
-				this.message = 'Fill all dropdowns';
-
-				return;
-			}
-
-			var event = {
-				customer: this.selectedCustomer,
-				product: this.selectedProduct,
-				type: this.selectedType,
-				timestamp: window.Barchart.Timestamp.now().timestamp,
-				context: this.inputContext.replace(' ', '').split(',')
-			};
-
-			this.events.push(event);
-
-			if (this.auto) {
-				this.eventBatcher.push(event);
-			}
-		},
-		send: function send() {
-			var _this2 = this;
-
-			if (!validateDropdowns.call(this)) {
-				this.message = 'Fill all dropdowns';
-
-				return;
-			}
-
-			if (this.events.length === 0) {
-				this.message = 'Event stack is empty';
-
-				return;
-			}
-
-			this.message = 'Sending...';
-
-			this.eventGateway.createEvents(this.events).then(function (response) {
-				_clear.call(_this2);
-
-				_this2.message = response;
-			}).catch(function (err) {
-				_clear.call(_this2);
-
-				_this2.message = err;
-			});
-		},
-		clear: function clear() {
-			_clear.call(this);
-		},
-		switchMode: function switchMode() {
-			var _this3 = this;
-
-			if (this.auto) {
-				this.events.forEach(function (event) {
-					return _this3.eventBatcher.push(event);
-				});
-				this.eventBatcher.start();
-
-				this.message = 'Auto mode enabled';
-			} else {
-				this.eventBatcher.stop();
-				this.eventBatcher.clear();
-
-				this.message = 'Auto mode disabled';
-			}
-		}
-	}
-});
-
-function callback(response) {
-	_clear.call(this);
-
-	this.message = response;
-}
-
-function _clear() {
-	this.events = [];
-	this.message = '';
-}
-
-function validateDropdowns() {
-	if (!this.selectedCustomer || !this.selectedProduct || !this.selectedType || !this.inputContext) {
-		return false;
-	}
-
-	return true;
-}
-
-},{}],3:[function(require,module,exports){
+},{"../../../lib/index":8,"../../../package":90,"@barchart/common-js/lang/Timestamp":37,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventType":54,"@barchart/events-api-common/lib/data/ProductType":55}],4:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -205,7 +173,7 @@ module.exports = function () {
 	return Configuration;
 }();
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -310,7 +278,7 @@ module.exports = function () {
 	return EventBatcher;
 }();
 
-},{"../gateway/EventGateway":5,"@barchart/common-js/lang/assert":38,"@barchart/common-js/timing/Scheduler":50}],5:[function(require,module,exports){
+},{"../gateway/EventGateway":6,"@barchart/common-js/lang/assert":39,"@barchart/common-js/timing/Scheduler":51}],6:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -477,7 +445,7 @@ module.exports = function () {
 	return EventGateway;
 }();
 
-},{"../common/Configuration":3,"@barchart/common-js/api/failures/FailureReason":8,"@barchart/common-js/api/http/Gateway":11,"@barchart/common-js/api/http/builders/EndpointBuilder":12,"@barchart/common-js/api/http/definitions/ProtocolType":17,"@barchart/common-js/api/http/definitions/VerbType":18,"@barchart/common-js/api/http/interceptors/ErrorInterceptor":22,"@barchart/common-js/api/http/interceptors/RequestInterceptor":23,"@barchart/common-js/api/http/interceptors/ResponseInterceptor":24,"@barchart/common-js/lang/Disposable":33,"@barchart/common-js/lang/Enum":34,"@barchart/common-js/lang/assert":38,"@barchart/events-api-common/lib/data/serialization/EventSchema":56}],6:[function(require,module,exports){
+},{"../common/Configuration":4,"@barchart/common-js/api/failures/FailureReason":9,"@barchart/common-js/api/http/Gateway":12,"@barchart/common-js/api/http/builders/EndpointBuilder":13,"@barchart/common-js/api/http/definitions/ProtocolType":18,"@barchart/common-js/api/http/definitions/VerbType":19,"@barchart/common-js/api/http/interceptors/ErrorInterceptor":23,"@barchart/common-js/api/http/interceptors/RequestInterceptor":24,"@barchart/common-js/api/http/interceptors/ResponseInterceptor":25,"@barchart/common-js/lang/Disposable":34,"@barchart/common-js/lang/Enum":35,"@barchart/common-js/lang/assert":39,"@barchart/events-api-common/lib/data/serialization/EventSchema":57}],7:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -532,10 +500,12 @@ module.exports = function () {
 
 			var protocolType = Enum.fromCode(ProtocolType, protocol.toUpperCase());
 
-			_this._startReport = EndpointBuilder.for('start-report', 'start report').withVerb(VerbType.POST).withProtocol(protocolType).withHost(host).withPort(port).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withRequestInterceptor(RequestInterceptor.fromDelegate(startReportRequestInterceptor)).withResponseInterceptor(responseInterceptorForReportDeserialization).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
+			_this._startReportEndpoint = EndpointBuilder.for('start-report', 'start report').withVerb(VerbType.POST).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(function (pb) {
+				pb.withLiteralParameter('reports', 'reports');
+			}).withBody('filter').withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForReportDeserialization).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
 
 			_this._reportUrlGenerator = function (source) {
-				return 'https://' + Configuration.getHost(host) + '/reports/' + source;
+				return 'https://' + host + '/reports/' + source;
 			};
 			return _this;
 		}
@@ -572,25 +542,43 @@ module.exports = function () {
 			}
 
 			/**
-    * Generates a URL suitable for downloading a report (as a CSV)
+    * Starts a report.
     *
     * @public
-    * @param {String} source
-    * @return {Promise<String>}
+    * @param {Object} filter
+    * @returns {Promise<Object>}
     */
 
 		}, {
-			key: 'getReportUrl',
-			value: function getReportUrl(source) {
+			key: 'startReport',
+			value: function startReport(filter) {
 				var _this3 = this;
 
 				return Promise.resolve().then(function () {
 					checkStart.call(_this3);
 
-					assert.argumentIsRequired(source, 'source', String);
+					assert.argumentIsRequired(filter, 'filter', Object);
 
-					return _this3._reportUrlGenerator(source);
+					return Gateway.invoke(_this3._startReportEndpoint, EventJobSchema.START.schema.format({ filter: filter }));
 				});
+			}
+
+			/**
+    * Generates a URL suitable for downloading a report (as a CSV)
+    *
+    * @public
+    * @param {String} source
+    * @return {String}
+    */
+
+		}, {
+			key: 'getReportUrl',
+			value: function getReportUrl(source) {
+				checkStart.call(this);
+
+				assert.argumentIsRequired(source, 'source', String);
+
+				return this._reportUrlGenerator(source);
 			}
 
 			/**
@@ -613,23 +601,19 @@ module.exports = function () {
 		return ReportGateway;
 	}(Disposable);
 
-	var startReportRequestInterceptor = function startReportRequestInterceptor(request) {
-		return FailureReason.validateSchema(EventJobSchema.START, request.data).then(function () {
-			return Promise.resolve(request);
-		}).catch(function (e) {
-			console.error('Error serializing data to start report', e);
-
-			return Promise.reject();
-		});
-	};
-
 	var responseInterceptorForReportDeserialization = ResponseInterceptor.fromDelegate(function (response) {
 		try {
-			return JSON.parse(response.data, EventJobSchema.GET.schema.getReviver());
+			return JSON.parse(response.data, EventJobSchema.PROCESS.schema.getReviver());
 		} catch (e) {
 			console.log('Error deserializing event-job', e);
 		}
 	});
+
+	function start(gateway) {
+		return gateway.start().then(function () {
+			return gateway;
+		});
+	}
 
 	function checkStart() {
 		if (this.getIsDisposed()) {
@@ -644,7 +628,7 @@ module.exports = function () {
 	return ReportGateway;
 }();
 
-},{"../common/Configuration":3,"@barchart/common-js/api/failures/FailureReason":8,"@barchart/common-js/api/http/Gateway":11,"@barchart/common-js/api/http/builders/EndpointBuilder":12,"@barchart/common-js/api/http/definitions/ProtocolType":17,"@barchart/common-js/api/http/definitions/VerbType":18,"@barchart/common-js/api/http/interceptors/ErrorInterceptor":22,"@barchart/common-js/api/http/interceptors/RequestInterceptor":23,"@barchart/common-js/api/http/interceptors/ResponseInterceptor":24,"@barchart/common-js/lang/Disposable":33,"@barchart/common-js/lang/Enum":34,"@barchart/common-js/lang/assert":38,"@barchart/events-api-common/lib/data/serialization/EventJobSchema":55}],7:[function(require,module,exports){
+},{"../common/Configuration":4,"@barchart/common-js/api/failures/FailureReason":9,"@barchart/common-js/api/http/Gateway":12,"@barchart/common-js/api/http/builders/EndpointBuilder":13,"@barchart/common-js/api/http/definitions/ProtocolType":18,"@barchart/common-js/api/http/definitions/VerbType":19,"@barchart/common-js/api/http/interceptors/ErrorInterceptor":23,"@barchart/common-js/api/http/interceptors/RequestInterceptor":24,"@barchart/common-js/api/http/interceptors/ResponseInterceptor":25,"@barchart/common-js/lang/Disposable":34,"@barchart/common-js/lang/Enum":35,"@barchart/common-js/lang/assert":39,"@barchart/events-api-common/lib/data/serialization/EventJobSchema":56}],8:[function(require,module,exports){
 'use strict';
 
 var EventGateway = require('./gateway/EventGateway'),
@@ -662,7 +646,7 @@ module.exports = function () {
 	};
 }();
 
-},{"./engine/EventBatcher":4,"./gateway/EventGateway":5,"./gateway/ReportGateway":6}],8:[function(require,module,exports){
+},{"./engine/EventBatcher":5,"./gateway/EventGateway":6,"./gateway/ReportGateway":7}],9:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -876,7 +860,7 @@ module.exports = function () {
 	return FailureReason;
 }();
 
-},{"./../../collections/Tree":26,"./../../lang/assert":38,"./../../lang/attributes":39,"./../../lang/is":41,"./../../serialization/json/Schema":47,"./FailureReasonItem":9,"./FailureType":10}],9:[function(require,module,exports){
+},{"./../../collections/Tree":27,"./../../lang/assert":39,"./../../lang/attributes":40,"./../../lang/is":42,"./../../serialization/json/Schema":48,"./FailureReasonItem":10,"./FailureType":11}],10:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -983,7 +967,7 @@ module.exports = function () {
 	return FailureReasonItem;
 }();
 
-},{"./../../lang/assert":38,"./../../lang/attributes":39,"./FailureType":10}],10:[function(require,module,exports){
+},{"./../../lang/assert":39,"./../../lang/attributes":40,"./FailureType":11}],11:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1188,7 +1172,7 @@ module.exports = function () {
 	return FailureType;
 }();
 
-},{"./../../lang/Enum":34,"./../../lang/assert":38}],11:[function(require,module,exports){
+},{"./../../lang/Enum":35,"./../../lang/assert":39}],12:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1414,7 +1398,7 @@ module.exports = function () {
 	return Gateway;
 }();
 
-},{"./../../lang/array":37,"./../../lang/assert":38,"./../../lang/attributes":39,"./../../lang/promise":43,"./../failures/FailureReason":8,"./../failures/FailureType":10,"./definitions/Endpoint":14,"./definitions/VerbType":18,"axios":57}],12:[function(require,module,exports){
+},{"./../../lang/array":38,"./../../lang/assert":39,"./../../lang/attributes":40,"./../../lang/promise":44,"./../failures/FailureReason":9,"./../failures/FailureType":11,"./definitions/Endpoint":15,"./definitions/VerbType":19,"axios":58}],13:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1775,7 +1759,7 @@ module.exports = function () {
 	return EndpointBuilder;
 }();
 
-},{"./../../../lang/assert":38,"./../definitions/Endpoint":14,"./../definitions/Parameters":16,"./../definitions/ProtocolType":17,"./../definitions/VerbType":18,"./../interceptors/CompositeErrorInterceptor":19,"./../interceptors/CompositeRequestInterceptor":20,"./../interceptors/CompositeResponseInterceptor":21,"./../interceptors/ErrorInterceptor":22,"./../interceptors/RequestInterceptor":23,"./../interceptors/ResponseInterceptor":24,"./ParametersBuilder":13}],13:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./../definitions/Endpoint":15,"./../definitions/Parameters":17,"./../definitions/ProtocolType":18,"./../definitions/VerbType":19,"./../interceptors/CompositeErrorInterceptor":20,"./../interceptors/CompositeRequestInterceptor":21,"./../interceptors/CompositeResponseInterceptor":22,"./../interceptors/ErrorInterceptor":23,"./../interceptors/RequestInterceptor":24,"./../interceptors/ResponseInterceptor":25,"./ParametersBuilder":14}],14:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1943,7 +1927,7 @@ module.exports = function () {
 	return ParametersBuilder;
 }();
 
-},{"./../../../lang/assert":38,"./../../../lang/attributes":39,"./../../../lang/is":41,"./../definitions/Parameter":15,"./../definitions/Parameters":16}],14:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./../../../lang/attributes":40,"./../../../lang/is":42,"./../definitions/Parameter":16,"./../definitions/Parameters":17}],15:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2242,7 +2226,7 @@ module.exports = function () {
 	return Endpoint;
 }();
 
-},{"./../../../lang/is":41,"./../interceptors/ErrorInterceptor":22,"./../interceptors/RequestInterceptor":23,"./../interceptors/ResponseInterceptor":24,"./Parameter":15,"./Parameters":16,"./ProtocolType":17,"./VerbType":18}],15:[function(require,module,exports){
+},{"./../../../lang/is":42,"./../interceptors/ErrorInterceptor":23,"./../interceptors/RequestInterceptor":24,"./../interceptors/ResponseInterceptor":25,"./Parameter":16,"./Parameters":17,"./ProtocolType":18,"./VerbType":19}],16:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2367,7 +2351,7 @@ module.exports = function () {
 	return Parameter;
 }();
 
-},{"./../../../lang/is":41}],16:[function(require,module,exports){
+},{"./../../../lang/is":42}],17:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2455,7 +2439,7 @@ module.exports = function () {
 	return Parameters;
 }();
 
-},{"./../../../lang/assert":38,"./../../../lang/is":41,"./Parameter":15}],17:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./../../../lang/is":42,"./Parameter":16}],18:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2569,7 +2553,7 @@ module.exports = function () {
 	return ProtocolType;
 }();
 
-},{"./../../../lang/Enum":34,"./../../../lang/assert":38,"./../../../lang/is":41}],18:[function(require,module,exports){
+},{"./../../../lang/Enum":35,"./../../../lang/assert":39,"./../../../lang/is":42}],19:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2672,7 +2656,7 @@ module.exports = function () {
 	return VerbType;
 }();
 
-},{"./../../../lang/Enum":34}],19:[function(require,module,exports){
+},{"./../../../lang/Enum":35}],20:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2737,7 +2721,7 @@ module.exports = function () {
 	return CompositeErrorInterceptor;
 }();
 
-},{"./../../../lang/assert":38,"./ErrorInterceptor":22}],20:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./ErrorInterceptor":23}],21:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2802,7 +2786,7 @@ module.exports = function () {
 	return CompositeRequestInterceptor;
 }();
 
-},{"./../../../lang/assert":38,"./RequestInterceptor":23}],21:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./RequestInterceptor":24}],22:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2867,7 +2851,7 @@ module.exports = function () {
 	return CompositeResponseInterceptor;
 }();
 
-},{"./../../../lang/assert":38,"./ResponseInterceptor":24}],22:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./ResponseInterceptor":25}],23:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3029,7 +3013,7 @@ module.exports = function () {
 	return ErrorInterceptor;
 }();
 
-},{"./../../../lang/assert":38,"./../../../lang/is":41,"./../../failures/FailureReason":8,"./../../failures/FailureType":10}],23:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./../../../lang/is":42,"./../../failures/FailureReason":9,"./../../failures/FailureType":11}],24:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3178,7 +3162,7 @@ module.exports = function () {
 	return RequestInterceptor;
 }();
 
-},{"./../../../lang/assert":38,"./../../../lang/is":41}],24:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./../../../lang/is":42}],25:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3325,7 +3309,7 @@ module.exports = function () {
 	return ResponseInterceptor;
 }();
 
-},{"./../../../lang/assert":38,"./../../../lang/is":41}],25:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./../../../lang/is":42}],26:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3427,7 +3411,7 @@ module.exports = function () {
 	return LinkedList;
 }();
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3797,7 +3781,7 @@ module.exports = function () {
 	return Tree;
 }();
 
-},{"./../lang/is":41}],27:[function(require,module,exports){
+},{"./../lang/is":42}],28:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3941,7 +3925,7 @@ module.exports = function () {
 	return ComparatorBuilder;
 }();
 
-},{"./../../lang/assert":38,"./comparators":28}],28:[function(require,module,exports){
+},{"./../../lang/assert":39,"./comparators":29}],29:[function(require,module,exports){
 'use strict';
 
 var assert = require('./../../lang/assert');
@@ -4016,7 +4000,7 @@ module.exports = function () {
 	};
 }();
 
-},{"./../../lang/assert":38}],29:[function(require,module,exports){
+},{"./../../lang/assert":39}],30:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4102,7 +4086,7 @@ module.exports = function () {
 	return AdHoc;
 }();
 
-},{"./assert":38,"./is":41}],30:[function(require,module,exports){
+},{"./assert":39,"./is":42}],31:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4245,7 +4229,7 @@ module.exports = function () {
 	return Currency;
 }();
 
-},{"./Enum":34,"./assert":38,"./is":41}],31:[function(require,module,exports){
+},{"./Enum":35,"./assert":39,"./is":42}],32:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4844,7 +4828,7 @@ module.exports = function () {
 	return Day;
 }();
 
-},{"./../collections/sorting/ComparatorBuilder":27,"./../collections/sorting/comparators":28,"./assert":38,"./is":41}],32:[function(require,module,exports){
+},{"./../collections/sorting/ComparatorBuilder":28,"./../collections/sorting/comparators":29,"./assert":39,"./is":42}],33:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5548,7 +5532,7 @@ module.exports = function () {
 	return Decimal;
 }();
 
-},{"./Enum":34,"./assert":38,"./is":41,"big.js":82}],33:[function(require,module,exports){
+},{"./Enum":35,"./assert":39,"./is":42,"big.js":83}],34:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5697,7 +5681,7 @@ module.exports = function () {
 	return Disposable;
 }();
 
-},{"./assert":38}],34:[function(require,module,exports){
+},{"./assert":39}],35:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5844,7 +5828,7 @@ module.exports = function () {
 	return Enum;
 }();
 
-},{"./assert":38}],35:[function(require,module,exports){
+},{"./assert":39}],36:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5967,7 +5951,7 @@ module.exports = function () {
 	return Money;
 }();
 
-},{"./Currency":30,"./Decimal":32,"./assert":38,"./is":41}],36:[function(require,module,exports){
+},{"./Currency":31,"./Decimal":33,"./assert":39,"./is":42}],37:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -6107,7 +6091,7 @@ module.exports = function () {
 	return Timestamp;
 }();
 
-},{"./assert":38,"./is":41,"moment-timezone":86}],37:[function(require,module,exports){
+},{"./assert":39,"./is":42,"moment-timezone":87}],38:[function(require,module,exports){
 'use strict';
 
 var assert = require('./assert'),
@@ -6631,7 +6615,7 @@ module.exports = function () {
 	}
 }();
 
-},{"./assert":38,"./is":41}],38:[function(require,module,exports){
+},{"./assert":39,"./is":42}],39:[function(require,module,exports){
 'use strict';
 
 var is = require('./is');
@@ -6779,7 +6763,7 @@ module.exports = function () {
 	};
 }();
 
-},{"./is":41}],39:[function(require,module,exports){
+},{"./is":42}],40:[function(require,module,exports){
 'use strict';
 
 var assert = require('./assert'),
@@ -6956,7 +6940,7 @@ module.exports = function () {
 	};
 }();
 
-},{"./assert":38,"./is":41}],40:[function(require,module,exports){
+},{"./assert":39,"./is":42}],41:[function(require,module,exports){
 'use strict';
 
 module.exports = function () {
@@ -7000,7 +6984,7 @@ module.exports = function () {
 	};
 }();
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
@@ -7223,7 +7207,7 @@ module.exports = function () {
 	};
 }();
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict';
 
 var array = require('./array'),
@@ -7376,7 +7360,7 @@ module.exports = function () {
 	return object;
 }();
 
-},{"./array":37,"./is":41}],43:[function(require,module,exports){
+},{"./array":38,"./is":42}],44:[function(require,module,exports){
 'use strict';
 
 var assert = require('./assert');
@@ -7570,7 +7554,7 @@ module.exports = function () {
 	};
 }();
 
-},{"./assert":38}],44:[function(require,module,exports){
+},{"./assert":39}],45:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -7669,7 +7653,7 @@ module.exports = function () {
 	return Component;
 }();
 
-},{"./../../lang/Currency":30,"./../../lang/Money":35,"./DataType":45,"./Field":46}],45:[function(require,module,exports){
+},{"./../../lang/Currency":31,"./../../lang/Money":36,"./DataType":46,"./Field":47}],46:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -7902,6 +7886,20 @@ module.exports = function () {
 			}
 
 			/**
+    * References an array.
+    *
+    * @public
+    * @static
+    * @returns {DataType}
+    */
+
+		}, {
+			key: 'ARRAY',
+			get: function get() {
+				return dataTypeArray;
+			}
+
+			/**
     * References a {@link Decimal} instance.
     *
     * @public
@@ -7969,6 +7967,7 @@ module.exports = function () {
 	var dataTypeNumber = new DataType('Number', null, null, is.number);
 	var dataTypeBoolean = new DataType('Boolean', null, null, is.boolean);
 	var dataTypeObject = new DataType('Object', null, null, is.object);
+	var dataTypeArray = new DataType('Array', null, null, is.array);
 
 	var dataTypeDecimal = new DataType('Decimal', null, function (x) {
 		return Decimal.parse(x);
@@ -7991,7 +7990,7 @@ module.exports = function () {
 		return x instanceof AdHoc;
 	}, getBuilder(buildAdHoc));
 
-	var dataTypes = [dataTypeString, dataTypeNumber, dataTypeBoolean, dataTypeObject, dataTypeDecimal, dataTypeDay, dataTypeTimestamp, dataTypeAdHoc];
+	var dataTypes = [dataTypeString, dataTypeNumber, dataTypeBoolean, dataTypeObject, dataTypeArray, dataTypeDecimal, dataTypeDay, dataTypeTimestamp, dataTypeAdHoc];
 
 	function getBuilder(builder) {
 		return function (data) {
@@ -8046,7 +8045,7 @@ module.exports = function () {
 	return DataType;
 }();
 
-},{"./../../lang/AdHoc":29,"./../../lang/Day":31,"./../../lang/Decimal":32,"./../../lang/Enum":34,"./../../lang/Timestamp":36,"./../../lang/assert":38,"./../../lang/is":41,"moment":88}],46:[function(require,module,exports){
+},{"./../../lang/AdHoc":30,"./../../lang/Day":32,"./../../lang/Decimal":33,"./../../lang/Enum":35,"./../../lang/Timestamp":37,"./../../lang/assert":39,"./../../lang/is":42,"moment":89}],47:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8126,7 +8125,7 @@ module.exports = function () {
 	return Field;
 }();
 
-},{}],47:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8496,7 +8495,7 @@ module.exports = function () {
 	return Schema;
 }();
 
-},{"./../../collections/LinkedList":25,"./../../collections/Tree":26,"./../../lang/attributes":39,"./../../lang/functions":40,"./../../lang/is":41,"./Component":44,"./Field":46}],48:[function(require,module,exports){
+},{"./../../collections/LinkedList":26,"./../../collections/Tree":27,"./../../lang/attributes":40,"./../../lang/functions":41,"./../../lang/is":42,"./Component":45,"./Field":47}],49:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8593,7 +8592,7 @@ module.exports = function () {
 	return ComponentBuilder;
 }();
 
-},{"./../../../lang/assert":38,"./../Component":44,"./../DataType":45,"./../Field":46}],49:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./../Component":45,"./../DataType":46,"./../Field":47}],50:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8736,7 +8735,7 @@ module.exports = function () {
 	return SchemaBuilder;
 }();
 
-},{"./../../../lang/assert":38,"./../../../lang/is":41,"./../Component":44,"./../DataType":45,"./../Field":46,"./../Schema":47,"./ComponentBuilder":48}],50:[function(require,module,exports){
+},{"./../../../lang/assert":39,"./../../../lang/is":42,"./../Component":45,"./../DataType":46,"./../Field":47,"./../Schema":48,"./ComponentBuilder":49}],51:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8986,7 +8985,7 @@ module.exports = function () {
 	return Scheduler;
 }();
 
-},{"./../lang/Disposable":33,"./../lang/assert":38,"./../lang/is":41,"./../lang/object":42,"./../lang/promise":43}],51:[function(require,module,exports){
+},{"./../lang/Disposable":34,"./../lang/assert":39,"./../lang/is":42,"./../lang/object":43,"./../lang/promise":44}],52:[function(require,module,exports){
 const Enum = require('@barchart/common-js/lang/Enum');
 
 module.exports = (() => {
@@ -9015,7 +9014,7 @@ module.exports = (() => {
 	return CustomerType;
 })();
 
-},{"@barchart/common-js/lang/Enum":34}],52:[function(require,module,exports){
+},{"@barchart/common-js/lang/Enum":35}],53:[function(require,module,exports){
 const assert = require('@barchart/common-js/lang/assert'),
 	Enum = require('@barchart/common-js/lang/Enum');
 
@@ -9109,7 +9108,7 @@ module.exports = (() => {
 	return EventJobStatus;
 })();
 
-},{"@barchart/common-js/lang/Enum":34,"@barchart/common-js/lang/assert":38}],53:[function(require,module,exports){
+},{"@barchart/common-js/lang/Enum":35,"@barchart/common-js/lang/assert":39}],54:[function(require,module,exports){
 const Enum = require('@barchart/common-js/lang/Enum');
 
 module.exports = (() => {
@@ -9138,7 +9137,7 @@ module.exports = (() => {
 	return EventType;
 })();
 
-},{"@barchart/common-js/lang/Enum":34}],54:[function(require,module,exports){
+},{"@barchart/common-js/lang/Enum":35}],55:[function(require,module,exports){
 const Enum = require('@barchart/common-js/lang/Enum');
 
 module.exports = (() => {
@@ -9167,7 +9166,7 @@ module.exports = (() => {
 	return ProductType;
 })();
 
-},{"@barchart/common-js/lang/Enum":34}],55:[function(require,module,exports){
+},{"@barchart/common-js/lang/Enum":35}],56:[function(require,module,exports){
 (function (process){
 const DataType = require('@barchart/common-js/serialization/json/DataType'),
 	Enum = require('@barchart/common-js/lang/Enum'),
@@ -9262,7 +9261,7 @@ module.exports = (() => {
 })();
 
 }).call(this,require('_process'))
-},{"../CustomerType":51,"../EventJobStatus":52,"@barchart/common-js/lang/Enum":34,"@barchart/common-js/serialization/json/DataType":45,"@barchart/common-js/serialization/json/builders/SchemaBuilder":49,"_process":83}],56:[function(require,module,exports){
+},{"../CustomerType":52,"../EventJobStatus":53,"@barchart/common-js/lang/Enum":35,"@barchart/common-js/serialization/json/DataType":46,"@barchart/common-js/serialization/json/builders/SchemaBuilder":50,"_process":84}],57:[function(require,module,exports){
 const DataType = require('@barchart/common-js/serialization/json/DataType'),
 	Enum = require('@barchart/common-js/lang/Enum'),
 	SchemaBuilder = require('@barchart/common-js/serialization/json/builders/SchemaBuilder');
@@ -9312,16 +9311,16 @@ module.exports = (() => {
 		.withField('product', DataType.forEnum(ProductType, 'ProductType'))
 		.withField('type', DataType.forEnum(EventType, 'EventType'))
 		.withField('timestamp', DataType.TIMESTAMP)
-		.withField('context', DataType.OBJECT)
+		.withField('context', DataType.ARRAY)
 		.schema
 	);
 
 	return EventSchema;
 })();
 
-},{"@barchart/common-js/lang/Enum":34,"@barchart/common-js/serialization/json/DataType":45,"@barchart/common-js/serialization/json/builders/SchemaBuilder":49,"@barchart/events-api-common/lib/data/CustomerType":51,"@barchart/events-api-common/lib/data/EventType":53,"@barchart/events-api-common/lib/data/ProductType":54}],57:[function(require,module,exports){
+},{"@barchart/common-js/lang/Enum":35,"@barchart/common-js/serialization/json/DataType":46,"@barchart/common-js/serialization/json/builders/SchemaBuilder":50,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventType":54,"@barchart/events-api-common/lib/data/ProductType":55}],58:[function(require,module,exports){
 module.exports = require('./lib/axios');
-},{"./lib/axios":59}],58:[function(require,module,exports){
+},{"./lib/axios":60}],59:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9497,7 +9496,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"../core/createError":65,"./../core/settle":69,"./../helpers/buildURL":73,"./../helpers/cookies":75,"./../helpers/isURLSameOrigin":77,"./../helpers/parseHeaders":79,"./../utils":81}],59:[function(require,module,exports){
+},{"../core/createError":66,"./../core/settle":70,"./../helpers/buildURL":74,"./../helpers/cookies":76,"./../helpers/isURLSameOrigin":78,"./../helpers/parseHeaders":80,"./../utils":82}],60:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -9552,7 +9551,7 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./cancel/Cancel":60,"./cancel/CancelToken":61,"./cancel/isCancel":62,"./core/Axios":63,"./core/mergeConfig":68,"./defaults":71,"./helpers/bind":72,"./helpers/spread":80,"./utils":81}],60:[function(require,module,exports){
+},{"./cancel/Cancel":61,"./cancel/CancelToken":62,"./cancel/isCancel":63,"./core/Axios":64,"./core/mergeConfig":69,"./defaults":72,"./helpers/bind":73,"./helpers/spread":81,"./utils":82}],61:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9573,7 +9572,7 @@ Cancel.prototype.__CANCEL__ = true;
 
 module.exports = Cancel;
 
-},{}],61:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 'use strict';
 
 var Cancel = require('./Cancel');
@@ -9632,14 +9631,14 @@ CancelToken.source = function source() {
 
 module.exports = CancelToken;
 
-},{"./Cancel":60}],62:[function(require,module,exports){
+},{"./Cancel":61}],63:[function(require,module,exports){
 'use strict';
 
 module.exports = function isCancel(value) {
   return !!(value && value.__CANCEL__);
 };
 
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9727,7 +9726,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"../helpers/buildURL":73,"./../utils":81,"./InterceptorManager":64,"./dispatchRequest":66,"./mergeConfig":68}],64:[function(require,module,exports){
+},{"../helpers/buildURL":74,"./../utils":82,"./InterceptorManager":65,"./dispatchRequest":67,"./mergeConfig":69}],65:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9781,7 +9780,7 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":81}],65:[function(require,module,exports){
+},{"./../utils":82}],66:[function(require,module,exports){
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -9801,7 +9800,7 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":67}],66:[function(require,module,exports){
+},{"./enhanceError":68}],67:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9889,7 +9888,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"../cancel/isCancel":62,"../defaults":71,"./../helpers/combineURLs":74,"./../helpers/isAbsoluteURL":76,"./../utils":81,"./transformData":70}],67:[function(require,module,exports){
+},{"../cancel/isCancel":63,"../defaults":72,"./../helpers/combineURLs":75,"./../helpers/isAbsoluteURL":77,"./../utils":82,"./transformData":71}],68:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9933,7 +9932,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -9986,7 +9985,7 @@ module.exports = function mergeConfig(config1, config2) {
   return config;
 };
 
-},{"../utils":81}],69:[function(require,module,exports){
+},{"../utils":82}],70:[function(require,module,exports){
 'use strict';
 
 var createError = require('./createError');
@@ -10013,7 +10012,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":65}],70:[function(require,module,exports){
+},{"./createError":66}],71:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10035,7 +10034,7 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":81}],71:[function(require,module,exports){
+},{"./../utils":82}],72:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -10137,7 +10136,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 }).call(this,require('_process'))
-},{"./adapters/http":58,"./adapters/xhr":58,"./helpers/normalizeHeaderName":78,"./utils":81,"_process":83}],72:[function(require,module,exports){
+},{"./adapters/http":59,"./adapters/xhr":59,"./helpers/normalizeHeaderName":79,"./utils":82,"_process":84}],73:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -10150,7 +10149,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],73:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10223,7 +10222,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":81}],74:[function(require,module,exports){
+},{"./../utils":82}],75:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10239,7 +10238,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],75:[function(require,module,exports){
+},{}],76:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10294,7 +10293,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":81}],76:[function(require,module,exports){
+},{"./../utils":82}],77:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10310,7 +10309,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],77:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10380,7 +10379,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":81}],78:[function(require,module,exports){
+},{"./../utils":82}],79:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -10394,7 +10393,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":81}],79:[function(require,module,exports){
+},{"../utils":82}],80:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -10449,7 +10448,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":81}],80:[function(require,module,exports){
+},{"./../utils":82}],81:[function(require,module,exports){
 'use strict';
 
 /**
@@ -10478,7 +10477,7 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],81:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 'use strict';
 
 var bind = require('./helpers/bind');
@@ -10814,7 +10813,7 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":72,"is-buffer":84}],82:[function(require,module,exports){
+},{"./helpers/bind":73,"is-buffer":85}],83:[function(require,module,exports){
 /*
  *  big.js v5.0.3
  *  A small, fast, easy-to-use library for arbitrary-precision decimal arithmetic.
@@ -11755,7 +11754,7 @@ module.exports = {
   }
 })(this);
 
-},{}],83:[function(require,module,exports){
+},{}],84:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -11941,7 +11940,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],84:[function(require,module,exports){
+},{}],85:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -11954,7 +11953,7 @@ module.exports = function isBuffer (obj) {
     typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
 }
 
-},{}],85:[function(require,module,exports){
+},{}],86:[function(require,module,exports){
 module.exports={
 	"version": "2016j",
 	"zones": [
@@ -12554,11 +12553,11 @@ module.exports={
 		"Pacific/Pohnpei|Pacific/Ponape"
 	]
 }
-},{}],86:[function(require,module,exports){
+},{}],87:[function(require,module,exports){
 var moment = module.exports = require("./moment-timezone");
 moment.tz.load(require('./data/packed/latest.json'));
 
-},{"./data/packed/latest.json":85,"./moment-timezone":87}],87:[function(require,module,exports){
+},{"./data/packed/latest.json":86,"./moment-timezone":88}],88:[function(require,module,exports){
 //! moment-timezone.js
 //! version : 0.5.11
 //! Copyright (c) JS Foundation and other contributors
@@ -13161,7 +13160,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 	return moment;
 }));
 
-},{"moment":88}],88:[function(require,module,exports){
+},{"moment":89}],89:[function(require,module,exports){
 //! moment.js
 
 ;(function (global, factory) {
@@ -17765,7 +17764,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 
 })));
 
-},{}],89:[function(require,module,exports){
+},{}],90:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
   "version": "1.0.0",
@@ -17819,4 +17818,4 @@ module.exports={
   "license": "MIT"
 }
 
-},{}]},{},[1,2]);
+},{}]},{},[3,2]);

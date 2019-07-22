@@ -45,10 +45,26 @@ body {
     padding: 20px 20px 40px 20px;
 }
 
-.main .event-stack {
+.main .stack {
     border-right: #aaaaaa 1px solid;
     height: 500px;
     overflow-y: auto;
+    padding-right: 20px;
+}
+
+.main .stack-item {
+    padding: 5px 10px;
+}
+
+.main .stack-report-item a {
+    color: black;
+    display: block;
+    text-decoration: none;
+}
+
+.main .stack-report-item a:hover {
+    background-color: #dddddd;
+    cursor: pointer;
 }
 
 .main .response {

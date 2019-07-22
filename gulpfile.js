@@ -73,10 +73,32 @@ gulp.task('create-tag', (cb) => {
 	});
 });
 
-gulp.task('build-example-bundle', function() {
-	return browserify([ './example/example.shim.js', './example/example.vue.js' ])
+gulp.task('build-example-bundles', (cb) => {
+	runSequence(
+		'build-example-event-bundle',
+		'build-example-report-bundle',
+
+		function (error) {
+			if (error) {
+				console.log(error.message);
+			}
+
+			cb(error);
+		});
+});
+
+gulp.task('build-example-event-bundle', function() {
+	return browserify([ './example/src/js/example.shim.js', './example/src/js/example.event.vue.js' ])
 		.bundle()
-		.pipe(source('example.js'))
+		.pipe(source('example.event.js'))
+		.pipe(buffer())
+		.pipe(gulp.dest('./example'));
+});
+
+gulp.task('build-example-report-bundle', function() {
+	return browserify([ './example/src/js/example.shim.js', './example/src/js/example.report.vue.js' ])
+		.bundle()
+		.pipe(source('example.report.js'))
 		.pipe(buffer())
 		.pipe(gulp.dest('./example'));
 });

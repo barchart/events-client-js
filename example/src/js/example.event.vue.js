@@ -1,5 +1,7 @@
 'use strict';
 
+import config from './example.config.js';
+
 const app = new Vue({
 	el: '.wrapper',
 	created() {
@@ -24,32 +26,12 @@ const app = new Vue({
 		eventBatcher: null,
 		eventGateway: null,
 
-		config: {
-			version: window.Barchart.ClientVersion,
-			customers: [
-				{
-					text: window.Barchart.CustomerType.TGAM.description,
-					value: window.Barchart.CustomerType.TGAM.code,
-				},
-			],
-			products: [
-				{
-					text: window.Barchart.ProductType.PORTFOLIO.description,
-					value: window.Barchart.ProductType.PORTFOLIO.code,
-				}
-			],
-			types: [
-				{
-					text: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.description,
-					value: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.code,
-				}
-			],
-		}
+		config: config,
 	},
 	methods: {
 		generate() {
-			if (!validateDropdowns.call(this)) {
-				this.message = 'Fill all dropdowns';
+			if (!validateFields.call(this)) {
+				this.message = 'Fill all fields';
 
 				return;
 			}
@@ -69,8 +51,8 @@ const app = new Vue({
 			}
 		},
 		send() {
-			if (!validateDropdowns.call(this)) {
-				this.message = 'Fill all dropdowns';
+			if (!validateFields.call(this)) {
+				this.message = 'Fill all fields';
 
 				return;
 			}
@@ -125,7 +107,7 @@ function clear() {
 	this.message = '';
 }
 
-function validateDropdowns() {
+function validateFields() {
 	if (!this.selectedCustomer || !this.selectedProduct || !this.selectedType || !this.inputContext) {
 		return false;
 	}
