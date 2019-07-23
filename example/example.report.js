@@ -158,7 +158,7 @@ module.exports = function () {
 		}
 
 		/**
-   * The host of the staging system.
+   * The host of the development system.
    *
    * @public
    * @static
@@ -167,7 +167,35 @@ module.exports = function () {
 
 
 		_createClass(Configuration, null, [{
+			key: 'development',
+			get: function get() {
+				return '6xrf96awp3.execute-api.us-east-1.amazonaws.com/stage';
+			}
+
+			/**
+    * The host of the staging system.
+    *
+    * @public
+    * @static
+    * @returns {String}
+    */
+
+		}, {
 			key: 'staging',
+			get: function get() {
+				return '6xrf96awp3.execute-api.us-east-1.amazonaws.com/stage';
+			}
+
+			/**
+    * The host of the production system.
+    *
+    * @public
+    * @static
+    * @returns {String}
+    */
+
+		}, {
+			key: 'production',
 			get: function get() {
 				return '6xrf96awp3.execute-api.us-east-1.amazonaws.com/stage';
 			}
@@ -401,7 +429,7 @@ module.exports = function () {
 			}
 
 			/**
-    * Creates and starts a new {@link EventGateway} for use in the staging environment.
+    * Creates and starts a new {@link EventGateway} for use in the development environment.
     *
     * @public
     * @static
@@ -409,10 +437,42 @@ module.exports = function () {
     */
 
 		}], [{
+			key: 'forDevelopment',
+			value: function forDevelopment() {
+				return Promise.resolve().then(function () {
+					return start(new EventGateway('https', Configuration.development, 443));
+				});
+			}
+
+			/**
+    * Creates and starts a new {@link EventGateway} for use in the staging environment.
+    *
+    * @public
+    * @static
+    * @returns {Promise<EventGateway>}
+    */
+
+		}, {
 			key: 'forStaging',
 			value: function forStaging() {
 				return Promise.resolve().then(function () {
 					return start(new EventGateway('https', Configuration.staging, 443));
+				});
+			}
+
+			/**
+    * Creates and starts a new {@link EventGateway} for use in the production environment.
+    *
+    * @public
+    * @static
+    * @returns {Promise<EventGateway>}
+    */
+
+		}, {
+			key: 'forProduction',
+			value: function forProduction() {
+				return Promise.resolve().then(function () {
+					return start(new EventGateway('https', Configuration.production, 443));
 				});
 			}
 		}]);
@@ -17780,7 +17840,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],90:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
