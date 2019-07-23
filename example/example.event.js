@@ -13,8 +13,14 @@ module.exports = function () {
 		products: [{
 			text: window.Barchart.ProductType.PORTFOLIO.description,
 			value: window.Barchart.ProductType.PORTFOLIO.code
+		}, {
+			text: window.Barchart.ProductType.WATCHLIST.description,
+			value: window.Barchart.ProductType.WATCHLIST.code
 		}],
 		types: [{
+			text: window.Barchart.EventType.ACCESSED.description,
+			value: window.Barchart.EventType.ACCESSED.code
+		}, {
 			text: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.description,
 			value: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.code
 		}]
@@ -9228,6 +9234,17 @@ module.exports = (() => {
 	class EventType extends Enum {
 
 		/**
+		 * Acceessed event type.
+		 *
+		 * @public
+		 * @static
+		 * @returns {EventType}
+		 */
+		static get ACCESSED() {
+			return accessed;
+		}
+
+		/**
 		 * Brokerage report downloaded event type.
 		 *
 		 * @public
@@ -9243,6 +9260,7 @@ module.exports = (() => {
 		}
 	}
 
+	const accessed = new EventType('A', 'Accessed');
 	const brokerageReportDownloaded = new EventType('BRD', 'Brokerage Report Downloaded');
 
 	return EventType;
@@ -9267,12 +9285,24 @@ module.exports = (() => {
 			return portfolio;
 		}
 
+		/**
+		 * ProductType for Watchlist product.
+		 *
+		 * @public
+		 * @static
+		 * @returns {ProductType}
+		 */
+		static get WATCHLIST() {
+			return watchlist;
+		}
+
 		toString() {
 			return `[ProductType (code=${this.code})]`;
 		}
 	}
 
 	const portfolio = new ProductType('PORTFOLIO', 'PORTFOLIO');
+	const watchlist = new ProductType('WATCHLIST', 'WATCHLIST');
 
 	return ProductType;
 })();
