@@ -1,154 +1,155 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.default = {
-	version: window.Barchart.ClientVersion,
-	customers: [{
-		text: window.Barchart.CustomerType.TGAM.description,
-		value: window.Barchart.CustomerType.TGAM.code
-	}],
-	products: [{
-		text: window.Barchart.ProductType.PORTFOLIO.description,
-		value: window.Barchart.ProductType.PORTFOLIO.code
-	}],
-	types: [{
-		text: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.description,
-		value: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.code
-	}]
-};
+module.exports = function () {
+	'use strict';
+
+	return {
+		version: window.Barchart.ClientVersion,
+		customers: [{
+			text: window.Barchart.CustomerType.TGAM.description,
+			value: window.Barchart.CustomerType.TGAM.code
+		}],
+		products: [{
+			text: window.Barchart.ProductType.PORTFOLIO.description,
+			value: window.Barchart.ProductType.PORTFOLIO.code
+		}],
+		types: [{
+			text: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.description,
+			value: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.code
+		}]
+	};
+}();
 
 },{}],2:[function(require,module,exports){
 'use strict';
 
-var _exampleConfig = require('./example.config.js');
+var Config = require('./example.config');
 
-var _exampleConfig2 = _interopRequireDefault(_exampleConfig);
+module.exports = function () {
+	'use strict';
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var app = new Vue({
+		el: '.wrapper',
+		created: function created() {
+			var _this = this;
 
-var app = new Vue({
-	el: '.wrapper',
-	created: function created() {
-		var _this = this;
-
-		window.Barchart.Event.EventGateway.forStaging().then(function (gateway) {
-			_this.eventGateway = gateway;
-			_this.eventBatcher = new window.Barchart.Event.EventBatcher(gateway, callback.bind(_this));
-		});
-	},
-
-	data: {
-		selectedCustomer: '',
-		selectedProduct: '',
-		selectedType: '',
-		inputContext: '',
-
-		message: '',
-
-		events: [],
-
-		auto: false,
-
-		eventBatcher: null,
-		eventGateway: null,
-
-		config: _exampleConfig2.default
-	},
-	methods: {
-		generate: function generate() {
-			if (!validateFields.call(this)) {
-				this.message = 'Fill all fields';
-
-				return;
-			}
-
-			var event = {
-				customer: this.selectedCustomer,
-				product: this.selectedProduct,
-				type: this.selectedType,
-				timestamp: window.Barchart.Timestamp.now().timestamp,
-				context: this.inputContext.replace(' ', '').split(',')
-			};
-
-			this.events.push(event);
-
-			if (this.auto) {
-				this.eventBatcher.push(event);
-			}
-		},
-		send: function send() {
-			var _this2 = this;
-
-			if (!validateFields.call(this)) {
-				this.message = 'Fill all fields';
-
-				return;
-			}
-
-			if (this.events.length === 0) {
-				this.message = 'Event stack is empty';
-
-				return;
-			}
-
-			this.message = 'Sending...';
-
-			this.eventGateway.createEvents(this.events).then(function (response) {
-				_clear.call(_this2);
-
-				_this2.message = response;
-			}).catch(function (err) {
-				_clear.call(_this2);
-
-				_this2.message = err;
+			window.Barchart.Event.EventGateway.forStaging().then(function (gateway) {
+				_this.eventGateway = gateway;
+				_this.eventBatcher = new window.Barchart.Event.EventBatcher(gateway, callback.bind(_this));
 			});
 		},
-		clear: function clear() {
-			_clear.call(this);
+
+		data: {
+			selectedCustomer: '',
+			selectedProduct: '',
+			selectedType: '',
+			inputContext: '',
+
+			message: '',
+
+			events: [],
+
+			auto: false,
+
+			eventBatcher: null,
+			eventGateway: null,
+
+			config: Config
 		},
-		switchMode: function switchMode() {
-			var _this3 = this;
+		methods: {
+			generate: function generate() {
+				if (!validateFields.call(this)) {
+					this.message = 'Fill all fields';
 
-			if (this.auto) {
-				this.events.forEach(function (event) {
-					return _this3.eventBatcher.push(event);
+					return;
+				}
+
+				var event = {
+					customer: this.selectedCustomer,
+					product: this.selectedProduct,
+					type: this.selectedType,
+					timestamp: window.Barchart.Timestamp.now().timestamp,
+					context: this.inputContext.replace(' ', '').split(',')
+				};
+
+				this.events.push(event);
+
+				if (this.auto) {
+					this.eventBatcher.push(event);
+				}
+			},
+			send: function send() {
+				var _this2 = this;
+
+				if (!validateFields.call(this)) {
+					this.message = 'Fill all fields';
+
+					return;
+				}
+
+				if (this.events.length === 0) {
+					this.message = 'Event stack is empty';
+
+					return;
+				}
+
+				this.message = 'Sending...';
+
+				this.eventGateway.createEvents(this.events).then(function (response) {
+					_clear.call(_this2);
+
+					_this2.message = response;
+				}).catch(function (err) {
+					_clear.call(_this2);
+
+					_this2.message = err;
 				});
-				this.eventBatcher.start();
+			},
+			clear: function clear() {
+				_clear.call(this);
+			},
+			switchMode: function switchMode() {
+				var _this3 = this;
 
-				this.message = 'Auto mode enabled';
-			} else {
-				this.eventBatcher.stop();
-				this.eventBatcher.clear();
+				if (this.auto) {
+					this.events.forEach(function (event) {
+						return _this3.eventBatcher.push(event);
+					});
+					this.eventBatcher.start();
 
-				this.message = 'Auto mode disabled';
+					this.message = 'Auto mode enabled';
+				} else {
+					this.eventBatcher.stop();
+					this.eventBatcher.clear();
+
+					this.message = 'Auto mode disabled';
+				}
 			}
 		}
-	}
-});
+	});
 
-function callback(response) {
-	_clear.call(this);
+	function callback(response) {
+		_clear.call(this);
 
-	this.message = response;
-}
-
-function _clear() {
-	this.events = [];
-	this.message = '';
-}
-
-function validateFields() {
-	if (!this.selectedCustomer || !this.selectedProduct || !this.selectedType || !this.inputContext) {
-		return false;
+		this.message = response;
 	}
 
-	return true;
-}
+	function _clear() {
+		this.events = [];
+		this.message = '';
+	}
 
-},{"./example.config.js":1}],3:[function(require,module,exports){
+	function validateFields() {
+		if (!this.selectedCustomer || !this.selectedProduct || !this.selectedType || !this.inputContext) {
+			return false;
+		}
+
+		return true;
+	}
+}();
+
+},{"./example.config":1}],3:[function(require,module,exports){
 'use strict';
 
 var Timestamp = require('@barchart/common-js/lang/Timestamp');
@@ -381,7 +382,7 @@ module.exports = function () {
 
 			_this._createEventEndpoint = EndpointBuilder.for('create-events', 'create events').withVerb(VerbType.POST).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(function (pb) {
 				pb.withLiteralParameter('events', 'events');
-			}).withBody('events').withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withRequestInterceptor(RequestInterceptor.fromDelegate(createEventRequestInterceptor)).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
+			}).withBody('events').withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withRequestInterceptor(RequestInterceptor.fromDelegate(createEventRequestInterceptor)).withResponseInterceptor(responseInterceptorForEventDeserialization).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
 			return _this;
 		}
 
@@ -477,6 +478,10 @@ module.exports = function () {
 			return Promise.reject();
 		});
 	};
+
+	var responseInterceptorForEventDeserialization = ResponseInterceptor.fromDelegate(function (response, ignored) {
+		return response.data;
+	});
 
 	function checkStart() {
 		if (this.getIsDisposed()) {

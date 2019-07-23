@@ -160,7 +160,7 @@ gulp.task('release', (cb) => {
 });
 
 gulp.task('lint', () => {
-	return gulp.src([ './**/*.js', './test/specs/**/*.js', '!./node_modules/**', '!./docs/**', '!./test/SpecRunner.js', '!./example/example.js' ])
+	return gulp.src([ './**/*.js', './test/specs/**/*.js', '!./node_modules/**', '!./docs/**', '!./test/SpecRunner.js', '!./example/example.event.js', '!./example/example.report.js' ])
 		.pipe(jshint({'esversion': 6}))
 		.pipe(jshint.reporter('default'));
 });

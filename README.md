@@ -7,3 +7,11 @@ The code is documented with [JSDoc](http://usejsdoc.org/). While the output hasn
 
     > npm install
     > gulp document
+
+## Development
+
+Gulp is used to check "linting" and to run build
+
+    > npm install
+    > gulp lint
+    > gulp build-example-bundles
