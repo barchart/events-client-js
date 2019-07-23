@@ -143,7 +143,7 @@ gulp.task('release', (cb) => {
 		'document',
 		'bump-version',
 		'embed-version',
-		'build-example-bundle',
+		'build-example-bundles',
 		'commit-changes',
 		'push-changes',
 		'create-tag',
