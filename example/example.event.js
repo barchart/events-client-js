@@ -9224,7 +9224,8 @@ const DataType = require('@barchart/common-js/serialization/json/DataType'),
 	SchemaBuilder = require('@barchart/common-js/serialization/json/builders/SchemaBuilder');
 
 const CustomerType = require('../CustomerType'),
-	EventJobStatus = require('../EventJobStatus');
+	EventJobStatus = require('../EventJobStatus'),
+	ProductType = require('../ProductType');
 
 module.exports = (() => {
 	'use strict';
@@ -9291,6 +9292,7 @@ module.exports = (() => {
 
 	const start = new EventJobSchema(SchemaBuilder.withName('start')
 		.withField('filter.customer', DataType.forEnum(CustomerType, 'CustomerType'))
+		.withField('filter.product', DataType.forEnum(ProductType, 'ProductType'), true)
 		.withField('filter.start', DataType.TIMESTAMP, true)
 		.withField('filter.end', DataType.TIMESTAMP, true)
 		.schema
@@ -9303,6 +9305,7 @@ module.exports = (() => {
 		.withField('timing.day', DataType.DAY)
 		.withField('timing.start', DataType.TIMESTAMP)
 		.withField('filter.customer', DataType.forEnum(CustomerType, 'CustomerType'))
+		.withField('filter.product', DataType.forEnum(ProductType, 'ProductType'), true)
 		.withField('filter.start', DataType.TIMESTAMP, true)
 		.withField('filter.end', DataType.TIMESTAMP, true)
 		.schema
@@ -9312,7 +9315,7 @@ module.exports = (() => {
 })();
 
 }).call(this,require('_process'))
-},{"../CustomerType":52,"../EventJobStatus":53,"@barchart/common-js/lang/Enum":35,"@barchart/common-js/serialization/json/DataType":46,"@barchart/common-js/serialization/json/builders/SchemaBuilder":50,"_process":84}],57:[function(require,module,exports){
+},{"../CustomerType":52,"../EventJobStatus":53,"../ProductType":55,"@barchart/common-js/lang/Enum":35,"@barchart/common-js/serialization/json/DataType":46,"@barchart/common-js/serialization/json/builders/SchemaBuilder":50,"_process":84}],57:[function(require,module,exports){
 const DataType = require('@barchart/common-js/serialization/json/DataType'),
 	Enum = require('@barchart/common-js/lang/Enum'),
 	SchemaBuilder = require('@barchart/common-js/serialization/json/builders/SchemaBuilder');

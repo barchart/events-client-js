@@ -13,6 +13,7 @@ module.exports = (() => {
 		},
 		data: {
 			selectedCustomer: '',
+			selectedProduct: '',
 			startTime: '',
 			endTime: '',
 
@@ -37,6 +38,10 @@ module.exports = (() => {
 				const filter = {
 					customer: this.selectedCustomer,
 				};
+
+				if (this.selectedProduct) {
+					filter.product = this.selectedProduct;
+				}
 
 				if (this.startTime) {
 					filter.start = parseInt(this.startTime);

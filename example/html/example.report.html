@@ -31,6 +31,15 @@
           </div>
 
           <div class="btn-group">
+            <select class="custom-select" v-model="selectedProduct">
+              <option value="">Product - None</option>
+              <option v-for="product in config.products" v-bind:value="product.value" >
+                {{ product.text }}
+              </option>
+            </select>
+          </div>
+
+          <div class="btn-group">
             <input class="form-control" type="text" v-model="startTime" placeholder="StartTime - optional">
           </div>
 
