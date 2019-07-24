@@ -56,13 +56,12 @@ body {
     padding: 5px 10px;
 }
 
-.main .stack-report-item a {
+.main .stack-report-item div {
     color: black;
-    display: block;
     text-decoration: none;
 }
 
-.main .stack-report-item a:hover {
+.main .stack-report-item div:hover {
     background-color: #dddddd;
     cursor: pointer;
 }

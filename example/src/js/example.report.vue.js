@@ -53,21 +53,47 @@ module.exports = (() => {
 
 				this.reportGateway.startReport(filter)
 					.then((response) => {
-						this.reports.push({
-							data: response.filter,
-							link: this.reportGateway.getReportUrl(response.source),
-						});
+						this.reports.push(format(response));
 
 						this.message = response;
 					}).catch((err) => {
 						this.message = err;
 					});
 			},
+			get(report) {
+				if (report.status === window.Barchart.EventJobStatus.RUNNING) {
+					return this.reportGateway.getReportAvailability(report.source)
+						.then((response) => {
+							const index = this.reports.findIndex(r => r.source === report.source);
+
+							if (index >= 0) {
+								this.reports[index] = format(response);
+							}
+
+							this.message = response;
+						})
+						.catch((err) => {
+							this.message = err;
+						});
+				} else if (report.status === window.Barchart.EventJobStatus.COMPLETE) {
+					const path = this.reportGateway.getReportUrl(report.source);
+
+					return window.location.href = path;
+				}
+			},
 			clear() {
 				clear.call(this);
 			},
 		}
 	});
+
+	function format(response) {
+		return {
+			filter: response.filter,
+			source: response.source,
+			status: response.status,
+		};
+	}
 
 	function clear() {
 		this.reports = [ ];

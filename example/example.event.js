@@ -161,6 +161,7 @@ module.exports = function () {
 var Timestamp = require('@barchart/common-js/lang/Timestamp');
 
 var CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+    EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus'),
     EventType = require('@barchart/events-api-common/lib/data/EventType'),
     ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
@@ -175,6 +176,7 @@ module.exports = function () {
 
 	window.Barchart.Timestamp = Timestamp;
 	window.Barchart.CustomerType = CustomerType;
+	window.Barchart.EventJobStatus = EventJobStatus;
 	window.Barchart.EventType = EventType;
 	window.Barchart.ProductType = ProductType;
 
@@ -183,7 +185,7 @@ module.exports = function () {
 	window.Barchart.ClientVersion = packageJSON.version;
 }();
 
-},{"../../../lib/index":8,"../../../package":90,"@barchart/common-js/lang/Timestamp":37,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventType":54,"@barchart/events-api-common/lib/data/ProductType":55}],4:[function(require,module,exports){
+},{"../../../lib/index":8,"../../../package":90,"@barchart/common-js/lang/Timestamp":37,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventJobStatus":53,"@barchart/events-api-common/lib/data/EventType":54,"@barchart/events-api-common/lib/data/ProductType":55}],4:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -216,7 +218,7 @@ module.exports = function () {
 		_createClass(Configuration, null, [{
 			key: 'development',
 			get: function get() {
-				return '6xrf96awp3.execute-api.us-east-1.amazonaws.com/stage';
+				return 'jr1w6tgfr8.execute-api.us-east-1.amazonaws.com/stage';
 			}
 
 			/**
@@ -230,7 +232,7 @@ module.exports = function () {
 		}, {
 			key: 'staging',
 			get: function get() {
-				return '6xrf96awp3.execute-api.us-east-1.amazonaws.com/stage';
+				return 'jr1w6tgfr8.execute-api.us-east-1.amazonaws.com/stage';
 			}
 
 			/**
@@ -244,7 +246,7 @@ module.exports = function () {
 		}, {
 			key: 'production',
 			get: function get() {
-				return '6xrf96awp3.execute-api.us-east-1.amazonaws.com/stage';
+				return 'jr1w6tgfr8.execute-api.us-east-1.amazonaws.com/stage';
 			}
 		}]);
 
@@ -274,7 +276,7 @@ module.exports = function () {
 			_classCallCheck(this, EventBatcher);
 
 			assert.argumentIsRequired(eventGateway, 'eventGateway', EventGateway, 'EventGateway');
-			assert.argumentIsRequired(callback, 'callback', Function, 'Function');
+			assert.argumentIsOptional(callback, 'callback', Function, 'Function');
 
 			this._eventGateway = eventGateway;
 			this._callback = callback;
@@ -331,20 +333,18 @@ module.exports = function () {
 			return this._scheduler.schedule(watch.bind(this), 5000, 'Watch');
 		}
 
-		console.log('[ ' + this._currentBatch.length + ' ] events available.');
-
 		this._sending = true;
 
 		return this._eventGateway.createEvents(this._currentBatch).then(function (response) {
 			console.log('[ ' + _this._currentBatch.length + ' ] events successfully sent');
 
-			_this._callback(response);
+			if (_this._callback) {
+				_this._callback(response);
+			}
 
 			return response;
 		}).catch(function (err) {
 			console.error(err);
-
-			_this._callback(err);
 
 			return err;
 		}).then(function () {
@@ -621,6 +621,10 @@ module.exports = function () {
 				pb.withLiteralParameter('reports', 'reports');
 			}).withBody('filter').withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForReportDeserialization).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
 
+			_this._getReportAvailabilityEndpoint = EndpointBuilder.for('get-report-availability', 'get report availability').withVerb(VerbType.GET).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(function (pb) {
+				pb.withLiteralParameter('reports', 'reports').withVariableParameter('source', 'source', 'source', false).withLiteralParameter('availability', 'availability');
+			}).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForReportAvailabilityDeserialization).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
+
 			_this._reportUrlGenerator = function (source) {
 				return 'https://' + host + '/reports/' + source;
 			};
@@ -681,6 +685,31 @@ module.exports = function () {
 			}
 
 			/**
+    * Returns a report availability.
+    *
+    * @public
+    * @param {Object} source
+    * @return {Promise<Object>}
+    */
+
+		}, {
+			key: 'getReportAvailability',
+			value: function getReportAvailability(source) {
+				var _this4 = this;
+
+				return Promise.resolve().then(function () {
+					checkStart.call(_this4);
+
+					assert.argumentIsRequired(source, 'source', String);
+
+					var payload = {};
+					payload.source = source;
+
+					return Gateway.invoke(_this4._getReportAvailabilityEndpoint, payload);
+				});
+			}
+
+			/**
     * Generates a URL suitable for downloading a report (as a CSV)
     *
     * @public
@@ -726,6 +755,14 @@ module.exports = function () {
 		}
 	});
 
+	var responseInterceptorForReportAvailabilityDeserialization = ResponseInterceptor.fromDelegate(function (response) {
+		try {
+			return JSON.parse(response.data, EventJobSchema.PROCESS.schema.getReviver());
+		} catch (e) {
+			console.log('Error deserializing event-job', e);
+		}
+	});
+
 	function start(gateway) {
 		return gateway.start().then(function () {
 			return gateway;
@@ -748,6 +785,10 @@ module.exports = function () {
 },{"../common/Configuration":4,"@barchart/common-js/api/failures/FailureReason":9,"@barchart/common-js/api/http/Gateway":12,"@barchart/common-js/api/http/builders/EndpointBuilder":13,"@barchart/common-js/api/http/definitions/ProtocolType":18,"@barchart/common-js/api/http/definitions/VerbType":19,"@barchart/common-js/api/http/interceptors/ErrorInterceptor":23,"@barchart/common-js/api/http/interceptors/RequestInterceptor":24,"@barchart/common-js/api/http/interceptors/ResponseInterceptor":25,"@barchart/common-js/lang/Disposable":34,"@barchart/common-js/lang/Enum":35,"@barchart/common-js/lang/assert":39,"@barchart/events-api-common/lib/data/serialization/EventJobSchema":56}],8:[function(require,module,exports){
 'use strict';
 
+var CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+    EventType = require('@barchart/events-api-common/lib/data/EventType'),
+    ProductType = require('@barchart/events-api-common/lib/data/ProductType');
+
 var EventGateway = require('./gateway/EventGateway'),
     ReportGateway = require('./gateway/ReportGateway');
 
@@ -759,11 +800,15 @@ module.exports = function () {
 	return {
 		EventBatcher: EventBatcher,
 		EventGateway: EventGateway,
-		ReportGateway: ReportGateway
+		ReportGateway: ReportGateway,
+
+		CustomerType: CustomerType,
+		EventType: EventType,
+		ProductType: ProductType
 	};
 }();
 
-},{"./engine/EventBatcher":5,"./gateway/EventGateway":6,"./gateway/ReportGateway":7}],9:[function(require,module,exports){
+},{"./engine/EventBatcher":5,"./gateway/EventGateway":6,"./gateway/ReportGateway":7,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventType":54,"@barchart/events-api-common/lib/data/ProductType":55}],9:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -9109,6 +9154,9 @@ module.exports = (() => {
 	'use strict';
 
 	class CustomerType extends Enum {
+		constructor(code, description) {
+			super(code, description);
+		}
 
 		/**
 		 * Customer type for TGAM.
@@ -9232,6 +9280,9 @@ module.exports = (() => {
 	'use strict';
 
 	class EventType extends Enum {
+		constructor(code, description) {
+			super(code, description);
+		}
 
 		/**
 		 * Acceessed event type.
@@ -9273,9 +9324,12 @@ module.exports = (() => {
 	'use strict';
 
 	class ProductType extends Enum {
+		constructor(code, description) {
+			super(code, description);
+		}
 
 		/**
-		 * ProductType for Portfolio product.
+		 * ProductType for Portfolio product.g
 		 *
 		 * @public
 		 * @static
@@ -9392,12 +9446,13 @@ module.exports = (() => {
 		.withField('job', DataType.STRING)
 		.withField('source', DataType.STRING)
 		.withField('status', DataType.forEnum(EventJobStatus, 'EventJobStatus'))
-		.withField('timing.day', DataType.DAY)
-		.withField('timing.start', DataType.TIMESTAMP)
 		.withField('filter.customer', DataType.forEnum(CustomerType, 'CustomerType'))
 		.withField('filter.product', DataType.forEnum(ProductType, 'ProductType'), true)
 		.withField('filter.start', DataType.TIMESTAMP, true)
 		.withField('filter.end', DataType.TIMESTAMP, true)
+		.withField('timing.day', DataType.DAY)
+		.withField('timing.start', DataType.TIMESTAMP)
+		.withField('timing.end', DataType.TIMESTAMP, true)
 		.schema
 	);
 

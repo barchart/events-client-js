@@ -72,7 +72,7 @@
 
         <div class="stack report-stack">
           <div class="stack-item stack-report-item" v-for="(report, index) in reports">
-            <a v-bind:href="report.link" target="_blank">{{ index + 1 }}. {{ report.data }}</a>
+            <div v-on:click="get(report)">{{ index + 1 }}. {{ report }}</div>
           </div>
         </div>
       </div>
