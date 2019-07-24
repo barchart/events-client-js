@@ -62,6 +62,8 @@ module.exports = (() => {
 			},
 			get(report) {
 				if (report.status === window.Barchart.EventJobStatus.RUNNING) {
+					this.message = 'Sending...';
+
 					return this.reportGateway.getReportAvailability(report.source)
 						.then((response) => {
 							const index = this.reports.findIndex(r => r.source === report.source);
@@ -78,7 +80,7 @@ module.exports = (() => {
 				} else if (report.status === window.Barchart.EventJobStatus.COMPLETE) {
 					const path = this.reportGateway.getReportUrl(report.source);
 
-					return window.location.href = path;
+					window.location.href = path;
 				}
 			},
 			clear() {

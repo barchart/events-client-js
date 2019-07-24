@@ -1,29 +1,18 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 'use strict';
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 module.exports = function () {
 	'use strict';
 
+	var _types;
+
 	return {
 		version: window.Barchart.ClientVersion,
-		customers: [{
-			text: window.Barchart.CustomerType.TGAM.description,
-			value: window.Barchart.CustomerType.TGAM.code
-		}],
-		products: [{
-			text: window.Barchart.ProductType.PORTFOLIO.description,
-			value: window.Barchart.ProductType.PORTFOLIO.code
-		}, {
-			text: window.Barchart.ProductType.WATCHLIST.description,
-			value: window.Barchart.ProductType.WATCHLIST.code
-		}],
-		types: [{
-			text: window.Barchart.EventType.ACCESSED.description,
-			value: window.Barchart.EventType.ACCESSED.code
-		}, {
-			text: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.description,
-			value: window.Barchart.EventType.BROKERAGE_REPORT_DOWNLOADED.code
-		}]
+		customers: [window.Barchart.CustomerType.TGAM],
+		products: [window.Barchart.ProductType.PORTFOLIO, window.Barchart.ProductType.WATCHLIST],
+		types: (_types = {}, _defineProperty(_types, window.Barchart.ProductType.PORTFOLIO.code, [window.Barchart.EventType.PORTFOLIO_APPLICATION_LOADED, window.Barchart.EventType.PORTFOLIO_ACCESSED, window.Barchart.EventType.PORTFOLIO_CREATED, window.Barchart.EventType.PORTFOLIO_DELETED, window.Barchart.EventType.PORTFOLIO_TRANSACTION_CREATED, window.Barchart.EventType.PORTFOLIO_TRANSACTION_EDITED, window.Barchart.EventType.PORTFOLIO_TRANSACTION_DELTED, window.Barchart.EventType.PORTFOLIO_TRANSACTION_HISTORY_VIEWED_SINGLE, window.Barchart.EventType.PORTFOLIO_TRANSACTION_HISTORY_VIEWED_ALL, window.Barchart.EventType.PORTFOLIO_POSITION_CREATED, window.Barchart.EventType.PORTFOLIO_POSITION_DELETED, window.Barchart.EventType.PORTFOLIO_BROKERAGE_REPORT_DOWNLOADED, window.Barchart.EventType.PORTFOLIO_CUSTOM_VIEW_CREATED, window.Barchart.EventType.PORTFOLIO_CUSTOM_VIEW_DELETED]), _defineProperty(_types, window.Barchart.ProductType.WATCHLIST.code, [window.Barchart.EventType.WATCHLIST_APPLICATION_LOADED, window.Barchart.EventType.WATCHLIST_ACCESSED, window.Barchart.EventType.WATCHLIST_CREATED, window.Barchart.EventType.WATCHLIST_DELETED, window.Barchart.EventType.WATCHLIST_SYMBOL_ADDED, window.Barchart.EventType.WATCHLIST_SYMBOL_REMOVED, window.Barchart.EventType.WATCHLIST_CUSTOM_VIEW_CREATED, window.Barchart.EventType.WATCHLIST_CUSTOM_VIEW_DELETED]), _types)
 	};
 }();
 
@@ -9284,26 +9273,92 @@ module.exports = (() => {
 			super(code, description);
 		}
 
-		/**
-		 * Acceessed event type.
-		 *
-		 * @public
-		 * @static
-		 * @returns {EventType}
-		 */
-		static get ACCESSED() {
-			return accessed;
+		static get WATCHLIST_APPLICATION_LOADED() {
+			return watchlistApplicationLoaded;
 		}
 
-		/**
-		 * Brokerage report downloaded event type.
-		 *
-		 * @public
-		 * @static
-		 * @returns {EventType}
-		 */
-		static get BROKERAGE_REPORT_DOWNLOADED() {
-			return brokerageReportDownloaded;
+		static get WATCHLIST_ACCESSED() {
+			return watchlistAccessed;
+		}
+
+		static get WATCHLIST_CREATED() {
+			return watchlistCreated;
+		}
+
+		static get WATCHLIST_DELETED() {
+			return watchlistDeleted;
+		}
+
+		static get WATCHLIST_SYMBOL_ADDED() {
+			return watchlistSymbolAdded;
+		}
+
+		static get WATCHLIST_SYMBOL_REMOVED() {
+			return watchlistSymbolRemoved;
+		}
+
+		static get WATCHLIST_CUSTOM_VIEW_CREATED() {
+			return watchlistCustomViewCreated;
+		}
+
+		static get WATCHLIST_CUSTOM_VIEW_DELETED() {
+			return watchlistCustomViewDeleted;
+		}
+
+		static get PORTFOLIO_APPLICATION_LOADED() {
+			return portfolioApplicationLoaded;
+		}
+
+		static get PORTFOLIO_ACCESSED() {
+			return portfolioAccessed;
+		}
+
+		static get PORTFOLIO_CREATED() {
+			return portfolioCreated;
+		}
+
+		static get PORTFOLIO_DELETED() {
+			return portfolioDeleted;
+		}
+
+		static get PORTFOLIO_TRANSACTION_CREATED() {
+			return portfolioTransactionCreated;
+		}
+
+		static get PORTFOLIO_TRANSACTION_EDITED() {
+			return portfolioTransactionEdited;
+		}
+
+		static get PORTFOLIO_TRANSACTION_DELTED() {
+			return portfolioTransactionDeleted;
+		}
+
+		static get PORTFOLIO_TRANSACTION_HISTORY_VIEWED_SINGLE() {
+			return portfolioTransactionHistoryViewedSingle;
+		}
+
+		static get PORTFOLIO_TRANSACTION_HISTORY_VIEWED_ALL() {
+			return portfolioTransactionHistoryViewedAll;
+		}
+
+		static get PORTFOLIO_POSITION_CREATED() {
+			return portfolioPositionCreated;
+		}
+
+		static get PORTFOLIO_POSITION_DELETED() {
+			return portfolioPositionDeleted;
+		}
+
+		static get PORTFOLIO_BROKERAGE_REPORT_DOWNLOADED() {
+			return portfolioBrokerageReportDownloaded;
+		}
+
+		static get PORTFOLIO_CUSTOM_VIEW_CREATED() {
+			return portfolioCustomViewCreated;
+		}
+
+		static get PORTFOLIO_CUSTOM_VIEW_DELETED() {
+			return portfolioCustomViewDeleted;
 		}
 
 		toString() {
@@ -9311,8 +9366,39 @@ module.exports = (() => {
 		}
 	}
 
-	const accessed = new EventType('A', 'Accessed');
-	const brokerageReportDownloaded = new EventType('BRD', 'Brokerage Report Downloaded');
+	// Watchlist
+
+	const watchlistApplicationLoaded = new EventType('W-AL', 'Application Loaded');
+	const watchlistAccessed = new EventType('W-A', 'Accessed');
+	const watchlistCreated = new EventType('W-C', 'Created');
+	const watchlistDeleted = new EventType('W-D', 'Deleted');
+
+	const watchlistSymbolAdded = new EventType('W-SA', 'Symbol Added');
+	const watchlistSymbolRemoved = new EventType('W-SR', 'Symbol Removed');
+
+	const watchlistCustomViewCreated = new EventType('W-CVC', 'Custom View Created');
+	const watchlistCustomViewDeleted = new EventType('W-CVD', 'Custom View Deleted');
+
+	// Portfolio
+
+	const portfolioApplicationLoaded = new EventType('P-AL', 'Application Loaded');
+	const portfolioAccessed = new EventType('P-A', 'Accessed');
+	const portfolioCreated = new EventType('P-C', 'Created');
+	const portfolioDeleted = new EventType('P-D', 'Deleted');
+
+	const portfolioTransactionCreated = new EventType('P-TA', 'Transaction Created');
+	const portfolioTransactionEdited = new EventType('P-TE', 'Transaction Edited');
+	const portfolioTransactionDeleted = new EventType('P-TD', 'Transaction Deleted');
+	const portfolioTransactionHistoryViewedSingle = new EventType('P-THVS', 'Transaction History Viewed (Single position)');
+	const portfolioTransactionHistoryViewedAll = new EventType('P-THVA', 'Transaction History Viewed (All positions)');
+
+	const portfolioPositionCreated = new EventType('P-PC', 'Position Created');
+	const portfolioPositionDeleted = new EventType('P-PD', 'Position Deleted');
+
+	const portfolioBrokerageReportDownloaded = new EventType('P-BRD', 'Brokerage Report Downloaded');
+
+	const portfolioCustomViewCreated = new EventType('P-CVC', 'Custom View Created');
+	const portfolioCustomViewDeleted = new EventType('P-CVD', 'Custom View Deleted');
 
 	return EventType;
 })();

@@ -24,8 +24,8 @@
           <div class="btn-group">
             <select class="custom-select" v-model="selectedCustomer">
               <option disabled value="">Customer</option>
-              <option v-for="customer in config.customers" v-bind:value="customer.value" >
-                {{ customer.text }}
+              <option v-for="customer in config.customers" v-bind:value="customer.code" >
+                {{ customer.description }}
               </option>
             </select>
           </div>
@@ -33,17 +33,17 @@
           <div class="btn-group">
             <select class="custom-select" v-model="selectedProduct">
               <option disabled value="">Product</option>
-              <option v-for="product in config.products" v-bind:value="product.value" >
-                {{ product.text }}
+              <option v-for="product in config.products" v-bind:value="product.code" >
+                {{ product.description }}
               </option>
             </select>
           </div>
 
           <div class="btn-group">
-            <select class="custom-select" v-model="selectedType">
+            <select class="custom-select type-select" v-model="selectedType">
               <option disabled value="">Type</option>
-              <option v-for="type in config.types" v-bind:value="type.value" >
-                {{ type.text }}
+              <option v-for="type in config.types[selectedProduct]" v-bind:value="type.code" >
+                {{ type.description }}
               </option>
             </select>
           </div>
