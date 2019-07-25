@@ -196,7 +196,7 @@ module.exports = function () {
 		_createClass(Configuration, null, [{
 			key: 'development',
 			get: function get() {
-				return 'jr1w6tgfr8.execute-api.us-east-1.amazonaws.com/stage';
+				return 'events-stage.aws.barchart.com';
 			}
 
 			/**
@@ -210,7 +210,7 @@ module.exports = function () {
 		}, {
 			key: 'staging',
 			get: function get() {
-				return 'jr1w6tgfr8.execute-api.us-east-1.amazonaws.com/stage';
+				return 'events-stage.aws.barchart.com';
 			}
 
 			/**
@@ -224,7 +224,7 @@ module.exports = function () {
 		}, {
 			key: 'production',
 			get: function get() {
-				return 'jr1w6tgfr8.execute-api.us-east-1.amazonaws.com/stage';
+				return 'events.aws.barchart.com';
 			}
 		}]);
 
@@ -18098,7 +18098,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],91:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
