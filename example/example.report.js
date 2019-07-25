@@ -348,8 +348,8 @@ var assert = require('@barchart/common-js/lang/assert'),
     Timestamp = require('@barchart/common-js/lang/Timestamp');
 
 var CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
-    EventType = require('@barchart/events-api-common/lib/data/EventType');
-ProductType = require('@barchart/events-api-common/lib/data/ProductType');
+    EventType = require('@barchart/events-api-common/lib/data/EventType'),
+    ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
 module.exports = function () {
 	'use strict';
