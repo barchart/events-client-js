@@ -367,14 +367,14 @@ module.exports = function () {
 
 		_createClass(EventFactory, [{
 			key: 'build',
-			value: function build(event, context) {
-				assert.argumentIsRequired(event, 'event', EventType, 'EventType');
+			value: function build(type, context) {
+				assert.argumentIsRequired(type, 'type', EventType, 'EventType');
 				assert.argumentIsArray(context, 'context');
 
 				return {
 					customer: this._customer,
 					product: this._product,
-					event: event,
+					type: type,
 					timestamp: Timestamp.now().timestamp,
 					context: context
 				};
@@ -18098,7 +18098,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],91:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
