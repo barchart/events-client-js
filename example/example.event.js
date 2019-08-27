@@ -18230,7 +18230,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],91:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
