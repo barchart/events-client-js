@@ -204,8 +204,13 @@ module.exports = function () {
    */
 
 
-		_createClass(Configuration, null, [{
-			key: 'development',
+		_createClass(Configuration, [{
+			key: 'toString',
+			value: function toString() {
+				return '[Configuration]';
+			}
+		}], [{
+			key: 'developmentHost',
 			get: function get() {
 				return 'events-stage.aws.barchart.com';
 			}
@@ -219,7 +224,7 @@ module.exports = function () {
     */
 
 		}, {
-			key: 'staging',
+			key: 'stagingHost',
 			get: function get() {
 				return 'events-stage.aws.barchart.com';
 			}
@@ -233,7 +238,7 @@ module.exports = function () {
     */
 
 		}, {
-			key: 'production',
+			key: 'productionHost',
 			get: function get() {
 				return 'events.aws.barchart.com';
 			}
@@ -260,6 +265,15 @@ var EventGateway = require('../gateway/EventGateway');
 module.exports = function () {
 	'use strict';
 
+	/**
+  * A wrapper utility for an {@link @EventGateway} which caches and
+  * periodically sends new {@link Event} objects to the server.
+  *
+  * @public
+  * @param {EventGateway}
+  * @param {Function=} callback
+  */
+
 	var EventBatcher = function () {
 		function EventBatcher(eventGateway, callback) {
 			_classCallCheck(this, EventBatcher);
@@ -270,41 +284,80 @@ module.exports = function () {
 			this._eventGateway = eventGateway;
 			this._callback = callback;
 
-			this._currentBatch = [];
-			this._nextBatch = [];
-
-			this._sending = false;
-			this._watching = false;
-
 			this._scheduler = new Scheduler();
+
+			this._buffer = [];
+			this._running = false;
 		}
+
+		/**
+   * Starts the scheduler for transmitting events, causing
+   * events to be periodically flushed from the buffer.
+   *
+   * @public
+   */
+
 
 		_createClass(EventBatcher, [{
 			key: 'start',
 			value: function start() {
-				this._watching = true;
+				if (this._running) {
+					return;
+				}
+
+				this._scheduler = new Scheduler();
+				this._running = true;
 
 				watch.call(this);
 			}
+
+			/**
+    * Stops the scheduler, causing events to accumulate in
+    * the buffer.
+    *
+    * @public
+    */
+
 		}, {
 			key: 'stop',
 			value: function stop() {
-				this._watching = false;
+				this._running = false;
+
+				if (this._scheduler !== null) {
+					this._scheduler.dispose();
+					this._scheduler = null;
+				}
 			}
+
+			/**
+    * Clears the internal buffer of any events waiting to be
+    * sent to the server.
+    *
+    * @public
+    */
+
 		}, {
 			key: 'clear',
 			value: function clear() {
-				this._currentBatch = [];
-				this._nextBatch = [];
+				this._buffer = [];
 			}
+
+			/**
+    * Adds a new event to the buffer.
+    *
+    * @public
+    * @param {Event} event
+    */
+
 		}, {
 			key: 'push',
 			value: function push(event) {
-				if (this._sending) {
-					this._nextBatch.push(event);
-				} else {
-					this._currentBatch.push(event);
-				}
+				this._buffer.push(event);
+			}
+		}, {
+			key: 'toString',
+			value: function toString() {
+				return '[EventBatcher]';
 			}
 		}]);
 
@@ -314,34 +367,32 @@ module.exports = function () {
 	function watch() {
 		var _this = this;
 
-		if (!this._watching) {
+		if (!this._running) {
 			return;
 		}
 
-		if (this._currentBatch.length === 0) {
+		if (this._buffer.length === 0) {
 			return this._scheduler.schedule(watch.bind(this), 5000, 'Watch');
 		}
 
-		this._sending = true;
+		var batch = this._buffer;
 
-		return this._eventGateway.createEvents(this._currentBatch).then(function (response) {
-			console.log('[ ' + _this._currentBatch.length + ' ] events successfully sent');
+		this._buffer = [];
 
+		return this._eventGateway.createEvents(batch).then(function (response) {
 			if (_this._callback) {
 				_this._callback(response);
 			}
 
 			return response;
 		}).catch(function (err) {
-			console.error(err);
+			console.error('Failed to transmit events to server', err);
 
 			return err;
 		}).then(function () {
-			_this._currentBatch = _this._nextBatch;
-			_this._nextBatch = [];
-			_this._sending = false;
-
-			return _this._scheduler.schedule(watch.bind(_this), 5000, 'Watch');
+			if (_this._running) {
+				_this._scheduler.schedule(watch.bind(_this), 5000, 'Watch');
+			}
 		});
 	}
 
@@ -365,6 +416,14 @@ var CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
 module.exports = function () {
 	'use strict';
 
+	/**
+  * A factory for event objects.
+  *
+  * @public
+  * @param {CustomerType} customer
+  * @param {ProductType} product
+  */
+
 	var EventFactory = function () {
 		function EventFactory(customer, product) {
 			_classCallCheck(this, EventFactory);
@@ -376,8 +435,30 @@ module.exports = function () {
 			this._product = product;
 		}
 
+		/**
+   * Configures a new event factory, which will build events for a specific
+   * customer and product.
+   *
+   * @public
+   * @param {CustomerType} customer
+   * @param {ProductType} product
+   * @returns {EventFactory}
+   */
+
+
 		_createClass(EventFactory, [{
 			key: 'build',
+
+
+			/**
+    * Creates a new event object, using the factory's customer and
+    * product.
+    *
+    * @public
+    * @param {EventType} type
+    * @param {Array} context
+    * @returns {Event}
+    */
 			value: function build(type, context) {
 				assert.argumentIsRequired(type, 'type', EventType, 'EventType');
 				assert.argumentIsArray(context, 'context');
@@ -390,6 +471,11 @@ module.exports = function () {
 					context: context
 				};
 			}
+		}, {
+			key: 'toString',
+			value: function toString() {
+				return '[EventFactory]';
+			}
 		}], [{
 			key: 'for',
 			value: function _for(customer, product) {
@@ -399,6 +485,18 @@ module.exports = function () {
 
 		return EventFactory;
 	}();
+
+	/**
+  * An event.
+  *
+  * @typedef Event
+  * @type {Object}
+  * @property {CustomerType} customer
+  * @property {ProductType} product
+  * @property {EventType} type
+  * @property {Number} timestamp
+  * @property {Array} context
+  */
 
 	return EventFactory;
 }();
@@ -438,11 +536,10 @@ module.exports = function () {
   * Web service gateway for invoking the Events API.
   *
   * @public
+  * @extends {Disposable}
   * @param {String} protocol - The protocol to use (either HTTP or HTTPS).
   * @param {String} host - The host name of the Events web service.
   * @param {Number} port - The TCP port number of the Events web service.
-  * @extends {Disposable}
-  *
   */
 
 	var EventGateway = function (_Disposable) {
@@ -499,8 +596,8 @@ module.exports = function () {
     * Creates an events.
     *
     * @public
-    * @param {Array} events
-    * @returns {Promise<Object>}
+    * @param {Array<Event>} events
+    * @returns {Promise<Array<Events>>}
     */
 
 		}, {
@@ -527,11 +624,16 @@ module.exports = function () {
     * @returns {Promise<EventGateway>}
     */
 
+		}, {
+			key: 'toString',
+			value: function toString() {
+				return '[EventGateway]';
+			}
 		}], [{
 			key: 'forDevelopment',
 			value: function forDevelopment() {
 				return Promise.resolve().then(function () {
-					return start(new EventGateway('https', Configuration.development, 443));
+					return start(new EventGateway('https', Configuration.developmentHost, 443));
 				});
 			}
 
@@ -547,7 +649,7 @@ module.exports = function () {
 			key: 'forStaging',
 			value: function forStaging() {
 				return Promise.resolve().then(function () {
-					return start(new EventGateway('https', Configuration.staging, 443));
+					return start(new EventGateway('https', Configuration.stagingHost, 443));
 				});
 			}
 
@@ -563,7 +665,7 @@ module.exports = function () {
 			key: 'forProduction',
 			value: function forProduction() {
 				return Promise.resolve().then(function () {
-					return start(new EventGateway('https', Configuration.production, 443));
+					return start(new EventGateway('https', Configuration.productionHost, 443));
 				});
 			}
 		}]);
@@ -583,7 +685,7 @@ module.exports = function () {
 		})).then(function () {
 			return Promise.resolve(request);
 		}).catch(function (e) {
-			console.error('Error serializing data to create event', e);
+			console.error('Error serializing data for event creation (using EventSchema.TYPE schema)', e);
 
 			return Promise.reject();
 		});
@@ -624,7 +726,6 @@ var assert = require('@barchart/common-js/lang/assert'),
 var EndpointBuilder = require('@barchart/common-js/api/http/builders/EndpointBuilder'),
     ErrorInterceptor = require('@barchart/common-js/api/http/interceptors/ErrorInterceptor'),
     Gateway = require('@barchart/common-js/api/http/Gateway'),
-    FailureReason = require('@barchart/common-js/api/failures/FailureReason'),
     ProtocolType = require('@barchart/common-js/api/http/definitions/ProtocolType'),
     RequestInterceptor = require('@barchart/common-js/api/http/interceptors/RequestInterceptor'),
     ResponseInterceptor = require('@barchart/common-js/api/http/interceptors/ResponseInterceptor'),
@@ -641,11 +742,10 @@ module.exports = function () {
   * Web service gateway for invoking the Reports API.
   *
   * @public
+  * @extends {Disposable}
   * @param {String} protocol - The protocol to use (either HTTP or HTTPS).
   * @param {String} host - The host name of the Events web service.
   * @param {Number} port - The TCP port number of the Events web service.
-  * @extends {Disposable}
-  *
   */
 
 	var ReportGateway = function (_Disposable) {
@@ -779,11 +879,32 @@ module.exports = function () {
     * @returns {Promise<ReportGateway>}
     */
 
+		}, {
+			key: 'toString',
+			value: function toString() {
+				return '[ReportGateway]';
+			}
 		}], [{
 			key: 'forStaging',
 			value: function forStaging() {
 				return Promise.resolve().then(function () {
-					return start(new ReportGateway('https', Configuration.staging, 443));
+					return start(new ReportGateway('https', Configuration.stagingHost, 443));
+				});
+			}
+
+			/**
+    * Creates and starts a new {@link ReportGateway} for use in the production environment.
+    *
+    * @public
+    * @static
+    * @returns {Promise<ReportGateway>}
+    */
+
+		}, {
+			key: 'forProduction',
+			value: function forProduction() {
+				return Promise.resolve().then(function () {
+					return start(new ReportGateway('https', Configuration.productionHost, 443));
 				});
 			}
 		}]);
@@ -795,7 +916,7 @@ module.exports = function () {
 		try {
 			return JSON.parse(response.data, EventJobSchema.PROCESS.schema.getReviver());
 		} catch (e) {
-			console.log('Error deserializing event-job', e);
+			console.log('Error deserializing report (using EventJobSchema.PROCESS schema)', e);
 		}
 	});
 
@@ -803,7 +924,7 @@ module.exports = function () {
 		try {
 			return JSON.parse(response.data, EventJobSchema.PROCESS.schema.getReviver());
 		} catch (e) {
-			console.log('Error deserializing event-job', e);
+			console.log('Error deserializing report availability (using EventJobSchema.PROCESS schema)', e);
 		}
 	});
 
@@ -826,7 +947,7 @@ module.exports = function () {
 	return ReportGateway;
 }();
 
-},{"../common/Configuration":4,"@barchart/common-js/api/failures/FailureReason":10,"@barchart/common-js/api/http/Gateway":13,"@barchart/common-js/api/http/builders/EndpointBuilder":14,"@barchart/common-js/api/http/definitions/ProtocolType":19,"@barchart/common-js/api/http/definitions/VerbType":20,"@barchart/common-js/api/http/interceptors/ErrorInterceptor":24,"@barchart/common-js/api/http/interceptors/RequestInterceptor":25,"@barchart/common-js/api/http/interceptors/ResponseInterceptor":26,"@barchart/common-js/lang/Disposable":35,"@barchart/common-js/lang/Enum":36,"@barchart/common-js/lang/assert":40,"@barchart/events-api-common/lib/data/serialization/EventJobSchema":57}],9:[function(require,module,exports){
+},{"../common/Configuration":4,"@barchart/common-js/api/http/Gateway":13,"@barchart/common-js/api/http/builders/EndpointBuilder":14,"@barchart/common-js/api/http/definitions/ProtocolType":19,"@barchart/common-js/api/http/definitions/VerbType":20,"@barchart/common-js/api/http/interceptors/ErrorInterceptor":24,"@barchart/common-js/api/http/interceptors/RequestInterceptor":25,"@barchart/common-js/api/http/interceptors/ResponseInterceptor":26,"@barchart/common-js/lang/Disposable":35,"@barchart/common-js/lang/Enum":36,"@barchart/common-js/lang/assert":40,"@barchart/events-api-common/lib/data/serialization/EventJobSchema":57}],9:[function(require,module,exports){
 'use strict';
 
 var CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
@@ -9386,7 +9507,7 @@ module.exports = (() => {
 			return portfolioTransactionEdited;
 		}
 
-		static get PORTFOLIO_TRANSACTION_DELTED() {
+		static get PORTFOLIO_TRANSACTION_DELETED() {
 			return portfolioTransactionDeleted;
 		}
 
@@ -9443,7 +9564,7 @@ module.exports = (() => {
 	const portfolioCreated = new EventType('P-C', 'Created');
 	const portfolioDeleted = new EventType('P-D', 'Deleted');
 
-	const portfolioTransactionCreated = new EventType('P-TA', 'Transaction Created');
+	const portfolioTransactionCreated = new EventType('P-TC', 'Transaction Created');
 	const portfolioTransactionEdited = new EventType('P-TE', 'Transaction Edited');
 	const portfolioTransactionDeleted = new EventType('P-TD', 'Transaction Deleted');
 	const portfolioTransactionHistoryViewedSingle = new EventType('P-THVS', 'Transaction History Viewed (Single position)');
@@ -18109,7 +18230,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],91:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
