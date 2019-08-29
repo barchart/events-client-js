@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@barchart/common-js": "~3.3.0",
-    "@barchart/events-api-common": "~1.0.0"
+    "@barchart/events-api-common": "~1.0.22"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
