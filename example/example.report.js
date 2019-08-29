@@ -503,7 +503,7 @@ module.exports = function () {
 					assert.argumentIsArray(events, 'events');
 
 					return Gateway.invoke(_this3._createEventEndpoint, { events: events.map(function (event) {
-							return EventSchema.TYPE.schema.format(event);
+							return EventSchema.CLIENT.schema.format(event);
 						}) });
 				});
 			}
@@ -573,11 +573,11 @@ module.exports = function () {
 
 	var createEventRequestInterceptor = function createEventRequestInterceptor(request) {
 		return Promise.all(request.data.events.map(function (event) {
-			return FailureReason.validateSchema(EventSchema.TYPE, event);
+			return FailureReason.validateSchema(EventSchema.CLIENT, event);
 		})).then(function () {
 			return Promise.resolve(request);
 		}).catch(function (e) {
-			console.error('Error serializing data for event creation (using EventSchema.TYPE schema)', e);
+			console.error('Error serializing data for event creation (using EventSchema.CLIENT schema)', e);
 
 			return Promise.reject();
 		});
@@ -18221,7 +18221,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],89:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
