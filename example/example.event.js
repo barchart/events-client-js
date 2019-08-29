@@ -18230,13 +18230,14 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],91:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
     "email": "bryan.ingle@barchart.com",
     "url": "http://www.barchart.com"
   },
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: Please use gulp to run tests\" && exit 1"
   },
