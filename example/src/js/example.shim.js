@@ -5,8 +5,6 @@ const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'
 	EventType = require('@barchart/events-api-common/lib/data/EventType'),
 	ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
-const Event = require('../../../lib/index');
-
 const packageJSON = require('../../../package');
 
 module.exports = (() => {
@@ -19,8 +17,6 @@ module.exports = (() => {
 	window.Barchart.EventJobStatus = EventJobStatus;
 	window.Barchart.EventType = EventType;
 	window.Barchart.ProductType = ProductType;
-
-	window.Barchart.Event = Event;
 
 	window.Barchart.ClientVersion = packageJSON.version;
 })();
