@@ -88,8 +88,6 @@ module.exports = function () {
 					_this2.message = response;
 				}).catch(function (err) {
 					_this2.message = err;
-
-					throw err;
 				});
 			},
 			get: function get(report) {
@@ -112,11 +110,7 @@ module.exports = function () {
 						_this3.message = err;
 					});
 				} else if (report.status === window.Barchart.EventJobStatus.COMPLETE) {
-					this.reportGateway.getReport(report.source).then(function (response) {
-						console.log(response);
-
-						window.location.href = response.headers.location;
-					});
+					this.reportGateway.getReport(report.source);
 				}
 			},
 			clear: function clear() {
@@ -18660,7 +18654,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],91:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
@@ -18671,7 +18665,7 @@ module.exports={
     "test": "echo \"Error: Please use gulp to run tests\" && exit 1"
   },
   "dependencies": {
-    "@barchart/common-js": "git@github.com:barchart/barchart-common-js.git#master",
+    "@barchart/common-js": "~3.3.0",
     "@barchart/events-api-common": "~1.3.0"
   },
   "devDependencies": {

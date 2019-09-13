@@ -18667,7 +18667,7 @@ moment.tz.load(require('./data/packed/latest.json'));
 },{}],91:[function(require,module,exports){
 module.exports={
   "name": "@barchart/events-client-js",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "description": "JavaScript library for interfacing with Barchart's Events API",
   "author": {
     "name": "Bryan Ingle",
@@ -18678,7 +18678,7 @@ module.exports={
     "test": "echo \"Error: Please use gulp to run tests\" && exit 1"
   },
   "dependencies": {
-    "@barchart/common-js": "git@github.com:barchart/barchart-common-js.git#master",
+    "@barchart/common-js": "~3.3.0",
     "@barchart/events-api-common": "~1.3.0"
   },
   "devDependencies": {
