@@ -78,9 +78,7 @@ module.exports = (() => {
 							this.message = err;
 						});
 				} else if (report.status === window.Barchart.EventJobStatus.COMPLETE) {
-					const path = this.reportGateway.getReportUrl(report.source);
-
-					window.location.href = path;
+					this.reportGateway.getReport(report.source);
 				}
 			},
 			clear() {
