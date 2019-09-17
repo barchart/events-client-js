@@ -32,19 +32,16 @@ module.exports = function () {
 
 	var app = new Vue({
 		el: '.wrapper',
-		created: function created() {
-			var _this = this;
-
-			window.Barchart.Event.ReportGateway.forStaging().then(function (gateway) {
-				_this.reportGateway = gateway;
-			});
-		},
-
 		data: {
 			selectedCustomer: '',
 			selectedProduct: '',
 			startTime: '',
 			endTime: '',
+
+			username: '',
+			password: '',
+
+			showAuth: true,
 
 			message: '',
 
@@ -55,6 +52,19 @@ module.exports = function () {
 			config: Config
 		},
 		methods: {
+			connect: function connect() {
+				var _this = this;
+
+				if (!this.username || !this.password) {
+					return;
+				}
+
+				return window.Barchart.Event.ReportGateway.forStaging({ username: this.username, password: this.password }).then(function (gateway) {
+					_this.reportGateway = gateway;
+
+					_this.showAuth = false;
+				});
+			},
 			start: function start() {
 				var _this2 = this;
 
@@ -794,9 +804,9 @@ module.exports = function () {
 			}
 		}], [{
 			key: 'forStaging',
-			value: function forStaging() {
+			value: function forStaging(credentials) {
 				return Promise.resolve().then(function () {
-					return start(new ReportGateway('https', Configuration.stagingHost, 443, { username: 'admin', password: 'secret' }));
+					return start(new ReportGateway('https', Configuration.stagingHost, 443, credentials));
 				});
 			}
 
@@ -810,9 +820,9 @@ module.exports = function () {
 
 		}, {
 			key: 'forProduction',
-			value: function forProduction() {
+			value: function forProduction(credentials) {
 				return Promise.resolve().then(function () {
-					return start(new ReportGateway('https', Configuration.productionHost, 443));
+					return start(new ReportGateway('https', Configuration.productionHost, 443, credentials));
 				});
 			}
 		}]);
@@ -863,7 +873,6 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var assert = require('./../../lang/assert'),
-    attributes = require('./../../lang/attributes'),
     is = require('./../../lang/is');
 
 var FailureReasonItem = require('./FailureReasonItem'),
@@ -1044,37 +1053,48 @@ module.exports = function () {
 			}
 
 			/**
-    * Validates that a candidate conforms to a schema
+    * Validates that a candidate conforms to a schema, returning a rejected
+    * promise (with a serialized FailureReason) if a problem exists.
     *
     * @public
     * @static
-    * @param {Schema} schema
+    * @param {Schema|Enum} schema
     * @param {Object} candidate
+    * @param {String=} description
+    * @returns {Promise}
     */
 
 		}, {
 			key: 'validateSchema',
-			value: function validateSchema(schema, candidate) {
-				var _this2 = this;
-
+			value: function validateSchema(schema, candidate, description) {
 				return Promise.resolve().then(function () {
+					var schemaToUse = void 0;
+
+					if (schema instanceof Schema) {
+						schemaToUse = schema;
+					} else if (schema.schema && schema.schema instanceof Schema) {
+						schemaToUse = schema.schema;
+					} else {
+						schemaToUse = null;
+					}
+
+					var fields = schemaToUse.getInvalidFields(candidate);
+
 					var failure = void 0;
 
-					schema.schema.fields.map(function (field) {
-						if (field.optional) {
-							return;
-						}
+					if (fields.length !== 0) {
+						failure = FailureReason.forRequest({ endpoint: { description: description || 'serialize data into ' + schema.name } }).addItem(FailureType.REQUEST_INPUT_MALFORMED, {}, true);
 
-						if (!attributes.has(candidate, field.name) || !field.dataType.validator.call(_this2, attributes.read(candidate, field.name))) {
-							if (!failure) {
-								failure = FailureReason.forRequest({ endpoint: { description: 'serialize data into ' + schema } }).addItem(FailureType.REQUEST_INPUT_MALFORMED, {}, true);
-							}
+						failure = fields.reduce(function (accumulator, field) {
+							accumulator.addItem(FailureType.REQUEST_PARAMETER_MALFORMED, { name: field.name });
 
-							failure.addItem(FailureType.REQUEST_PARAMETER_MALFORMED, { name: field.name });
-						}
-					});
+							return accumulator;
+						}, failure);
+					} else {
+						failure = null;
+					}
 
-					if (failure) {
+					if (failure !== null) {
 						return Promise.reject(failure.format());
 					} else {
 						return Promise.resolve(null);
@@ -1089,7 +1109,7 @@ module.exports = function () {
 	return FailureReason;
 }();
 
-},{"./../../collections/Tree":28,"./../../lang/assert":40,"./../../lang/attributes":41,"./../../lang/is":43,"./../../serialization/json/Schema":49,"./FailureReasonItem":9,"./FailureType":10}],9:[function(require,module,exports){
+},{"./../../collections/Tree":28,"./../../lang/assert":40,"./../../lang/is":43,"./../../serialization/json/Schema":49,"./FailureReasonItem":9,"./FailureType":10}],9:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -8542,8 +8562,6 @@ module.exports = function () {
 		return x instanceof AdHoc;
 	}, getBuilder(buildAdHoc));
 
-	var dataTypes = [dataTypeString, dataTypeNumber, dataTypeBoolean, dataTypeObject, dataTypeArray, dataTypeDecimal, dataTypeDay, dataTypeTimestamp, dataTypeAdHoc];
-
 	function getBuilder(builder) {
 		return function (data) {
 			try {
@@ -8771,11 +8789,45 @@ module.exports = function () {
     *
     * @public
     * @param {*} candidate
+    * @returns {Boolean}
     */
 			value: function validate(candidate) {
-				var returnVal = is.object(candidate);
+				return !getCandidateIsInvalid(candidate) && this.getInvalidFields(candidate).length === 0;
+			}
 
-				return false;
+			/**
+    * Returns an array of {@link Field} objects from the schema for which the
+    * candidate object does not comply with.
+    *
+    * @public
+    * @param {*} candidate
+    * @returns {Field[]}
+    */
+
+		}, {
+			key: 'getInvalidFields',
+			value: function getInvalidFields(candidate) {
+				var _this = this;
+
+				if (getCandidateIsInvalid(candidate)) {
+					return this.fields.filter(function (f) {
+						return !f.optional;
+					});
+				}
+
+				return this.fields.reduce(function (problems, field) {
+					var check = !field.optional || attributes.has(candidate, field.name);
+
+					if (check) {
+						var valid = field.dataType.validator.call(_this, attributes.read(candidate, field.name));
+
+						if (!valid) {
+							problems.push(field);
+						}
+					}
+
+					return problems;
+				}, []);
 			}
 
 			/**
@@ -8835,10 +8887,10 @@ module.exports = function () {
 		}, {
 			key: 'getReviverFactory',
 			value: function getReviverFactory() {
-				var _this = this;
+				var _this2 = this;
 
 				return function () {
-					return _this.getReviver();
+					return _this2.getReviver();
 				};
 			}
 		}, {
@@ -8902,11 +8954,11 @@ module.exports = function () {
 		function SchemaError(key, name, message) {
 			_classCallCheck(this, SchemaError);
 
-			var _this2 = _possibleConstructorReturn(this, (SchemaError.__proto__ || Object.getPrototypeOf(SchemaError)).call(this, message));
+			var _this3 = _possibleConstructorReturn(this, (SchemaError.__proto__ || Object.getPrototypeOf(SchemaError)).call(this, message));
 
-			_this2.key = key;
-			_this2.name = name;
-			return _this2;
+			_this3.key = key;
+			_this3.name = name;
+			return _this3;
 		}
 
 		_createClass(SchemaError, [{
@@ -9042,6 +9094,10 @@ module.exports = function () {
 		if (attributes.has(data, field.name)) {
 			attributes.write(target, field.name, field.dataType.convert(attributes.read(data, field.name)));
 		}
+	}
+
+	function getCandidateIsInvalid(candidate) {
+		return is.undefined(candidate) || is.null(candidate) || !is.object(candidate);
 	}
 
 	return Schema;

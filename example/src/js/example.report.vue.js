@@ -5,17 +5,16 @@ module.exports = (() => {
 
 	const app = new Vue({
 		el: '.wrapper',
-		created() {
-			window.Barchart.Event.ReportGateway.forStaging()
-				.then((gateway) => {
-					this.reportGateway = gateway;
-				});
-		},
 		data: {
 			selectedCustomer: '',
 			selectedProduct: '',
 			startTime: '',
 			endTime: '',
+
+			username: '',
+			password: '',
+
+			showAuth: true,
 
 			message: '',
 
@@ -26,6 +25,18 @@ module.exports = (() => {
 			config: Config,
 		},
 		methods: {
+			connect() {
+				if (!this.username || !this.password) {
+					return;
+				}
+
+				return window.Barchart.Event.ReportGateway.forStaging({ username: this.username, password: this.password })
+					.then((gateway) => {
+						this.reportGateway = gateway;
+
+						this.showAuth = false;
+					});
+			},
 			start() {
 				if (!validateFields.call(this)) {
 					this.message = 'Fill required fields';

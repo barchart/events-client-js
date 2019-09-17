@@ -12,6 +12,26 @@ h5 {
     font-size: 14px;
 }
 
+.container-center-outer  {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+}
+
+.asterisk-required {
+    color: red;
+    margin-left: 4px;
+}
+
+.btn-connect {
+    background-color: #265a88;
+}
+
+.btn-connect:hover {
+    background-color: #254a77;
+}
+
 .header {
     background-color: #29506D;
     color: #FFFFFF;
