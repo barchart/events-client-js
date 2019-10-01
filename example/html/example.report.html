@@ -94,7 +94,8 @@
 
         <div class="stack report-stack">
           <div class="stack-item stack-report-item" v-for="(report, index) in reports">
-            <div v-on:click="get(report)">{{ index + 1 }}. {{ report }}</div>
+            <a v-bind:href="report.link" v-if="!!report.link">{{ index + 1 }}. {{ report.filter }} - {{ report.status.description }}</a>
+            <div v-on:click="get(report)" v-else>{{ index + 1 }}. {{ report.filter }} - {{ report.status.description }}</div>
           </div>
         </div>
       </div>

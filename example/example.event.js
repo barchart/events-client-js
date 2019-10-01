@@ -685,7 +685,7 @@ module.exports = function () {
 
 			_this._getReportEndpoint = EndpointBuilder.for('get-report', 'get report').withVerb(VerbType.GET).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(function (pb) {
 				pb.withLiteralParameter('reports', 'reports').withVariableParameter('source', 'source', 'source', false);
-			}).withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
+			}).withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForGetReport).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
 			return _this;
 		}
 
@@ -832,6 +832,14 @@ module.exports = function () {
 
 		return ReportGateway;
 	}(Disposable);
+
+	var responseInterceptorForGetReport = ResponseInterceptor.fromDelegate(function (response) {
+		try {
+			return JSON.parse(response.data);
+		} catch (e) {
+			console.log('Error deserializing report', e);
+		}
+	});
 
 	var responseInterceptorForReportDeserialization = ResponseInterceptor.fromDelegate(function (response) {
 		try {

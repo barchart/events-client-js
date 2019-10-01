@@ -84,12 +84,23 @@ module.exports = (() => {
 							}
 
 							this.message = response;
+
+							if (response.status === window.Barchart.EventJobStatus.COMPLETE) {
+								this.get(this.reports[index]);
+							}
 						})
 						.catch((err) => {
 							this.message = err;
 						});
 				} else if (report.status === window.Barchart.EventJobStatus.COMPLETE) {
-					this.reportGateway.getReport(report.source);
+					return this.reportGateway.getReport(report.source)
+						.then((response) => {
+							const index = this.reports.findIndex(r => r.source === report.source);
+
+							this.reports[index].link = response.link;
+
+							this.message = 'Ready to download';
+						});
 				}
 			},
 			clear() {
