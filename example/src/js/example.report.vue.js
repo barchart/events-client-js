@@ -99,7 +99,7 @@ module.exports = (() => {
 
 							this.reports[index].link = response.link;
 
-							this.message = 'Ready to download';
+							this.message = `Ready to download ${index + 1}`;
 						});
 				}
 			},
