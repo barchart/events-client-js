@@ -99,7 +99,7 @@ gulp.task('build-example-bundles', gulp.series(
 	'build-example-report-bundle'
 ));
 
-gulp.task('build-example-bundles', gulp.series('build-example-bundle'));
+gulp.task('build', gulp.series('build-example-bundles'));
 
 gulp.task('upload-example-to-S3', () => {
 	let publisher = awspublish.create({
