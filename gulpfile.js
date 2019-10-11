@@ -160,6 +160,10 @@ gulp.task('release', gulp.series(
 	'create-tag'
 ));
 
+gulp.task('watch', () => {
+	gulp.watch('./lib/**/*.js', gulp.series('build-example-bundles'));
+});
+
 gulp.task('lint', () => {
 	return gulp.src([ './**/*.js', './test/specs/**/*.js', '!./node_modules/**', '!./docs/**', '!./test/SpecRunner.js', '!./example/browser/example.event.js', '!./example/browser/example.report.js' ])
 		.pipe(jshint({'esversion': 6}))
