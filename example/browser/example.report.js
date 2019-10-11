@@ -114,7 +114,7 @@ module.exports = (() => {
           return this.reportGateway.getReport(report.source).then(response => {
             const index = this.reports.findIndex(r => r.source === report.source);
             this.reports[index].link = response.link;
-            this.message = `Ready to download ${index + 1}`;
+            this.message = `Report [ ${index + 1} ] is ready for download, click link (on left side of screen)`;
           });
         }
       },
@@ -409,7 +409,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.3.8'
+    version: '1.3.9'
   };
 })();
 
