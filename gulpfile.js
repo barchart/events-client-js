@@ -99,6 +99,31 @@ gulp.task('build-example-bundles', gulp.series(
 	'build-example-report-bundle'
 ));
 
+gulp.task('build-example-bundles', gulp.series('build-example-bundle'));
+
+gulp.task('upload-example-to-S3', () => {
+	let publisher = awspublish.create({
+		region: 'us-east-1',
+		params: {
+			Bucket: 'barchart-examples'
+		},
+		credentials: new AWS.SharedIniFileCredentials({profile: 'default'})
+	});
+
+	let headers = {'Cache-Control': 'no-cache'};
+	let options = {};
+
+	return gulp.src(['./example/browser/example.css', './example/browser/example.event.html', './example/browser/example.event.js', './example/browser/example.report.html', './example/browser/example.report.js'])
+		.pipe(rename((path) => {
+			path.dirname = 'events-client-js';
+		}))
+		.pipe(publisher.publish(headers, options))
+		.pipe(publisher.cache())
+		.pipe(awspublish.reporter());
+});
+
+gulp.task('deploy-example', gulp.series('upload-example-to-S3'));
+
 gulp.task('build-test-bundle', () => {
 	return browserify({ entries: glob.sync('test/specs/**/*.js') })
 		.bundle()
