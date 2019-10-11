@@ -103,7 +103,7 @@ module.exports = (() => {
 
 							this.reports[index].link = response.link;
 
-							this.message = `Ready to download ${index + 1}`;
+							this.message = `Report [ ${index + 1} ] is ready for download, click link (on left side of screen)`;
 						});
 				}
 			},
