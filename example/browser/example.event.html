@@ -18,7 +18,7 @@
   <div class="wrapper">
     <div class="header">
       <div class="float-left">
-        <h4 class="float-left">Barchart Event API</h4>
+	      <h4 class="float-left barchart-logo"><span>[Event Report API]</span></h4>
 
         <div class="float-left select-wrap">
           <div class="btn-group">
@@ -103,11 +103,14 @@
       </div>
     </div>
 
-    <div class="footer nav fixed-bottom">
-      <h5 class="float-left">
-        Client Version: <span>{{ config.version }}</span>
-      </h5>
-    </div>
+	  <div class="footer fixed-bottom">
+		  <h5 class="float-left">
+			  <a href="https://github.com/barchart/events-client-js" target="_blank">[events-client-js]</a>
+		  </h5>
+		  <h5 class="float-right">
+			  Client Version: <span>{{ config.version }}</span>
+		  </h5>
+	  </div>
   </div>
 
   <script src="./example.event.js"></script>
