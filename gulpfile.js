@@ -122,7 +122,7 @@ gulp.task('upload-example-to-S3', () => {
 		.pipe(awspublish.reporter());
 });
 
-gulp.task('deploy-example', gulp.series('upload-example-to-S3'));
+gulp.task('deploy-examples', gulp.series('upload-example-to-S3'));
 
 gulp.task('build-test-bundle', () => {
 	return browserify({ entries: glob.sync('test/specs/**/*.js') })
