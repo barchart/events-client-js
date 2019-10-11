@@ -1,20 +1,25 @@
 const Enum = require('@barchart/common-js/lang/Enum');
 
+const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+	ProductType = require('@barchart/events-api-common/lib/data/ProductType');
+
+const version = require('../../../lib/meta').version;
+
 module.exports = (() => {
 	'use strict';
 
 	return {
-		version: window.Barchart.ClientVersion,
+		version: version,
 		customers: [
-			window.Barchart.CustomerType.TGAM,
+			CustomerType.TGAM,
 		],
 		products: [
-			window.Barchart.ProductType.PORTFOLIO,
-			window.Barchart.ProductType.WATCHLIST,
+			ProductType.PORTFOLIO,
+			ProductType.WATCHLIST,
 		],
 		types: {
-			[window.Barchart.ProductType.PORTFOLIO.code]: Enum.getItems(window.Barchart.EventType).filter(eventType => eventType.product === window.Barchart.ProductType.PORTFOLIO),
-			[window.Barchart.ProductType.WATCHLIST.code]: Enum.getItems(window.Barchart.EventType).filter(eventType => eventType.product === window.Barchart.ProductType.WATCHLIST),
+			[ProductType.PORTFOLIO.code]: Enum.getItems(window.Barchart.EventType).filter(eventType => eventType.product === ProductType.PORTFOLIO),
+			[ProductType.WATCHLIST.code]: Enum.getItems(window.Barchart.EventType).filter(eventType => eventType.product === ProductType.WATCHLIST),
 		}
 	};
 })();

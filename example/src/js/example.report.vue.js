@@ -1,5 +1,9 @@
 const Config = require('./example.config');
 
+const ReportGateway = require('./../../../lib/gateway/ReportGateway');
+
+const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
+
 module.exports = (() => {
 	'use strict';
 
@@ -30,7 +34,7 @@ module.exports = (() => {
 					return;
 				}
 
-				return window.Barchart.Event.ReportGateway.forStaging({ username: this.username, password: this.password })
+				return ReportGateway.forStaging({ username: this.username, password: this.password })
 					.then((gateway) => {
 						this.reportGateway = gateway;
 
@@ -72,7 +76,7 @@ module.exports = (() => {
 					});
 			},
 			get(report) {
-				if (report.status === window.Barchart.EventJobStatus.RUNNING) {
+				if (report.status === EventJobStatus.RUNNING) {
 					this.message = 'Sending...';
 
 					return this.reportGateway.getReportAvailability(report.source)
@@ -85,14 +89,14 @@ module.exports = (() => {
 
 							this.message = response;
 
-							if (response.status === window.Barchart.EventJobStatus.COMPLETE) {
+							if (response.status === EventJobStatus.COMPLETE) {
 								this.get(this.reports[index]);
 							}
 						})
 						.catch((err) => {
 							this.message = err;
 						});
-				} else if (report.status === window.Barchart.EventJobStatus.COMPLETE) {
+				} else if (report.status === EventJobStatus.COMPLETE) {
 					return this.reportGateway.getReport(report.source)
 						.then((response) => {
 							const index = this.reports.findIndex(r => r.source === report.source);

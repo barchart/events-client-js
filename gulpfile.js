@@ -78,7 +78,7 @@ gulp.task('create-tag', (cb) => {
 });
 
 gulp.task('build-example-event-bundle', () => {
-	return browserify([ './example/src/js/example.shim.js', './example/src/js/example.event.vue.js' ])
+	return browserify([ './example/src/js/example.event.vue.js' ])
 		.bundle()
 		.pipe(source('example.event.js'))
 		.pipe(buffer())
@@ -86,7 +86,7 @@ gulp.task('build-example-event-bundle', () => {
 });
 
 gulp.task('build-example-report-bundle', () => {
-	return browserify([ './example/src/js/example.shim.js', './example/src/js/example.report.vue.js' ])
+	return browserify([ './example/src/js/example.report.vue.js' ])
 		.bundle()
 		.pipe(source('example.report.js'))
 		.pipe(buffer())

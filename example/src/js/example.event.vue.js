@@ -1,15 +1,20 @@
 const Config = require('./example.config');
 
+const Timestamp = require('@barchart/common-js/lang/Timestamp');
+
+const EventBatcher = require('./../../../lib/engine/EventBatcher'),
+	EventGateway = require('./../../../lib/gateway/EventGateway');
+	
 module.exports = (() => {
 	'use strict';
 
 	const app = new Vue({
 		el: '.wrapper',
 		created() {
-			window.Barchart.Event.EventGateway.forStaging()
+			EventGateway.forStaging()
 				.then((gateway) => {
 					this.eventGateway = gateway;
-					this.eventBatcher = new window.Barchart.Event.EventBatcher(gateway, callback.bind(this));
+					this.eventBatcher = new EventBatcher(gateway, callback.bind(this));
 				});
 		},
 		data: {
@@ -41,7 +46,7 @@ module.exports = (() => {
 					customer: this.selectedCustomer,
 					product: this.selectedProduct,
 					type: this.selectedType,
-					timestamp: window.Barchart.Timestamp.now().timestamp,
+					timestamp: Timestamp.now().timestamp,
 					context: this.inputContext.replace(' ', '').split(','),
 				};
 
