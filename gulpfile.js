@@ -22,6 +22,15 @@ function getVersionFromPackage() {
 	return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
 
+gulp.task('document', (cb) => {
+	exec('jsdoc . -c jsdoc.json -r -d docs', (error, stdout, stderr) => {
+		console.log(stdout);
+		console.log(stderr);
+
+		cb();
+	});
+});
+
 gulp.task('ensure-clean-working-directory', (cb) => {
 	gitStatus((err, status) => {
 		if (err, !status.clean) {
@@ -39,21 +48,13 @@ gulp.task('bump-version', () => {
 });
 
 gulp.task('embed-version', () => {
-	var version = getVersionFromPackage();
+	const version = getVersionFromPackage();
 
-	return gulp.src(['./lib/index.js'])
+	return gulp.src(['./lib/meta.js'])
 		.pipe(replace(/(version:\s*')([0-9]+\.[0-9]+\.[0-9]+)(')/g, '$1' + version + '$3'))
 		.pipe(gulp.dest('./lib/'));
 });
 
-gulp.task('document', (cb) => {
-	exec('jsdoc . -c jsdoc.json -r -d docs', (error, stdout, stderr) => {
-		console.log(stdout);
-		console.log(stderr);
-
-		cb();
-	});
-});
 
 gulp.task('commit-changes', () => {
 	return gulp.src([ './', './test/', './package.json', './lib/index.js', './example/example.js', './test/SpecRunner.js' ])
@@ -78,19 +79,19 @@ gulp.task('create-tag', (cb) => {
 });
 
 gulp.task('build-example-event-bundle', () => {
-	return browserify([ './example/src/js/example.event.vue.js' ])
+	return browserify([ './example/browser/js/startup.event.vue.js' ])
 		.bundle()
 		.pipe(source('example.event.js'))
 		.pipe(buffer())
-		.pipe(gulp.dest('./example'));
+		.pipe(gulp.dest('./example/browser'));
 });
 
 gulp.task('build-example-report-bundle', () => {
-	return browserify([ './example/src/js/example.report.vue.js' ])
+	return browserify([ './example/browser/js/startup.report.vue.js' ])
 		.bundle()
 		.pipe(source('example.report.js'))
 		.pipe(buffer())
-		.pipe(gulp.dest('./example'));
+		.pipe(gulp.dest('./example/browser'));
 });
 
 gulp.task('build-example-bundles', gulp.series(
@@ -135,7 +136,7 @@ gulp.task('release', gulp.series(
 ));
 
 gulp.task('lint', () => {
-	return gulp.src([ './**/*.js', './test/specs/**/*.js', '!./node_modules/**', '!./docs/**', '!./test/SpecRunner.js', '!./example/example.event.js', '!./example/example.report.js' ])
+	return gulp.src([ './**/*.js', './test/specs/**/*.js', '!./node_modules/**', '!./docs/**', '!./test/SpecRunner.js', '!./example/browser/example.event.js', '!./example/browser/example.report.js' ])
 		.pipe(jshint({'esversion': 6}))
 		.pipe(jshint.reporter('default'));
 });
