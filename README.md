@@ -10,7 +10,7 @@ This JavaScript client simplifies interaction with the Barchart Events System, b
 
 - EventGateway.sendEvents (sends a new event(s) to the backend),
 - ReportGateway.startReport (triggers generation of a new report),
-- ReportGateway.getReportAvailability (check progress of report generation), and
+- ReportGateway.getReportAvailability (checks progress of report generation), and
 - ReportGateway.getReport (gets the download link for a completed report)
 
 Also, two utilities exist:
@@ -45,7 +45,7 @@ Or, visit the hosted page at:
 
 ## Development
 
-### Check linting
+### Check for Lint
 
     > gulp lint
 
