@@ -20,7 +20,14 @@ Also, two utilities exist:
 
 _Use of this client is optional, you may interact with the backend directly via HTTP requests_
 
+
 ## Documentation
+
+### Usage Guide
+
+The following usage guide details report generation using this library or direct HTTP request (with cURL examples).
+
+### Code
 
 The code is documented with [JSDoc](http://usejsdoc.org/). While the output hasn't been committed to source control, you can generate the documentation by using the following commands:
 
