@@ -3,8 +3,8 @@
 
 The Barchart Events System accepts HTTP requests, offering the following functionality:
 
-- Accepts and saves events (e.g. Job Started, Pizza Ordered, Lightning Struck, etc).
-- Accepts requests to generate log files containing events, given a customer, product type, and optional start and end dates.
+- Accepts and _saves events_ (e.g. Job Started, Pizza Ordered, Lightning Struck, etc).
+- Accepts _requests to generate log files_ containing events, given a customer, product type, and optional start and end dates.
 
 This library simplifies interaction with the Barchart Events System, by exposing JavaScript classes with simple functions like:
 
