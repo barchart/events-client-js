@@ -1,6 +1,25 @@
 # @barchart/events-client-js
 ## JavaScript library for interfacing with Barchart's Events API
 
+The Barchart Events System accepts HTTP requests, offering the following functionality:
+
+- Accepts and saves events (e.g. Job Started, Pizza Ordered, Lightning Struck, etc).
+- Accepts requests to generate log files containing events, given a customer, product type, and optional start and end dates.
+
+This JavaScript client simplifies interaction with the Barchart Events System, by exposing JavaScript classes with simple functions like:
+
+- EventGateway.sendEvents (sends a new event(s) to the backend),
+- ReportGateway.startReport (triggers generation of a new report),
+- ReportGateway.getReportAvailability (check progress of report generation), and
+- ReportGateway.getReport (gets the download link for a completed report)
+
+Also, two utilities exist:
+
+- EventBatcher (Wraps an EventGateway, temporarily caching new events before sending them to the backend), and
+- EventFactory (Simplifies creation of event objects)
+
+_Use of this client is optional, you may interact with the backend directly via HTTP requests_
+
 ## Documentation
 
 The code is documented with [JSDoc](http://usejsdoc.org/). While the output hasn't been committed to source control, you can generate the documentation by using the following commands:
