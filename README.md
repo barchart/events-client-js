@@ -23,11 +23,7 @@ _Use of this client is optional, you may interact with the backend directly via 
 
 ## Documentation
 
-### Usage Guide
-
-The following usage guide details report generation using this library or direct HTTP request (with cURL examples).
-
-### Code
+## Code
 
 The code is documented with [JSDoc](http://usejsdoc.org/). While the output hasn't been committed to source control, you can generate the documentation by using the following commands:
 
@@ -35,6 +31,10 @@ The code is documented with [JSDoc](http://usejsdoc.org/). While the output hasn
     > gulp document
 
 ## Examples
+
+### Usage Guide
+
+The following usage guide details report generation using this library or direct HTTP request (with cURL examples).
 
 ### Browser
 
