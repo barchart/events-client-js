@@ -22,11 +22,13 @@ module.exports = (() => {
 })();
 
 },{"../../../lib/meta":5,"@barchart/common-js/lang/Enum":34,"@barchart/events-api-common/lib/data/CustomerType":49,"@barchart/events-api-common/lib/data/EventType":51,"@barchart/events-api-common/lib/data/ProductType":52}],2:[function(require,module,exports){
-const Config = require('./example.config');
+const FailureType = require('@barchart/common-js/api/failures/FailureType');
+
+const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
 
 const ReportGateway = require('./../../../lib/gateway/ReportGateway');
 
-const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
+const Config = require('./example.config');
 
 module.exports = (() => {
   'use strict';
@@ -41,6 +43,7 @@ module.exports = (() => {
       username: '',
       password: '',
       showAuth: true,
+      connecting: false,
       message: '',
       reports: [],
       reportGateway: null,
@@ -48,17 +51,42 @@ module.exports = (() => {
     },
     methods: {
       connect() {
-        if (!this.username || !this.password) {
+        if (this.connecting) {
           return;
         }
 
+        if (!this.username || !this.password) {
+          alert('Fill all required fields');
+          return;
+        }
+
+        this.connecting = true;
         return ReportGateway.forStaging({
           username: this.username,
           password: this.password
         }).then(gateway => {
-          this.reportGateway = gateway;
-          this.showAuth = false;
+          return gateway.getReportAvailability('Validate credentials').then(ignored => true).catch(errors => {
+            const valid = !errors.some(error => FailureType.fromCode(FailureType, error.value.code) === FailureType.REQUEST_AUTHORIZATION_FAILURE);
+            return valid;
+          }).then(valid => {
+            this.connecting = false;
+
+            if (valid) {
+              this.reportGateway = gateway;
+              this.showAuth = false;
+            } else {
+              alert('Invalid credentials');
+            }
+          });
         });
+      },
+
+      disconnect() {
+        this.clear();
+        this.username = '';
+        this.password = '';
+        this.reportGateway = null;
+        this.showAuth = true;
       },
 
       start() {
@@ -144,7 +172,7 @@ module.exports = (() => {
   }
 })();
 
-},{"./../../../lib/gateway/ReportGateway":4,"./example.config":1,"@barchart/events-api-common/lib/data/EventJobStatus":50}],3:[function(require,module,exports){
+},{"./../../../lib/gateway/ReportGateway":4,"./example.config":1,"@barchart/common-js/api/failures/FailureType":8,"@barchart/events-api-common/lib/data/EventJobStatus":50}],3:[function(require,module,exports){
 module.exports = (() => {
   'use strict';
   /**

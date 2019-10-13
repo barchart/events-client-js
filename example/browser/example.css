@@ -1,7 +1,5 @@
 body {
     font-family: "Gill Sans MT";
-
-    overflow-x: hidden;
 }
 
 h4 {
@@ -16,7 +14,8 @@ h5 {
     align-items: center;
     display: flex;
     justify-content: center;
-    height: 100vh;
+    height: calc(100vh - (50px + 40px)); /* ScreenH - (headerH + footerH) */
+    min-height: 300px;
 }
 
 .asterisk-required {
@@ -30,6 +29,22 @@ h5 {
 
 .btn-connect:hover {
     background-color: #254a77;
+}
+
+.buttons {
+    position: relative;
+}
+
+.loader {
+    position: absolute;
+    height: 30px;
+    width: auto;
+    top: 6px;
+    right: -40px;
+}
+
+.wrapper {
+    min-width: 1600px;
 }
 
 .header {
@@ -74,6 +89,7 @@ h5 {
 }
 
 .main {
+    display: flex;
     padding: 20px 20px 40px 20px;
 }
 

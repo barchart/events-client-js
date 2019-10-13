@@ -46,7 +46,6 @@
 					<div class="btn-group">
 						<input class="form-control" type="text" v-model="endTime" placeholder="EndTime - optional">
 					</div>
-
 				</div>
 
 
@@ -64,11 +63,21 @@
 					</div>
 				</div>
 			</div>
+
+			<div v-if="!showAuth" class="float-right">
+				<div class="btn-wrap">
+					<div class="btn-group">
+						<button v-on:click="disconnect" class="btn btn-outline-light">
+							Logout
+						</button>
+					</div>
+				</div>
+			</div>
 		</div>
 
 		<div v-if="showAuth" class="container-center-outer">
 			<div class="container-center-inner">
-				<div class="form-horizontal login">
+				<form v-on:submit.prevent="connect" class="form-horizontal login">
 					<div class="form-group">
 						<label for="username">Username<span class="asterisk-required">*</span></label>
 						<input id="username" class="form-control" type="text" v-model="username">
@@ -78,15 +87,14 @@
 						<input id="password" class="form-control" type="password" v-model="password">
 					</div>
 					<div class="form-group buttons">
-						<button v-on:click="connect" class="form-control btn btn-primary btn-connect">
-							Connect
-						</button>
+						<input type="submit" value="Connect" class="form-control btn btn-primary btn-connect" />
+						<img class="loader" v-show="connecting" src="https://d1l7hzv7igdihb.cloudfront.net/img/throbber.gif" alt="Please wait..." />
 					</div>
-				</div>
+				</form>
 			</div>
 		</div>
 
-		<div v-if="!showAuth" class="main row">
+		<div v-if="!showAuth" class="main">
 			<div class="event-wrap col-md-6">
 				<h4>Reports</h4>
 
