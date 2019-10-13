@@ -11,11 +11,20 @@ h5 {
 }
 
 .container-center-outer  {
-    align-items: center;
-    display: flex;
-    justify-content: center;
-    height: calc(100vh - (50px + 40px)); /* ScreenH - (headerH + footerH) */
-    min-height: 300px;
+	height: 100%;
+	width: 100%;
+
+	display: table;
+}
+.container-center-inner {
+	display: table-cell;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.login {
+	margin: auto;
+	width: 300px;
 }
 
 .asterisk-required {
@@ -89,13 +98,20 @@ h5 {
 }
 
 .main {
-    display: flex;
-    padding: 20px 20px 40px 20px;
+	position: absolute;
+	height: auto;
+	top: 50px;
+	bottom: 40px;
+	left: 0px;
+	right: 0px;
+	overflow: auto;
+	padding-top: 20px;
+	padding-left: 20px;
+	padding-right: 20px;
 }
 
 .main .stack {
     border-right: #aaaaaa 1px solid;
-    height: 500px;
     overflow-y: auto;
     padding-right: 20px;
 }
@@ -115,8 +131,15 @@ h5 {
 }
 
 .main .response {
-    height: 500px;
     overflow-y: auto;
+}
+
+.main .events-column {
+	float: right;
+}
+
+.main .response-column {
+	float: right;
 }
 
 .footer {

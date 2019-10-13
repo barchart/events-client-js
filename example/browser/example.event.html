@@ -83,21 +83,21 @@
 	</div>
 
 	<div class="main">
-		<div class="event-wrap col-md-6">
-			<h4>Event Stack</h4>
-
-			<div class="stack event-stack">
-				<div class="event-item" v-for="(event, index) in events">
-					{{ index + 1 }}. {{ event }}
-				</div>
-			</div>
-		</div>
-		<div class="response-wrap col-md-6">
-			<h4>Message</h4>
+		<div class="response-column col-md-6">
+			<h4>Server Response</h4>
 
 			<div class="response">
 				<div>
 					{{ message }}
+				</div>
+			</div>
+		</div>
+		<div class="pending-column col-md-6">
+			<h4>Pending Messages</h4>
+
+			<div class="stack event-stack">
+				<div class="event-item" v-for="(event, index) in events">
+					{{ index + 1 }}. {{ event }}
 				</div>
 			</div>
 		</div>
