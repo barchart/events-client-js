@@ -8,7 +8,7 @@ The Barchart Event Tracking System collects usage statistics from various softwa
 The HTTP-based API exposes three simple operations:
 
 * [Start a new data export](#start-new-export),
-* Check the status of a data export, and finally
+* [Check the status of a data export](), and finally
 * Download an export file, once completed.
 
 ### Semantics
@@ -33,8 +33,6 @@ __Overview__
 
 Notifies the system to begin the generation of a new export file. This processing happens asynchronously. In other words, once you make the request, you will be provided with a unique identifier for the export job and it will begin processing in the background. You will need to check back periodically to see if the job has completed.
 
-The export job will complete within 15 minutes. If too many records exist within the timeframe you've provided (_start_ to _end_), the job will fail and you will need to narrow your timeframe.
-
 The following parameters are required:
 
 * customer (required) - string - The name of the customer for which data is being exported. Barchart can provide you with the correct value.
@@ -42,13 +40,15 @@ The following parameters are required:
 * start (optional) - integer - The date and time of the first event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 * end (optional) - integer - The data and time of the last event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 
+The export job will complete within 15 minutes. If too many records exist within the timeframe you've provided (between the _start_ to _end_ parameters), the job will fail and you will need to narrow your timeframe.
+
 __Endpoint__
 
 https://events.aws.barchart.com/reports
 
 __Verb__
 
-Use an HTTP POST with this endpoint. The request body should be a "stringified" JSON document. Here is an example document.
+Use an HTTP POST with this endpoint. The request body should be a "stringified" JSON document. Here is an example document:
 
 	{
 		customer: 'BARCHART',
@@ -57,9 +57,25 @@ Use an HTTP POST with this endpoint. The request body should be a "stringified" 
 		end: 1571115600000
 	}
 
+__Response__
+
+A JSON document will be returned, which contains the following important properties:
+
+* job - string - The unique identifier of the new job.
+* status - string - One of the following { RUNNING, COMPLETED, TIMEOUT, FAILED }
+
+Here is an example:
+
+
+
 __cURL example__
 
 	> curl --request POST https://events.aws.barchart.com/reports -H "Authorization: 'Basic {your-base-64-encoded-credentials}'" -d '{"filter": {"customer": "BARCHART", "product": "WATCHLIST", "start": 1570011173902}}
+
+
+
+
+
 
 ## JavaScript SDK
 

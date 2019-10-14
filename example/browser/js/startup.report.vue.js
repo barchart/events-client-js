@@ -47,14 +47,12 @@ module.exports = (() => {
 
 				return ReportGateway.forStaging({ username: this.username, password: this.password })
 					.then((gateway) => {
-						return gateway.getReportAvailability('Validate credentials')
-							.then(ignored => true)
+						return gateway.getVersion()
 							.catch((errors) => {
 								const valid = !errors.some(error => FailureType.fromCode(FailureType, error.value.code) === FailureType.REQUEST_AUTHORIZATION_FAILURE);
 
 								return valid;
-							})
-							.then((valid) => {
+							}).then((valid) => {
 								this.connecting = false;
 
 								if (valid) {
