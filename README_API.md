@@ -5,7 +5,7 @@ The Barchart Event Tracking System collects usage statistics from various softwa
 
 ## Export File Schema
 
-Export files are pipe-delimited, plain text files which have a "csv" file extension. Inside the file, every row represents a discrete event. Different export files will have different columns, depending on the __product__ type the export is for.
+Export files are pipe-delimited, plain text files which have "csv" file extensions. Inside the file, every row represents a discrete event. Export files for different __product__ types have slightly different definitions.
 
 __Common columns__
 
@@ -45,17 +45,21 @@ The HTTP-based API exposes three simple operations:
 
 ### Semantics
 
-The API accepts JSON formatted data in the body of HTTP requests. The API returns JSON data in HTTP responses.
+The API accepts JSON formatted data in the body of HTTP requests and returns JSON data in HTTP responses.
 
 ### Security
 
-The API will only communicate using the HTTPS protocol and it uses [basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) to validate your identity. Contact Barchart for your username and password. In other words, you should include an HTTP request header, as follows:
+The API will only communicate over the HTTPS protocol.
+
+It uses [basic authentication](https://en.wikipedia.org/wiki/Basic_access_authentication) to validate your identity. Contact Barchart for your username and password.
+
+Your HTTP request header should include the following:
 
 	Authorization: Basic {base64-endocde({username:password})}
 
 ### Public Host
 
-The production host can be found here:
+The production environment can be accessed at:
 
 * events.aws.barchart.com
 
@@ -65,16 +69,16 @@ The production host can be found here:
 
 __Overview__
 
-Notifies the system to begin the generation of a new export file. This processing happens asynchronously. In other words, once you make the request, you will be provided with a unique identifier for the export job and it will begin processing in the background. You will need to check back periodically to see if the job has completed.
+Notifies the system to begin generation of a new export file. This processing happens asynchronously. In other words, once you make the request, report processing will begin and receive an immediate response with the identifier for the job that's in progress. You will need to check back periodically to determine if the job has completed.
 
 The following parameters are required:
 
-* customer (required) - string - The name of the customer for which data is being exported. Barchart can provide you with the correct value.
-* product (required) - string - The name of the product for which data is being exported. Barchart can provide you with a list of products which reports can be generated for.
+* customer (required) - string - The name of the customer for which data is being exported. Barchart can provide your customer name.
+* product (required) - string - The name of the product for which data is being exported. Barchart can provide you with a list of products.
 * start (optional) - integer - The date and time of the first event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 * end (optional) - integer - The data and time of the last event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 
-The export job will complete within 15 minutes. If too many records exist and the report cannot be compiled within 15 minutes, it will time out. If that happens, narrow your timeframe and retry.
+The export job will complete within 15 minutes. If too many records exist and the report cannot be compiled within 15 minutes, report generation will time out. If that happens, narrow your timeframe and retry.
 
 __Endpoint__
 
@@ -82,7 +86,11 @@ https://events.aws.barchart.com/reports
 
 __Verb__
 
-Use an HTTP POST with this endpoint. The request body should be a "stringified" JSON document. Here is an example document:
+POST
+
+__Body__
+
+The request body should be a "stringified" JSON document. Here is an example document:
 
 	{
 		customer: 'BARCHART',
@@ -93,7 +101,7 @@ Use an HTTP POST with this endpoint. The request body should be a "stringified" 
 
 __Response__
 
-A JSON document will be returned, which contains the following important properties:
+A JSON document will be returned which contains the following important properties:
 
 * source - string - The unique identifier of export job.
 * status - string - One of the following: { RUNNING, COMPLETED, TIMEOUT, FAILED }.
