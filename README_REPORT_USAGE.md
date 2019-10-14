@@ -63,9 +63,7 @@ JSON formatted data, here is an example:
 
 _cURL example_
 
-`
-curl --request POST https://events.aws.barchart.com/reports -H "Authorization: 'Basic {your-base-64-encoded-credentials}'" -d '{"filter": {"customer": "BARCHART", "product": "WATCHLIST", "start": 1570011173902}}
-`
+	> curl --request POST https://events.aws.barchart.com/reports -H "Authorization: 'Basic {your-base-64-encoded-credentials}'" -d '{"filter": {"customer": "BARCHART", "product": "WATCHLIST", "start": 1570011173902}}
 
 ## JavaScript SDK
 
