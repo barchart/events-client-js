@@ -131,7 +131,7 @@ __cURL example__
 
 __Overview__
 
-Once you have [started an export](#start-new-export), you will need to check it's status before attempting to download.
+Once you have [started an export](#start-new-export), you will need to check its status (before attempting a download).
 
 The following parameters are required:
 
@@ -139,7 +139,7 @@ The following parameters are required:
 
 __Endpoint__
 
-https://events.aws.barchart.com/{source}/availability
+https://events.aws.barchart.com/reports/{source}/availability
 
 __Verb__
 
@@ -177,7 +177,7 @@ __cURL example__
 
 __Overview__
 
-As soon as the export is complete, this endpoint can be used to download the report (or get a link to the report for downloading at a later time).
+As soon as the export is complete, you can download the report (or get a link to the report for downloading the report later).
 
 The following parameters are required:
 
@@ -185,7 +185,7 @@ The following parameters are required:
 
 __Endpoint__
 
-https://events.aws.barchart.com/{source}
+https://events.aws.barchart.com/reports/{source}
 
 __Verb__
 
@@ -199,13 +199,13 @@ If a "content-type" header is included in your request, you will receive a JSON 
 
 Here is an example:
 
-{
-	"link":"https://barchart-event-job.s3.amazonaws.com/..."
-}
+	{
+		link: "https://barchart-event-job.s3.amazonaws.com/..."
+	}
 
 __cURL example__
 
-	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8/availability -H "Authorization: 'Basic {base-64-encoded-credentials-separated-by-a-colon}'"
+	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8 -H "Authorization: 'Basic {base-64-encoded-credentials-separated-by-a-colon}'"
 
 Alternately, if you omit the "content-type" header, you will receive an HTTP 302 response, redirecting you to the download link.
 
