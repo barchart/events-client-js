@@ -1,5 +1,5 @@
 # @barchart/events-client-js
-## A basic usage guide for generating reports
+## A usage guide for generating reports (using the API directly)
 
 The Barchart Event Tracking System collects usage statistics from various software systems. This document will describe how to export data from the system, presumably for analysis by external tools (e.g. Tableua, Grafana, etc).
 
@@ -26,7 +26,16 @@ WATCHLIST:
 
 PORTFOLIO:
 
-## Raw API
+* [3] userId - The identifier of the user who triggered the event.
+* [4] portfolioId - The identifier of the portfolio which was affected by the event.
+* [5] positionId - The identifier of the position which was affected by the event.
+* [6] frame - The time "frame" of the position which was affected by the event.
+* [7] viewName - The name of the portfolio view which the event pertains to.
+* [8] showClosedPositions - Indicates the state of "show closed positions" checkbox related to the event.
+* [9] dividendStrategy - Indicates "dividend strategy" associated with the event.
+* [10] cashAdjustmentStrategy - Indicates "cash adjustment" strategy associated with the event.
+
+## API
 
 The HTTP-based API exposes three simple operations:
 
@@ -192,8 +201,8 @@ __cURL example__
 
 Alternately, if you omit the "content-type" header, you will receive an HTTP 302 response, redirecting you to the download link.
 
-
-
 ## JavaScript SDK
+
+If you would prefer, you can access these functions using the SDK. The readme file can be found [here](https://github.com/barchart/events-client-js/blob/master/README.md).
 
 
