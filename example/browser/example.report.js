@@ -65,7 +65,7 @@ module.exports = (() => {
           username: this.username,
           password: this.password
         }).then(gateway => {
-          return gateway.getReportAvailability('Validate credentials').then(ignored => true).catch(errors => {
+          return gateway.getVersion().catch(errors => {
             const valid = !errors.some(error => FailureType.fromCode(FailureType, error.value.code) === FailureType.REQUEST_AUTHORIZATION_FAILURE);
             return valid;
           }).then(valid => {
@@ -277,6 +277,9 @@ module.exports = (() => {
       this._getReportEndpoint = EndpointBuilder.for('get-report', 'get report').withVerb(VerbType.GET).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(pb => {
         pb.withLiteralParameter('reports', 'reports').withVariableParameter('source', 'source', 'source', false);
       }).withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForGetReport).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
+      this._getVersionEndpoint = EndpointBuilder.for('get-api-version', 'get API version').withVerb(VerbType.GET).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(pb => {
+        pb.withLiteralParameter('system', 'system').withLiteralParameter('version', 'version');
+      }).withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForGetReport).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
     }
     /**
      * Initializes the connection to the remote server and returns a promise
@@ -354,6 +357,20 @@ module.exports = (() => {
         const payload = {};
         payload.source = source;
         return Gateway.invoke(this._getReportEndpoint, payload);
+      });
+    }
+    /**
+     * Returns the server version.
+     *
+     * @public
+     * @return {Promise<String>}
+     */
+
+
+    getVersion() {
+      return Promise.resolve().then(() => {
+        checkStart.call(this);
+        return Gateway.invoke(this._getVersionEndpoint, {});
       });
     }
     /**
@@ -437,7 +454,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.3.11'
+    version: '1.3.12'
   };
 })();
 
@@ -7338,6 +7355,17 @@ module.exports = (() => {
 		}
 
 		/**
+		 * The job timed out.
+		 *
+		 * @public
+		 * @static
+		 * @returns {EventsJobStatus}
+		 */
+		static get TIMEOUT() {
+			return timeout;
+		}
+
+		/**
 		 * The job failed.
 		 *
 		 * @public
@@ -7355,6 +7383,7 @@ module.exports = (() => {
 
 	const running = new EventJobStatus('RUNNING', 'Running', true, false);
 	const complete = new EventJobStatus('COMPLETE', 'Complete', false, true);
+	const timeout = new EventJobStatus('TIMEOUT', 'Timeout', false, true);
 	const failed = new EventJobStatus('FAILED', 'Failed', false, true);
 
 	return EventJobStatus;
