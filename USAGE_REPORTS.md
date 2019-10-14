@@ -26,7 +26,7 @@ WATCHLIST:
 
 PORTFOLIO:
 
-## API
+## Raw API
 
 The HTTP-based API exposes three simple operations:
 
