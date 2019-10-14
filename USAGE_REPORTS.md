@@ -65,7 +65,7 @@ The following parameters are required:
 * start (optional) - integer - The date and time of the first event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 * end (optional) - integer - The data and time of the last event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 
-The export job will complete within 15 minutes. If too many records exist within the timeframe you've provided (between the _start_ to _end_ parameters), the job will fail and you will need to narrow your timeframe.
+The export job will complete within 15 minutes. If too many records exist and the report cannot be compiled within 15 minutes, it will time out. If that happens, narrow your timeframe and retry.
 
 __Endpoint__
 
