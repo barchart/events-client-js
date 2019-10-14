@@ -131,7 +131,7 @@ __cURL example__
 
 __Overview__
 
-Once you have [started an export]((#start-new-export), you will need to check it's status before attempting to download.
+Once you have [started an export](#start-new-export), you will need to check it's status before attempting to download.
 
 The following parameters are required:
 
