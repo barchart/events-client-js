@@ -6,7 +6,7 @@ The Barchart Event Tracking System collects usage statistics from various softwa
 - Accepts and _saves events_ (e.g. Job Started, Pizza Ordered, Lightning Struck, etc).
 - Accepts _requests to generate log files_ containing events, given a customer, product type, and optional start and end dates.
 
-This library simplifies interaction with the Barchart Events System, by exposing JavaScript classes with simple functions like:
+This SDK simplifies interaction with the Barchart Event Tracking System, by exposing JavaScript classes with simple functions:
 
 - EventGateway.sendEvents (sends a new event(s) to the backend),
 - ReportGateway.startReport (triggers generation of a new report),
@@ -30,7 +30,7 @@ You can interact with the Barchart Event Tracking System without using this SDK.
 
 ### Browser Test Client
 
-Two example pages exist. One allows you to send manually generate new events.events to server. The other allows you to trigger report generation, check report status, and download reports. Please note, these clients are attached to the _staging_ environment (not the production environment).
+Two example pages exist. One allows you to send manually generated events the backend. The other allows you to trigger report generation, check report status, and download reports. Please note, these clients are attached to the _staging_ environment (not the production environment).
 
 Load the examples from your local file system, here:
 
