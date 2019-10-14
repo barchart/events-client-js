@@ -40,17 +40,15 @@ The following parameters are required:
 * start (optional) - integer - The date and time of the first event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 * end (optional) - integer - The data and time of the last event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 
-_Endpoint_
+Endpoint:
 
 https://events.aws.barchart.com/reports
 
-_Verb_
+Verb:
 
-POST
+POST:
 
-_Body_
-
-JSON formatted data, here is an example:
+The request body should be a "stringified" JSON document. Here is an example document.
 
 	{
 		customer: 'BARCHART',
