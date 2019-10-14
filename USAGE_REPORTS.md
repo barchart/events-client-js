@@ -9,8 +9,8 @@ Export files are pipe-delimited, plain text files which have a "csv" file extens
 
 __Common columns__
 
-* [1] timestamp - number - The millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time) at which the event occurs.
-* [2] type - type - A description of the event type. Different products track differetn events.
+* [1] timestamp - The millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time) at which the event occurs.
+* [2] type - A description of the event type. Different products track differetn events.
 
 __Additional columns (by product)__
 
