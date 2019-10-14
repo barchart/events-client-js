@@ -52,14 +52,12 @@ _Body_
 
 JSON formatted data, here is an example:
 
-`
-{
-	customer: 'BARCHART',
-	product: 'PORTFOLIO',
-	start: 1571029200000,
-	end: 1571115600000
-}
-`
+	{
+		customer: 'BARCHART',
+		product: 'PORTFOLIO',
+		start: 1571029200000,
+		end: 1571115600000
+	}
 
 _cURL example_
 
