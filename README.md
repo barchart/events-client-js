@@ -1,5 +1,5 @@
 # @barchart/events-client-js
-## JavaScript library for interfacing with Barchart's Events API
+## JavaScript SDK for interfacing with Barchart's Event Tracking System
 
 The Barchart Events System accepts HTTP requests, offering the following functionality:
 
