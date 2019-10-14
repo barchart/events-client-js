@@ -10,7 +10,7 @@ Export files are pipe-delimited, plain text files which have a "csv" file extens
 __Common columns__
 
 * [1] timestamp - The millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time) at which the event occurs.
-* [2] type - A description of the event type. Different products track different events (e.g. WATCHLIST-CREATED or PORTFOLIO-DELETED).
+* [2] type - A description of the event type (e.g. WATCHLIST-CREATED or PORTFOLIO-DELETED).
 
 __Additional columns (by product)__
 
