@@ -24,13 +24,13 @@ Also, two utilities exist:
 
 A step-by-step guide for using the SDK can be found here:
 
-	> https://github.com/barchart/events-client-js/blob/master/README_SDK.md
+[README_SDK.md](https://github.com/barchart/events-client-js/blob/master/README_SDK.md)
 
 ### Direct API Access
 
 You can interact with the Barchart Event Tracking System without using this SDK. The documentation for the API can be found here:
 
-	> https://github.com/barchart/events-client-js/blob/master/README_API.md
+[README_API.md](https://github.com/barchart/events-client-js/blob/master/README_API.md)
 
 ### Browser Test Client
 
