@@ -113,7 +113,7 @@ gulp.task('upload-example-to-S3', () => {
 	let headers = {'Cache-Control': 'no-cache'};
 	let options = {};
 
-	return gulp.src(['./example/browser/example.css', './example/browser/example.event.html', './example/browser/example.event.js', './example/browser/example.report.html', './example/browser/example.report.js'])
+	return gulp.src(['./example/browser/example.event.html', './example/browser/example.event.js', './example/browser/example.event.css', './example/browser/example.report.html', './example/browser/example.report.js', './example/browser/example.report.css',])
 		.pipe(rename((path) => {
 			path.dirname = 'events-client-js';
 		}))
