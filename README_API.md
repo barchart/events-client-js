@@ -193,7 +193,7 @@ GET
 
 __Response__
 
-If a "content-type" header is included in your request, you will receive a JSON document, which contains the following important properties:
+If an "Accept" header for "application/json" is included in your request, you will receive a JSON document, which contains the following important properties:
 
 * link - string - A secure URL that can be used to download the export file. This link expires after a few minutes, so use it quickly.
 
@@ -205,9 +205,9 @@ Here is an example:
 
 __cURL example__
 
-	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8 -H "Authorization: 'Basic {base-64-encoded-credentials-separated-by-a-colon}'"
+	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8 -H "Authorization: 'Basic {base-64-encoded-credentials-separated-by-a-colon}'" -H "Accept: application/json"
 
-Alternately, if you omit the "content-type" header, you will receive an HTTP 302 response, redirecting you to the download link.
+Alternately, if you omit the "Accept" header, you will receive an HTTP 302 response, redirecting you to the download link.
 
 ## JavaScript SDK
 
