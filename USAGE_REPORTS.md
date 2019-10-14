@@ -7,7 +7,7 @@ The Barchart Event Tracking System collects usage statistics from various softwa
 
 The HTTP-based API exposes three simple operations:
 
-* [Start a new data export](#Start New Export),
+* [Start a new data export](#start-new-export),
 * Check the status of a data export, and finally
 * Download an export file, once completed.
 
