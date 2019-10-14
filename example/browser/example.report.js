@@ -168,7 +168,7 @@ module.exports = (() => {
   }
 
   function validateFields() {
-    return !!this.selectedCustomer;
+    return !!this.selectedCustomer && !!this.selectedProduct;
   }
 })();
 
