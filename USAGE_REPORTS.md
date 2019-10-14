@@ -87,7 +87,7 @@ __Response__
 A JSON document will be returned, which contains the following important properties:
 
 * source - string - The unique identifier of export job.
-* status - string - One of the following { RUNNING, COMPLETED, TIMEOUT, FAILED }
+* status - string - One of the following: { RUNNING, COMPLETED, TIMEOUT, FAILED }.
 
 Here is an example:
 
