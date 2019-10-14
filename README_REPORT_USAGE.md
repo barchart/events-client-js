@@ -29,6 +29,8 @@ The production host can be found here:
 
 #### Start New Export
 
+__Overview__
+
 Notifies the system to begin the generation of a new export file. This processing happens asynchronously. In other words, once you make the request, you will be provided with a unique identifier for the export job and it will begin processing in the background. You will need to check back periodically to see if the job has completed.
 
 The export job will complete within 15 minutes. If too many records exist within the timeframe you've provided (_start_ to _end_), the job will fail and you will need to narrow your timeframe.
@@ -40,15 +42,13 @@ The following parameters are required:
 * start (optional) - integer - The date and time of the first event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 * end (optional) - integer - The data and time of the last event to export. If provided, the value should be a millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time).
 
-Endpoint:
+__Endpoint__
 
 https://events.aws.barchart.com/reports
 
-Verb:
+__Verb__
 
-POST:
-
-The request body should be a "stringified" JSON document. Here is an example document.
+Use an HTTP POST with this endpoint. The request body should be a "stringified" JSON document. Here is an example document.
 
 	{
 		customer: 'BARCHART',
@@ -57,7 +57,7 @@ The request body should be a "stringified" JSON document. Here is an example doc
 		end: 1571115600000
 	}
 
-_cURL example_
+__cURL example__
 
 	> curl --request POST https://events.aws.barchart.com/reports -H "Authorization: 'Basic {your-base-64-encoded-credentials}'" -d '{"filter": {"customer": "BARCHART", "product": "WATCHLIST", "start": 1570011173902}}
 
