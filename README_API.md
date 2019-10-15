@@ -3,6 +3,12 @@
 
 The Barchart Event Tracking System collects usage statistics from various software systems. This document will describe how to export data from the system, presumably for analysis by external tools (e.g. Tableua, Grafana, etc) using the HTTP API directly.
 
+## Alternatives
+
+### JavaScript SDK
+
+If you prefer not to use the HTTP API directly, a JavaScript client exists, which is intended to simplify interaction with the backend. It exposes promise-based functions and handles HTTP request construction. The readme file for the SDK can be found [here](https://github.com/barchart/events-client-js/blob/master/README_SDK.md).
+
 ## Export File Schema
 
 Export files are pipe-delimited, plain text files which have "csv" file extensions. Inside the file, every row represents a discrete event. Export files for different __product__ types have slightly different definitions.
@@ -208,9 +214,5 @@ __cURL example__
 	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8 -H "Authorization: 'Basic {base-64-encoded-credentials-separated-by-a-colon}'" -H "Accept: application/json"
 
 Alternately, if you omit the "Accept" header, you will receive an HTTP 302 response, redirecting you to the download link.
-
-## JavaScript SDK
-
-If you would prefer, you can access these functions using the SDK. The readme file can be found [here](https://github.com/barchart/events-client-js/blob/master/README.md).
 
 
