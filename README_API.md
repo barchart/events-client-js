@@ -122,7 +122,7 @@ Here is an example:
 			customer: "BARCHART",
 			product: "PORTFOLIO"
 		},
-		"timing":{
+		timing: {
 			day: "2019-10-14",
 			start: 1571073977278
 		}

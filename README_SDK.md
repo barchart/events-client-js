@@ -34,7 +34,7 @@ const reportGateway = ReportGateway.forProduction(credentials)
 
 You can start a new export, as follows:
 
-`
+~~~~
 const unixNow = (new Date()).getTime();
 const unixTwentyFourHoursAgo = unixNow - (24 * 60 * 60 * 1000);
 
@@ -55,13 +55,13 @@ reportGateway.startReport(filter)
 	}).catch((error) => {
 		// Problem sending report or backend failed to start job. Unlikely.
 	})
-`
+~~~~
 
 #### Check Export Status
 
 After a job has been started, using the [startReport](#start-report) function, it will run for up to fifteen minutes. During that time, you can check the status of the job, as follows:
 
-`
+~~~~
 const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
 
 reportGateway.getReportAvailability(jobId)
@@ -79,13 +79,13 @@ reportGateway.getReportAvailability(jobId)
 	}).catch((e) => {
 		// Failed to retrieve status. Job might not exist. Unlikely.
 	});
-`
+~~~~
 
 #### Download Export
 
 Once the job's status is `EventJobStatus.COMPLETE`, you can retrieve a link to download the export file, as follows:
 
-`
+~~~~
 reportGateway.getReport(jobId)
 	.then((downloadData) => {
 		const url = downloadData.link;
@@ -94,7 +94,7 @@ reportGateway.getReport(jobId)
 	}).catch((e) => {
 		// Failed to retrieve download link. Maybe the report hasn't completed yet. Unlikely.
 	});
-`
+~~~~
 
 
 
