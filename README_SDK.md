@@ -17,7 +17,7 @@ This JavaScript API handles HTTP-based interactions with the backend. If you wou
 
 This class allows you to access API functions through a promise-based interface. Instantiate a new ReportGateway as follows:
 
-`
+~~~~
 const ReportGateway = require('@barchart/events-client-js/lib/gateway/ReportGateway');
 
 const credentials = { };
@@ -28,7 +28,7 @@ const reportGateway = ReportGateway.forProduction(credentials)
 	.then(() -> {
 		// ready to use...
 	});
-`
+~~~~
 
 #### Start New Export
 
