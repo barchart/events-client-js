@@ -97,5 +97,19 @@ reportGateway.getReport(jobId)
 	});
 ~~~~
 
+## Usage Example
+
+A reference implementation -- using Vue.js -- can be found here:
+
+* ./example/browser/js/startup.event.js
+
+You can launch this page locally from:
+
+* ./example/browser/example.report.html
+
+Or, you the reference example is hosted here:
+
+* https://examples.aws.barchart.com/events-client-js/example.report.html
+
 
 
