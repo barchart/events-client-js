@@ -97,12 +97,9 @@ module.exports = (() => {
 
         this.message = 'Sending...';
         const filter = {
-          customer: this.selectedCustomer
+          customer: this.selectedCustomer,
+          product: this.selectedProduct
         };
-
-        if (this.selectedProduct) {
-          filter.product = this.selectedProduct;
-        }
 
         if (this.startTime) {
           filter.start = parseInt(this.startTime);
@@ -262,6 +259,9 @@ module.exports = (() => {
   class ReportGateway extends Disposable {
     constructor(protocol, host, port, credentials) {
       super();
+      assert.argumentIsRequired(protocol, 'protocol', String);
+      assert.argumentIsRequired(host, 'host', String);
+      assert.argumentIsRequired(port, 'port', Number);
       assert.argumentIsRequired(credentials, 'credentials', Object);
       assert.argumentIsRequired(credentials.username, 'credentials.username', String, 'String');
       assert.argumentIsRequired(credentials.password, 'credentials.password', String, 'String');
@@ -454,7 +454,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.3.12'
+    version: '1.3.13'
   };
 })();
 
@@ -7264,6 +7264,17 @@ module.exports = (() => {
 		}
 
 		/**
+		 * Customer type for Barchart internal use.
+		 *
+		 * @public
+		 * @static
+		 * @returns {CustomerType}
+		 */
+		static get BARCHART() {
+			return barchart;
+		}
+
+		/**
 		 * Customer type for TGAM.
 		 *
 		 * @public
@@ -7279,6 +7290,7 @@ module.exports = (() => {
 		}
 	}
 
+	const barchart = new CustomerType('BARCHART', 'Barchart');
 	const tgam = new CustomerType('TGAM', 'The Globe and Mail');
 
 	return CustomerType;

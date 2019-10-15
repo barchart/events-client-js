@@ -479,7 +479,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.3.12'
+    version: '1.3.13'
   };
 })();
 
@@ -7649,6 +7649,17 @@ module.exports = (() => {
 		}
 
 		/**
+		 * Customer type for Barchart internal use.
+		 *
+		 * @public
+		 * @static
+		 * @returns {CustomerType}
+		 */
+		static get BARCHART() {
+			return barchart;
+		}
+
+		/**
 		 * Customer type for TGAM.
 		 *
 		 * @public
@@ -7664,6 +7675,7 @@ module.exports = (() => {
 		}
 	}
 
+	const barchart = new CustomerType('BARCHART', 'Barchart');
 	const tgam = new CustomerType('TGAM', 'The Globe and Mail');
 
 	return CustomerType;
