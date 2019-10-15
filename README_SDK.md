@@ -90,7 +90,7 @@ reportGateway.getReport(jobId)
 	.then((downloadData) => {
 		const url = downloadData.link;
 
-		// Now you can download the file (using your own or even anchor tag in the HTML document).
+		// Now you can download the file (using your own code or an anchor tag inside an HTML document).
 	}).catch((error) => {
 		// Failed to retrieve download link. Maybe the report hasn't completed yet. Unlikely.
 	});
