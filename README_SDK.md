@@ -76,7 +76,7 @@ reportGateway.getReportAvailability(jobId)
 		} else if (jobData.status === EventJobStatus.FAILED) {
 			// Other problem, should not happen.
 		}
-	}).catch((e) => {
+	}).catch((error) => {
 		// Failed to retrieve status. Job might not exist. Unlikely.
 	});
 ~~~~
@@ -91,7 +91,7 @@ reportGateway.getReport(jobId)
 		const url = downloadData.link;
 
 		// Now you can download the file (using your own or even anchor tag in the HTML document).
-	}).catch((e) => {
+	}).catch((error) => {
 		// Failed to retrieve download link. Maybe the report hasn't completed yet. Unlikely.
 	});
 ~~~~
