@@ -7,7 +7,7 @@ The Barchart Event Tracking System collects usage statistics from various softwa
 
 ### JavaScript SDK
 
-If you prefer not to use the HTTP API directly, a JavaScript client exists, which is intended to simplify interaction with the backend. It exposes promise-based functions and handles HTTP request construction. The readme file for the SDK can be found [here](https://github.com/barchart/events-client-js/blob/master/README_SDK.md).
+If you prefer not to use the HTTP API directly, a JavaScript SDK exists which simplifies interaction with the backend. It exposes promise-based functions and handles the details of HTTP interactions with the backend. The readme file for the SDK can be found [here](https://github.com/barchart/events-client-js/blob/master/README_SDK.md).
 
 ## Export File Schema
 
