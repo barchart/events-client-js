@@ -26,7 +26,7 @@ credentials.password = 'your-password'; // Ask Barchart
 
 const reportGateway = ReportGateway.forProduction(credentials)
 	.then(() -> {
-		// ready to use...
+		// Your gateway is ready to use.
 	});
 ~~~~
 
