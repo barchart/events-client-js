@@ -59,7 +59,7 @@ reportGateway.startReport(filter)
 
 #### Check Export Status
 
-After a job has been started, using the [startReport](#start-new-export) function, it will run for up to fifteen minutes. During that time, you can check the status of the job, as follows:
+After a job has been started (see the [startReport](#start-new-export) function), it will run for up to fifteen minutes. During that time, you can check the status of the job, as follows:
 
 ~~~~
 const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
