@@ -71,8 +71,8 @@ reportGateway.getReportAvailability(jobId)
 		} else if (jobData.status === EventJobStatus.COMPLETE) {
 			// Ready for download.
 		} else if (jobData.status === EventJobStatus.TIMEOUT) {
-			// Job did not complete within allotted time. Too many records in your filter's date
-			// range. Start a new job, narrowing your date range.
+			// Job did not complete within allotted time. Too many records in your
+			// filter's date range. Start a new job, narrowing your date range.
 		} else if (jobData.status === EventJobStatus.FAILED) {
 			// Other problem, should not happen.
 		}
@@ -90,7 +90,8 @@ reportGateway.getReport(jobId)
 	.then((downloadData) => {
 		const url = downloadData.link;
 
-		// Now you can download the file (using your own code or an anchor tag inside an HTML document).
+		// Now you can download the file (using your own code or an anchor tag
+		// inside an HTML document).
 	}).catch((error) => {
 		// Failed to retrieve download link. Maybe the report hasn't completed yet. Unlikely.
 	});
