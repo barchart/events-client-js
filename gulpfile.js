@@ -22,13 +22,15 @@ function getVersionFromPackage() {
 	return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
 
-gulp.task('document', (cb) => {
-	exec('jsdoc . -c jsdoc.json -r -d docs', (error, stdout, stderr) => {
-		console.log(stdout);
-		console.log(stderr);
+gulp.task('document', function (cb) {
+	config = {
+		"opts": {
+			"destination": "./docs"
+		},
+	};
 
-		cb();
-	});
+	gulp.src([ 'README.md', './lib/**/*.js' ], {read: false})
+	.pipe(jsdoc(config, cb));
 });
 
 gulp.task('ensure-clean-working-directory', (cb) => {
