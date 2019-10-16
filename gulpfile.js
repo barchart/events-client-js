@@ -21,7 +21,7 @@ function getVersionFromPackage() {
 	return JSON.parse(fs.readFileSync('./package.json', 'utf8')).version;
 }
 
-gulp.task('document', function (cb) {
+gulp.task('document', (cb) => {
 	config = {
 		"opts": {
 			"destination": "./docs"
