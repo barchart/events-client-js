@@ -56,7 +56,6 @@ gulp.task('embed-version', () => {
 		.pipe(gulp.dest('./lib/'));
 });
 
-
 gulp.task('commit-changes', () => {
 	return gulp.src([ './', './test/', './package.json', './lib/meta.js', './example/browser/example.event.js', './example/browser/example.report.js', './test/SpecRunner.js' ])
 		.pipe(git.add())
