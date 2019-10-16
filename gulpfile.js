@@ -7,7 +7,6 @@ const AWS = require('aws-sdk'),
 	browserify = require('browserify'),
 	buffer = require('vinyl-buffer'),
 	bump = require('gulp-bump'),
-	exec = require('child_process').exec,
 	git = require('gulp-git'),
 	gitStatus = require('git-get-status'),
 	glob = require('glob'),
@@ -30,7 +29,7 @@ gulp.task('document', function (cb) {
 	};
 
 	gulp.src([ 'README.md', './lib/**/*.js' ], {read: false})
-	.pipe(jsdoc(config, cb));
+		.pipe(jsdoc(config, cb));
 });
 
 gulp.task('ensure-clean-working-directory', (cb) => {
