@@ -21,6 +21,7 @@ module.exports = (() => {
 			password: '',
 
 			showAuth: true,
+			stage: 'production',
 			connecting: false,
 
 			message: '',
@@ -45,7 +46,7 @@ module.exports = (() => {
 
 				this.connecting = true;
 
-				return ReportGateway.forStaging({ username: this.username, password: this.password })
+				return ReportGateway.for(this.stage, { username: this.username, password: this.password })
 					.then((gateway) => {
 						return gateway.getVersion()
 							.catch((errors) => {

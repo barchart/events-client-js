@@ -2,6 +2,10 @@ body {
     font-family: "Gill Sans MT";
 }
 
+[v-cloak] {
+  display: none;
+}
+
 h4 {
     font-size: 18px;
 }

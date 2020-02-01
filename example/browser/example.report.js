@@ -12,6 +12,7 @@ module.exports = (() => {
 
   return {
     version: version,
+    stages: ['staging', 'production'],
     customers: [CustomerType.TGAM],
     products: [ProductType.PORTFOLIO, ProductType.WATCHLIST],
     types: {
@@ -43,6 +44,7 @@ module.exports = (() => {
       username: '',
       password: '',
       showAuth: true,
+      stage: 'production',
       connecting: false,
       message: '',
       reports: [],
@@ -61,7 +63,7 @@ module.exports = (() => {
         }
 
         this.connecting = true;
-        return ReportGateway.forStaging({
+        return ReportGateway.for(this.stage, {
           username: this.username,
           password: this.password
         }).then(gateway => {
@@ -372,6 +374,28 @@ module.exports = (() => {
         checkStart.call(this);
         return Gateway.invoke(this._getVersionEndpoint, {});
       });
+    }
+    /**
+     * Creates and starts a new {@link ReportGateway} for the provided environment.
+     *
+     * @param {String} stage
+     * @param {Object} credentials
+     * @returns {Promise<ReportGateway|null>}
+     */
+
+
+    static for(stage, credentials) {
+      let gatewayPromise;
+
+      if (stage === 'staging') {
+        gatewayPromise = ReportGateway.forStaging(credentials);
+      } else if (stage === 'production') {
+        gatewayPromise = ReportGateway.forProduction(credentials);
+      } else {
+        gatewayPromise = Promise.resolve(null);
+      }
+
+      return gatewayPromise;
     }
     /**
      * Creates and starts a new {@link ReportGateway} for use in the staging environment.
@@ -7264,17 +7288,6 @@ module.exports = (() => {
 		}
 
 		/**
-		 * Customer type for Barchart internal use.
-		 *
-		 * @public
-		 * @static
-		 * @returns {CustomerType}
-		 */
-		static get BARCHART() {
-			return barchart;
-		}
-
-		/**
 		 * Customer type for TGAM.
 		 *
 		 * @public
@@ -7290,7 +7303,6 @@ module.exports = (() => {
 		}
 	}
 
-	const barchart = new CustomerType('BARCHART', 'Barchart');
 	const tgam = new CustomerType('TGAM', 'The Globe and Mail');
 
 	return CustomerType;
@@ -7367,17 +7379,6 @@ module.exports = (() => {
 		}
 
 		/**
-		 * The job timed out.
-		 *
-		 * @public
-		 * @static
-		 * @returns {EventsJobStatus}
-		 */
-		static get TIMEOUT() {
-			return timeout;
-		}
-
-		/**
 		 * The job failed.
 		 *
 		 * @public
@@ -7395,7 +7396,6 @@ module.exports = (() => {
 
 	const running = new EventJobStatus('RUNNING', 'Running', true, false);
 	const complete = new EventJobStatus('COMPLETE', 'Complete', false, true);
-	const timeout = new EventJobStatus('TIMEOUT', 'Timeout', false, true);
 	const failed = new EventJobStatus('FAILED', 'Failed', false, true);
 
 	return EventJobStatus;

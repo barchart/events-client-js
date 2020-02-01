@@ -12,6 +12,7 @@ module.exports = (() => {
 
   return {
     version: version,
+    stages: ['staging', 'production'],
     customers: [CustomerType.TGAM],
     products: [ProductType.PORTFOLIO, ProductType.WATCHLIST],
     types: {
@@ -34,14 +35,6 @@ module.exports = (() => {
 
   const app = new Vue({
     el: '.wrapper',
-
-    created() {
-      EventGateway.forStaging().then(gateway => {
-        this.eventGateway = gateway;
-        this.eventBatcher = new EventBatcher(gateway, callback.bind(this));
-      });
-    },
-
     data: {
       selectedCustomer: '',
       selectedProduct: '',
@@ -52,9 +45,26 @@ module.exports = (() => {
       auto: false,
       eventBatcher: null,
       eventGateway: null,
+      showAuth: true,
+      stage: 'production',
       config: Config
     },
     methods: {
+      connect() {
+        return EventGateway.for(this.stage).then(gateway => {
+          this.eventGateway = gateway;
+          this.eventBatcher = new EventBatcher(gateway, callback.bind(this));
+          this.showAuth = false;
+        });
+      },
+
+      disconnect() {
+        this.clear();
+        this.eventGateway = null;
+        this.eventBatcher = null;
+        this.showAuth = true;
+      },
+
       generate() {
         if (!validateFields.call(this)) {
           this.message = 'Fill all fields';
@@ -392,6 +402,27 @@ module.exports = (() => {
           events: events.map(event => EventSchema.CLIENT.schema.format(event))
         });
       });
+    }
+    /**
+     * Creates and starts a new {@link EventGateway} for the provided environment.
+     *
+     * @param {String} stage
+     * @returns {Promise<ReportGateway|null>}
+     */
+
+
+    static for(stage) {
+      let gatewayPromise;
+
+      if (stage === 'staging') {
+        gatewayPromise = EventGateway.forStaging();
+      } else if (stage === 'production') {
+        gatewayPromise = EventGateway.forProduction();
+      } else {
+        gatewayPromise = Promise.resolve(null);
+      }
+
+      return gatewayPromise;
     }
     /**
      * Creates and starts a new {@link EventGateway} for use in the development environment.
@@ -7649,17 +7680,6 @@ module.exports = (() => {
 		}
 
 		/**
-		 * Customer type for Barchart internal use.
-		 *
-		 * @public
-		 * @static
-		 * @returns {CustomerType}
-		 */
-		static get BARCHART() {
-			return barchart;
-		}
-
-		/**
 		 * Customer type for TGAM.
 		 *
 		 * @public
@@ -7675,7 +7695,6 @@ module.exports = (() => {
 		}
 	}
 
-	const barchart = new CustomerType('BARCHART', 'Barchart');
 	const tgam = new CustomerType('TGAM', 'The Globe and Mail');
 
 	return CustomerType;

@@ -11,6 +11,10 @@ module.exports = (() => {
 
 	return {
 		version: version,
+		stages: [
+			'staging',
+			'production',
+		],
 		customers: [
 			CustomerType.TGAM,
 		],

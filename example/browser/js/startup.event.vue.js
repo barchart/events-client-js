@@ -4,19 +4,12 @@ const Timestamp = require('@barchart/common-js/lang/Timestamp');
 
 const EventBatcher = require('./../../../lib/engine/EventBatcher'),
 	EventGateway = require('./../../../lib/gateway/EventGateway');
-	
+
 module.exports = (() => {
 	'use strict';
 
 	const app = new Vue({
 		el: '.wrapper',
-		created() {
-			EventGateway.forStaging()
-				.then((gateway) => {
-					this.eventGateway = gateway;
-					this.eventBatcher = new EventBatcher(gateway, callback.bind(this));
-				});
-		},
 		data: {
 			selectedCustomer: '',
 			selectedProduct: '',
@@ -32,9 +25,27 @@ module.exports = (() => {
 			eventBatcher: null,
 			eventGateway: null,
 
+			showAuth: true,
+			stage: 'production',
+
 			config: Config,
 		},
 		methods: {
+			connect() {
+				return EventGateway.for(this.stage)
+					.then((gateway) => {
+						this.eventGateway = gateway;
+						this.eventBatcher = new EventBatcher(gateway, callback.bind(this));
+						this.showAuth = false;
+					});
+			},
+			disconnect() {
+				this.clear();
+
+				this.eventGateway = null;
+				this.eventBatcher = null;
+				this.showAuth = true;
+			},
 			generate() {
 				if (!validateFields.call(this)) {
 					this.message = 'Fill all fields';
