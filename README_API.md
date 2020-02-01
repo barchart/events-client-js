@@ -150,7 +150,7 @@ Here is an example:
 
 __cURL example__
 
-	> curl --request POST https://events.aws.barchart.com/reports -H "Authorization: 'Basic {base-64-encoded-credentials-separated-by-a-colon}'" -d '{"filter": {"customer": "BARCHART", "product": "WATCHLIST", "start": 1570011173902}}'
+	> curl --request POST https://events.aws.barchart.com/reports -H "Authorization: 'Basic {base-64-encoded-credentials}'" -d '{"filter": {"customer": "BARCHART", "product": "WATCHLIST", "start": 1570011173902}}'
 
 #### Check Export Status
 
@@ -196,7 +196,7 @@ Here is an example:
 
 __cURL example__
 
-	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8/availability -H "Authorization: 'Basic {base-64-encoded-credentials-separated-by-a-colon}'"
+	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8/availability -H "Authorization: 'Basic {base-64-encoded-credentials}'"
 
 #### Download Export
 
@@ -230,7 +230,7 @@ Here is an example:
 
 __cURL example__
 
-	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8 -H "Authorization: 'Basic {base-64-encoded-credentials-separated-by-a-colon}'" -H "Accept: application/json"
+	> curl --request GET https://events.aws.barchart.com/reports/JOB-96d3d9d2-308a-43c7-aa74-ec00dc2106d8 -H "Authorization: 'Basic {base-64-encoded-credentials}'" -H "Accept: application/json"
 
 Alternately, if you omit the "Accept" header, you will receive an HTTP 302 response, redirecting you to the download link.
 
