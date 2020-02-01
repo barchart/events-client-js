@@ -74,7 +74,7 @@ First, combine the username and password, separating them with a colon, as follo
 
 * bryan:green-eggs-and-spam
 
-Then, encode base64 encode the entire string, yielding the following output:
+Then, base64 encode the entire string, yielding the following output:
 
 * YnJ5YW46Z3JlZW4tZWdncy1hbmQtc3BhbQ==
 
