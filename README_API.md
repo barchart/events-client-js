@@ -63,6 +63,25 @@ Your HTTP request header should include the following:
 
 	Authorization: Basic {base64-endocde({username:password})}
 
+### Security (Example)
+
+Assume the following:
+
+* Username: bryan
+* Password: green-eggs-and-spam
+
+First, combine the username and password, separating them with a colon, as follows:
+
+* bryan:green-eggs-and-spam
+
+Then, encode base64 encode the entire string, yielding the following output:
+
+* YnJ5YW46Z3JlZW4tZWdncy1hbmQtc3BhbQ==
+
+Finally, include this encoded string in your HTTP request, as an Authorization header, as follows:
+
+* Authorization: Basic YnJ5YW46Z3JlZW4tZWdncy1hbmQtc3BhbQ==
+
 ### Public Host
 
 The production environment can be accessed at:
