@@ -16,8 +16,8 @@
     "url": "git+ssh://github.com/barchart/events-client-js.git"
   },
   "dependencies": {
-    "@barchart/common-js": "~3.3.0",
-    "@barchart/events-api-common": "~1.3.0"
+	"@barchart/common-js": "^3.5.1"
+    "@barchart/events-api-common": "^1.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.6.2",

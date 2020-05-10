@@ -1,5 +1,8 @@
 # @barchart/events-client-js
-## JavaScript SDK for interfacing with Barchart's Event Tracking System
+
+A **public** JavaScript SDK for interfacing with Barchart's Event Tracking System
+
+## Overview
 
 The Barchart Event Tracking System collects usage statistics from various software systems and exposes the following functionality:
 
@@ -17,6 +20,10 @@ Also, two utilities exist:
 
 - EventBatcher (Wraps an EventGateway, temporarily caching new events before sending them to the backend), and
 - EventFactory (Simplifies creation of event objects)
+
+## Documentation
+
+The code is documented with [JSDoc](http://usejsdoc.org/). This will be used as the basis for formal documentation (coming soon).
 
 ## Examples
 
@@ -44,23 +51,18 @@ Or, visit the hosted page at:
 
 ## Development
 
-### Code Documentation
+#### Package Managers
 
-The code is documented with [JSDoc](http://usejsdoc.org/). While the output hasn't been committed to source control, you can generate the documentation by using the following commands:
+This library has been published as a *public* module to NPM as [@barchart/events-client-js](https://www.npmjs.com/package/@barchart/events-client-js).
 
-    > npm i jsdoc -g
-    > gulp document
+```shell
+npm install @barchart/events-client-js -S
+```
 
-### Check for Lint
+#### Build
 
-    > gulp lint
+Modern JavaScript language features are used. Some browsers may still require polyfills.
 
-### Local Testing
+#### License
 
-Build the example pages manually:
-
-    > gulp build-example-bundles
-
-Alternately, a gulp task exists automatically rebuilds the example page bundle, as you make changes to the code:
-
-    > gulp watch
+This software is provided under the MIT license.
