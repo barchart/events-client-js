@@ -510,7 +510,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.3.14'
+    version: '1.4.1'
   };
 })();
 
@@ -1004,6 +1004,7 @@ const axios = require('axios');
 const array = require('./../../lang/array'),
       assert = require('./../../lang/assert'),
       attributes = require('./../../lang/attributes'),
+      is = require('./../../lang/is'),
       promise = require('./../../lang/promise');
 
 const Endpoint = require('./definitions/Endpoint'),
@@ -1089,7 +1090,15 @@ module.exports = (() => {
 
             url.push('/');
             return promise.pipeline(pathValues.map(value => previous => {
-              previous.push(value);
+              let encodedValue;
+
+              if (is.null(value) || is.undefined(value)) {
+                encodedValue = value;
+              } else {
+                encodedValue = value.toString().replace(/\//g, '%2F');
+              }
+
+              previous.push(encodedValue);
               return previous;
             }), []).then(paths => {
               url.push(paths.join('/'));
@@ -1198,7 +1207,7 @@ module.exports = (() => {
   return Gateway;
 })();
 
-},{"./../../lang/array":38,"./../../lang/assert":39,"./../../lang/attributes":40,"./../../lang/promise":44,"./../failures/FailureReason":7,"./../failures/FailureType":9,"./definitions/Endpoint":15,"./definitions/VerbType":19,"axios":56}],11:[function(require,module,exports){
+},{"./../../lang/array":38,"./../../lang/assert":39,"./../../lang/attributes":40,"./../../lang/is":42,"./../../lang/promise":44,"./../failures/FailureReason":7,"./../failures/FailureType":9,"./definitions/Endpoint":15,"./definitions/VerbType":19,"axios":56}],11:[function(require,module,exports){
 const assert = require('./../../../lang/assert');
 
 const Credentials = require('./../definitions/Credentials');
@@ -1793,8 +1802,7 @@ module.exports = (() => {
 },{"./../../../lang/is":42}],15:[function(require,module,exports){
 const is = require('./../../../lang/is');
 
-const Parameter = require('./Parameter'),
-      Parameters = require('./Parameters'),
+const Parameters = require('./Parameters'),
       ProtocolType = require('./ProtocolType'),
       VerbType = require('./VerbType');
 
@@ -2065,7 +2073,7 @@ module.exports = (() => {
   return Endpoint;
 })();
 
-},{"./../../../lang/is":42,"./../interceptors/ErrorInterceptor":23,"./../interceptors/RequestInterceptor":24,"./../interceptors/ResponseInterceptor":25,"./Parameter":16,"./Parameters":17,"./ProtocolType":18,"./VerbType":19}],16:[function(require,module,exports){
+},{"./../../../lang/is":42,"./../interceptors/ErrorInterceptor":23,"./../interceptors/RequestInterceptor":24,"./../interceptors/ResponseInterceptor":25,"./Parameters":17,"./ProtocolType":18,"./VerbType":19}],16:[function(require,module,exports){
 const is = require('./../../../lang/is');
 
 module.exports = (() => {
@@ -2168,8 +2176,7 @@ module.exports = (() => {
 })();
 
 },{"./../../../lang/is":42}],17:[function(require,module,exports){
-const assert = require('./../../../lang/assert'),
-      is = require('./../../../lang/is');
+const is = require('./../../../lang/is');
 
 const Parameter = require('./Parameter');
 
@@ -2229,7 +2236,7 @@ module.exports = (() => {
   return Parameters;
 })();
 
-},{"./../../../lang/assert":39,"./../../../lang/is":42,"./Parameter":16}],18:[function(require,module,exports){
+},{"./../../../lang/is":42,"./Parameter":16}],18:[function(require,module,exports){
 const assert = require('./../../../lang/assert'),
       Enum = require('./../../../lang/Enum'),
       is = require('./../../../lang/is');
@@ -2609,15 +2616,33 @@ module.exports = (() => {
   const errorInterceptorEmpty = new ErrorInterceptor();
   const errorInterceptorGeneral = new DelegateErrorInterceptor((error, endpoint) => {
     const response = error.response;
-    let rejectPromise;
+    let rejectPromise = null;
 
-    if (is.object(response) && is.object(response.headers) && response.headers['content-type'] === 'application/json' && is.object(response.data)) {
-      rejectPromise = Promise.reject(response.data);
-    } else if (is.undefined(response) && error.message === 'Network Error') {
+    if (rejectPromise === null && is.object(response) && is.object(response.headers) && response.headers['content-type'] === 'application/json') {
+      let deserialized = null;
+
+      if (is.object(response.data)) {
+        deserialized = response.data;
+      } else {
+        try {
+          deserialized = JSON.parse(response.data);
+        } catch (e) {
+          deserialized = null;
+        }
+      }
+
+      if (deserialized !== null) {
+        rejectPromise = Promise.reject(deserialized);
+      }
+    }
+
+    if (rejectPromise === null && is.undefined(response) && error.message === 'Network Error') {
       rejectPromise = Promise.reject(FailureReason.forRequest({
         endpoint: endpoint
       }).addItem(FailureType.REQUEST_AUTHORIZATION_FAILURE).format());
-    } else {
+    }
+
+    if (rejectPromise === null) {
       rejectPromise = Promise.reject(FailureReason.forRequest({
         endpoint: endpoint
       }).addItem(FailureType.REQUEST_GENERAL_FAILURE).format());
@@ -3088,29 +3113,29 @@ module.exports = (() => {
      *
      * @public
      * @param {Tree~nodePredicate} predicate - A predicate that tests each child node. The predicate takes two arguments -- the node's value, and the node itself.
-     * @param {boolean=} childrenFirst - True, if the tree should be searched depth first.
+     * @param {boolean=} parentFirst - If true, the true will be searched from parent-to-child (breadth first). Otherwise, child-to-parent (depth first).
      * @param {boolean=} includeCurrentNode - True, if the current node should be checked against the predicate.
      * @returns {Tree|null}
      */
 
 
-    search(predicate, childrenFirst, includeCurrentNode) {
+    search(predicate, parentFirst, includeCurrentNode) {
       let returnRef = null;
 
-      if (returnRef === null && childrenFirst && includeCurrentNode && predicate(this.getValue(), this)) {
+      if (returnRef === null && parentFirst && includeCurrentNode && predicate(this.getValue(), this)) {
         returnRef = this;
       }
 
       for (let i = 0; i < this._children.length; i++) {
         const child = this._children[i];
-        returnRef = child.search(predicate, childrenFirst, true);
+        returnRef = child.search(predicate, parentFirst, true);
 
         if (returnRef !== null) {
           break;
         }
       }
 
-      if (returnRef === null && !childrenFirst && includeCurrentNode && predicate(this.getValue(), this)) {
+      if (returnRef === null && !parentFirst && includeCurrentNode && predicate(this.getValue(), this)) {
         returnRef = this;
       }
 
@@ -3121,18 +3146,18 @@ module.exports = (() => {
      *
      * @public
      * @param {Tree~nodeAction} walkAction - A action to apply to each node. The action takes two arguments -- the node's value, and the node itself.
-     * @param {boolean=} childrenFirst - True if the tree should be walked depth first.
+     * @param {boolean=} parentFirst - If true, the true will be searched from parent-to-child (breadth first). Otherwise, child-to-parent (depth first).
      * @param {boolean=} includeCurrentNode - True if the current node should be applied to the action.
      */
 
 
-    walk(walkAction, childrenFirst, includeCurrentNode) {
+    walk(walkAction, parentFirst, includeCurrentNode) {
       const predicate = (value, node) => {
         walkAction(value, node);
         return false;
       };
 
-      this.search(predicate, childrenFirst, includeCurrentNode);
+      this.search(predicate, parentFirst, includeCurrentNode);
     }
     /**
      * Climbs the parents of the current node -- current node up to the root node, running an action on each node.
@@ -3443,8 +3468,7 @@ module.exports = (() => {
 })();
 
 },{"./../../lang/assert":39}],30:[function(require,module,exports){
-const assert = require('./assert'),
-      is = require('./is');
+const assert = require('./assert');
 
 module.exports = (() => {
   'use strict';
@@ -3509,7 +3533,7 @@ module.exports = (() => {
   return AdHoc;
 })();
 
-},{"./assert":39,"./is":42}],31:[function(require,module,exports){
+},{"./assert":39}],31:[function(require,module,exports){
 const assert = require('./assert'),
       Enum = require('./Enum'),
       is = require('./is');
@@ -4716,7 +4740,7 @@ module.exports = (() => {
   return Decimal;
 })();
 
-},{"./Enum":35,"./assert":39,"./is":42,"big.js":81}],34:[function(require,module,exports){
+},{"./Enum":35,"./assert":39,"./is":42,"big.js":82}],34:[function(require,module,exports){
 const assert = require('./assert');
 
 module.exports = (() => {
@@ -4914,6 +4938,7 @@ module.exports = (() => {
      * item's value. If no matching item can be found, a null value is returned.
      *
      * @public
+     * @static
      * @param {Function} type - The enumeration type.
      * @param {String} code - The enumeration item's code.
      * @returns {*|null}
@@ -4927,6 +4952,7 @@ module.exports = (() => {
      * Returns all of the enumeration's items (given an enumeration type).
      *
      * @public
+     * @static
      * @param {Function} type - The enumeration to list.
      * @returns {Array}
      */
@@ -5976,7 +6002,7 @@ module.exports = (() => {
 
   return {
     /**
-     * Returns true, if the argument is a number. NaN will return false.
+     * Returns true if the argument is a number. NaN will return false.
      *
      * @static
      * @public
@@ -5988,7 +6014,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is NaN.
+     * Returns true if the argument is NaN.
      *
      * @static
      * @public
@@ -6000,7 +6026,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a valid 32-bit integer.
+     * Returns true if the argument is a valid 32-bit integer.
      *
      * @static
      * @public
@@ -6012,7 +6038,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a valid integer (which can exceed 32 bits); however,
+     * Returns true if the argument is a valid integer (which can exceed 32 bits); however,
      * the check can fail above the value of Number.MAX_SAFE_INTEGER.
      *
      * @static
@@ -6025,7 +6051,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a number that is positive.
+     * Returns true if the argument is a number that is positive.
      *
      * @static
      * @public
@@ -6037,7 +6063,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a number that is negative.
+     * Returns true if the argument is a number that is negative.
      *
      * @static
      * @public
@@ -6049,7 +6075,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a string.
+     * Returns true if the argument is a string.
      *
      * @static
      * @public
@@ -6061,7 +6087,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a JavaScript Date instance.
+     * Returns true if the argument is a JavaScript Date instance.
      *
      * @static
      * @public
@@ -6073,7 +6099,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a function.
+     * Returns true if the argument is a function.
      *
      * @static
      * @public
@@ -6085,7 +6111,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is an array.
+     * Returns true if the argument is an array.
      *
      * @static
      * @public
@@ -6097,7 +6123,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a Boolean value.
+     * Returns true if the argument is a Boolean value.
      *
      * @static
      * @public
@@ -6109,7 +6135,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is an object.
+     * Returns true if the argument is an object.
      *
      * @static
      * @public
@@ -6121,7 +6147,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is a null value.
+     * Returns true if the argument is a null value.
      *
      * @static
      * @public
@@ -6133,7 +6159,7 @@ module.exports = (() => {
     },
 
     /**
-     * Returns true, if the argument is an undefined value.
+     * Returns true if the argument is an undefined value.
      *
      * @static
      * @public
@@ -6142,6 +6168,18 @@ module.exports = (() => {
      */
     undefined(candidate) {
       return candidate === undefined;
+    },
+
+    /**
+     * Returns true if the argument is a zero-length string.
+     *
+     * @static
+     * @public
+     * @param {*} candidate
+     * @returns {boolean}
+     */
+    zeroLengthString(candidate) {
+      return this.string(candidate) && candidate.length === 0;
     },
 
     /**
@@ -7504,10 +7542,10 @@ module.exports = (() => {
           };
 
           token = setTimeout(wrappedAction, millisecondDelay);
-        });
-        this._timeoutBindings[token] = Disposable.fromAction(() => {
-          clearTimeout(token);
-          delete this._timeoutBindings[token];
+          this._timeoutBindings[token] = Disposable.fromAction(() => {
+            clearTimeout(token);
+            delete this._timeoutBindings[token];
+          });
         });
         return schedulePromise;
       });
@@ -7571,7 +7609,13 @@ module.exports = (() => {
               delay = (millisecondDelay || 1000) * Math.pow(2, attempts - 1);
             }
 
-            return this.schedule(actionToBackoff, delay, `Attempt [ ${attempts} ] for [ ${actionDescription || 'unnamed action'} ]`);
+            if (delay === 0) {
+              return Promise.resolve().then(() => {
+                return actionToBackoff();
+              });
+            } else {
+              return this.schedule(actionToBackoff, delay, `Attempt [ ${attempts} ] for [ ${actionDescription || 'unnamed action'} ]`);
+            }
           }).then(result => {
             let resultPromise;
 
@@ -7680,6 +7724,17 @@ module.exports = (() => {
 		}
 
 		/**
+		 * Customer type for Barchart internal use.
+		 *
+		 * @public
+		 * @static
+		 * @returns {CustomerType}
+		 */
+		static get BARCHART() {
+			return barchart;
+		}
+
+		/**
 		 * Customer type for TGAM.
 		 *
 		 * @public
@@ -7695,6 +7750,7 @@ module.exports = (() => {
 		}
 	}
 
+	const barchart = new CustomerType('BARCHART', 'Barchart');
 	const tgam = new CustomerType('TGAM', 'The Globe and Mail');
 
 	return CustomerType;
@@ -8133,6 +8189,7 @@ module.exports = require('./lib/axios');
 var utils = require('./../utils');
 var settle = require('./../core/settle');
 var buildURL = require('./../helpers/buildURL');
+var buildFullPath = require('../core/buildFullPath');
 var parseHeaders = require('./../helpers/parseHeaders');
 var isURLSameOrigin = require('./../helpers/isURLSameOrigin');
 var createError = require('../core/createError');
@@ -8155,7 +8212,8 @@ module.exports = function xhrAdapter(config) {
       requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
     }
 
-    request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
+    var fullPath = buildFullPath(config.baseURL, config.url);
+    request.open(config.method.toUpperCase(), buildURL(fullPath, config.params, config.paramsSerializer), true);
 
     // Set the request timeout in MS
     request.timeout = config.timeout;
@@ -8216,7 +8274,11 @@ module.exports = function xhrAdapter(config) {
 
     // Handle timeout
     request.ontimeout = function handleTimeout() {
-      reject(createError('timeout of ' + config.timeout + 'ms exceeded', config, 'ECONNABORTED',
+      var timeoutErrorMessage = 'timeout of ' + config.timeout + 'ms exceeded';
+      if (config.timeoutErrorMessage) {
+        timeoutErrorMessage = config.timeoutErrorMessage;
+      }
+      reject(createError(timeoutErrorMessage, config, 'ECONNABORTED',
         request));
 
       // Clean up request
@@ -8230,7 +8292,7 @@ module.exports = function xhrAdapter(config) {
       var cookies = require('./../helpers/cookies');
 
       // Add xsrf header
-      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
+      var xsrfValue = (config.withCredentials || isURLSameOrigin(fullPath)) && config.xsrfCookieName ?
         cookies.read(config.xsrfCookieName) :
         undefined;
 
@@ -8253,8 +8315,8 @@ module.exports = function xhrAdapter(config) {
     }
 
     // Add withCredentials to request if needed
-    if (config.withCredentials) {
-      request.withCredentials = true;
+    if (!utils.isUndefined(config.withCredentials)) {
+      request.withCredentials = !!config.withCredentials;
     }
 
     // Add responseType to request if needed
@@ -8303,7 +8365,7 @@ module.exports = function xhrAdapter(config) {
   });
 };
 
-},{"../core/createError":64,"./../core/settle":68,"./../helpers/buildURL":72,"./../helpers/cookies":74,"./../helpers/isURLSameOrigin":76,"./../helpers/parseHeaders":78,"./../utils":80}],58:[function(require,module,exports){
+},{"../core/buildFullPath":64,"../core/createError":65,"./../core/settle":69,"./../helpers/buildURL":73,"./../helpers/cookies":75,"./../helpers/isURLSameOrigin":77,"./../helpers/parseHeaders":79,"./../utils":81}],58:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -8358,7 +8420,7 @@ module.exports = axios;
 // Allow use of default import syntax in TypeScript
 module.exports.default = axios;
 
-},{"./cancel/Cancel":59,"./cancel/CancelToken":60,"./cancel/isCancel":61,"./core/Axios":62,"./core/mergeConfig":67,"./defaults":70,"./helpers/bind":71,"./helpers/spread":79,"./utils":80}],59:[function(require,module,exports){
+},{"./cancel/Cancel":59,"./cancel/CancelToken":60,"./cancel/isCancel":61,"./core/Axios":62,"./core/mergeConfig":68,"./defaults":71,"./helpers/bind":72,"./helpers/spread":80,"./utils":81}],59:[function(require,module,exports){
 'use strict';
 
 /**
@@ -8483,7 +8545,15 @@ Axios.prototype.request = function request(config) {
   }
 
   config = mergeConfig(this.defaults, config);
-  config.method = config.method ? config.method.toLowerCase() : 'get';
+
+  // Set config.method
+  if (config.method) {
+    config.method = config.method.toLowerCase();
+  } else if (this.defaults.method) {
+    config.method = this.defaults.method.toLowerCase();
+  } else {
+    config.method = 'get';
+  }
 
   // Hook up interceptors middleware
   var chain = [dispatchRequest, undefined];
@@ -8533,7 +8603,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = Axios;
 
-},{"../helpers/buildURL":72,"./../utils":80,"./InterceptorManager":63,"./dispatchRequest":65,"./mergeConfig":67}],63:[function(require,module,exports){
+},{"../helpers/buildURL":73,"./../utils":81,"./InterceptorManager":63,"./dispatchRequest":66,"./mergeConfig":68}],63:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -8587,7 +8657,29 @@ InterceptorManager.prototype.forEach = function forEach(fn) {
 
 module.exports = InterceptorManager;
 
-},{"./../utils":80}],64:[function(require,module,exports){
+},{"./../utils":81}],64:[function(require,module,exports){
+'use strict';
+
+var isAbsoluteURL = require('../helpers/isAbsoluteURL');
+var combineURLs = require('../helpers/combineURLs');
+
+/**
+ * Creates a new URL by combining the baseURL with the requestedURL,
+ * only when the requestedURL is not already an absolute URL.
+ * If the requestURL is absolute, this function returns the requestedURL untouched.
+ *
+ * @param {string} baseURL The base URL
+ * @param {string} requestedURL Absolute or relative URL to combine
+ * @returns {string} The combined full path
+ */
+module.exports = function buildFullPath(baseURL, requestedURL) {
+  if (baseURL && !isAbsoluteURL(requestedURL)) {
+    return combineURLs(baseURL, requestedURL);
+  }
+  return requestedURL;
+};
+
+},{"../helpers/combineURLs":74,"../helpers/isAbsoluteURL":76}],65:[function(require,module,exports){
 'use strict';
 
 var enhanceError = require('./enhanceError');
@@ -8607,15 +8699,13 @@ module.exports = function createError(message, config, code, request, response) 
   return enhanceError(error, config, code, request, response);
 };
 
-},{"./enhanceError":66}],65:[function(require,module,exports){
+},{"./enhanceError":67}],66:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
 var transformData = require('./transformData');
 var isCancel = require('../cancel/isCancel');
 var defaults = require('../defaults');
-var isAbsoluteURL = require('./../helpers/isAbsoluteURL');
-var combineURLs = require('./../helpers/combineURLs');
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -8635,11 +8725,6 @@ function throwIfCancellationRequested(config) {
 module.exports = function dispatchRequest(config) {
   throwIfCancellationRequested(config);
 
-  // Support baseURL config
-  if (config.baseURL && !isAbsoluteURL(config.url)) {
-    config.url = combineURLs(config.baseURL, config.url);
-  }
-
   // Ensure headers exist
   config.headers = config.headers || {};
 
@@ -8654,7 +8739,7 @@ module.exports = function dispatchRequest(config) {
   config.headers = utils.merge(
     config.headers.common || {},
     config.headers[config.method] || {},
-    config.headers || {}
+    config.headers
   );
 
   utils.forEach(
@@ -8695,7 +8780,7 @@ module.exports = function dispatchRequest(config) {
   });
 };
 
-},{"../cancel/isCancel":61,"../defaults":70,"./../helpers/combineURLs":73,"./../helpers/isAbsoluteURL":75,"./../utils":80,"./transformData":69}],66:[function(require,module,exports){
+},{"../cancel/isCancel":61,"../defaults":71,"./../utils":81,"./transformData":70}],67:[function(require,module,exports){
 'use strict';
 
 /**
@@ -8739,7 +8824,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
   return error;
 };
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -8757,13 +8842,23 @@ module.exports = function mergeConfig(config1, config2) {
   config2 = config2 || {};
   var config = {};
 
-  utils.forEach(['url', 'method', 'params', 'data'], function valueFromConfig2(prop) {
+  var valueFromConfig2Keys = ['url', 'method', 'params', 'data'];
+  var mergeDeepPropertiesKeys = ['headers', 'auth', 'proxy'];
+  var defaultToConfig2Keys = [
+    'baseURL', 'url', 'transformRequest', 'transformResponse', 'paramsSerializer',
+    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
+    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress',
+    'maxContentLength', 'validateStatus', 'maxRedirects', 'httpAgent',
+    'httpsAgent', 'cancelToken', 'socketPath'
+  ];
+
+  utils.forEach(valueFromConfig2Keys, function valueFromConfig2(prop) {
     if (typeof config2[prop] !== 'undefined') {
       config[prop] = config2[prop];
     }
   });
 
-  utils.forEach(['headers', 'auth', 'proxy'], function mergeDeepProperties(prop) {
+  utils.forEach(mergeDeepPropertiesKeys, function mergeDeepProperties(prop) {
     if (utils.isObject(config2[prop])) {
       config[prop] = utils.deepMerge(config1[prop], config2[prop]);
     } else if (typeof config2[prop] !== 'undefined') {
@@ -8775,13 +8870,25 @@ module.exports = function mergeConfig(config1, config2) {
     }
   });
 
-  utils.forEach([
-    'baseURL', 'transformRequest', 'transformResponse', 'paramsSerializer',
-    'timeout', 'withCredentials', 'adapter', 'responseType', 'xsrfCookieName',
-    'xsrfHeaderName', 'onUploadProgress', 'onDownloadProgress', 'maxContentLength',
-    'validateStatus', 'maxRedirects', 'httpAgent', 'httpsAgent', 'cancelToken',
-    'socketPath'
-  ], function defaultToConfig2(prop) {
+  utils.forEach(defaultToConfig2Keys, function defaultToConfig2(prop) {
+    if (typeof config2[prop] !== 'undefined') {
+      config[prop] = config2[prop];
+    } else if (typeof config1[prop] !== 'undefined') {
+      config[prop] = config1[prop];
+    }
+  });
+
+  var axiosKeys = valueFromConfig2Keys
+    .concat(mergeDeepPropertiesKeys)
+    .concat(defaultToConfig2Keys);
+
+  var otherKeys = Object
+    .keys(config2)
+    .filter(function filterAxiosKeys(key) {
+      return axiosKeys.indexOf(key) === -1;
+    });
+
+  utils.forEach(otherKeys, function otherKeysDefaultToConfig2(prop) {
     if (typeof config2[prop] !== 'undefined') {
       config[prop] = config2[prop];
     } else if (typeof config1[prop] !== 'undefined') {
@@ -8792,7 +8899,7 @@ module.exports = function mergeConfig(config1, config2) {
   return config;
 };
 
-},{"../utils":80}],68:[function(require,module,exports){
+},{"../utils":81}],69:[function(require,module,exports){
 'use strict';
 
 var createError = require('./createError');
@@ -8819,7 +8926,7 @@ module.exports = function settle(resolve, reject, response) {
   }
 };
 
-},{"./createError":64}],69:[function(require,module,exports){
+},{"./createError":65}],70:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -8841,7 +8948,7 @@ module.exports = function transformData(data, headers, fns) {
   return data;
 };
 
-},{"./../utils":80}],70:[function(require,module,exports){
+},{"./../utils":81}],71:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -8860,13 +8967,12 @@ function setContentTypeIfUnset(headers, value) {
 
 function getDefaultAdapter() {
   var adapter;
-  // Only Node.JS has a process variable that is of [[Class]] process
-  if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
-    // For node use HTTP adapter
-    adapter = require('./adapters/http');
-  } else if (typeof XMLHttpRequest !== 'undefined') {
+  if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
     adapter = require('./adapters/xhr');
+  } else if (typeof process !== 'undefined' && Object.prototype.toString.call(process) === '[object process]') {
+    // For node use HTTP adapter
+    adapter = require('./adapters/http');
   }
   return adapter;
 }
@@ -8943,7 +9049,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 }).call(this,require('_process'))
-},{"./adapters/http":57,"./adapters/xhr":57,"./helpers/normalizeHeaderName":77,"./utils":80,"_process":82}],71:[function(require,module,exports){
+},{"./adapters/http":57,"./adapters/xhr":57,"./helpers/normalizeHeaderName":78,"./utils":81,"_process":83}],72:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -8956,7 +9062,7 @@ module.exports = function bind(fn, thisArg) {
   };
 };
 
-},{}],72:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9029,7 +9135,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
   return url;
 };
 
-},{"./../utils":80}],73:[function(require,module,exports){
+},{"./../utils":81}],74:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9045,7 +9151,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
     : baseURL;
 };
 
-},{}],74:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9100,7 +9206,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":80}],75:[function(require,module,exports){
+},{"./../utils":81}],76:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9116,7 +9222,7 @@ module.exports = function isAbsoluteURL(url) {
   return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
 };
 
-},{}],76:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9186,7 +9292,7 @@ module.exports = (
     })()
 );
 
-},{"./../utils":80}],77:[function(require,module,exports){
+},{"./../utils":81}],78:[function(require,module,exports){
 'use strict';
 
 var utils = require('../utils');
@@ -9200,7 +9306,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
   });
 };
 
-},{"../utils":80}],78:[function(require,module,exports){
+},{"../utils":81}],79:[function(require,module,exports){
 'use strict';
 
 var utils = require('./../utils');
@@ -9255,7 +9361,7 @@ module.exports = function parseHeaders(headers) {
   return parsed;
 };
 
-},{"./../utils":80}],79:[function(require,module,exports){
+},{"./../utils":81}],80:[function(require,module,exports){
 'use strict';
 
 /**
@@ -9284,11 +9390,10 @@ module.exports = function spread(callback) {
   };
 };
 
-},{}],80:[function(require,module,exports){
+},{}],81:[function(require,module,exports){
 'use strict';
 
 var bind = require('./helpers/bind');
-var isBuffer = require('is-buffer');
 
 /*global toString:true*/
 
@@ -9304,6 +9409,27 @@ var toString = Object.prototype.toString;
  */
 function isArray(val) {
   return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
+}
+
+/**
+ * Determine if a value is a Buffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a Buffer, otherwise false
+ */
+function isBuffer(val) {
+  return val !== null && !isUndefined(val) && val.constructor !== null && !isUndefined(val.constructor)
+    && typeof val.constructor.isBuffer === 'function' && val.constructor.isBuffer(val);
 }
 
 /**
@@ -9360,16 +9486,6 @@ function isString(val) {
  */
 function isNumber(val) {
   return typeof val === 'number';
-}
-
-/**
- * Determine if a value is undefined
- *
- * @param {Object} val The value to test
- * @returns {boolean} True if the value is undefined, otherwise false
- */
-function isUndefined(val) {
-  return typeof val === 'undefined';
 }
 
 /**
@@ -9620,11 +9736,11 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":71,"is-buffer":83}],81:[function(require,module,exports){
+},{"./helpers/bind":72}],82:[function(require,module,exports){
 /*
- *  big.js v5.0.3
+ *  big.js v5.2.2
  *  A small, fast, easy-to-use library for arbitrary-precision decimal arithmetic.
- *  Copyright (c) 2017 Michael Mclaughlin <M8ch88l@gmail.com>
+ *  Copyright (c) 2018 Michael Mclaughlin <M8ch88l@gmail.com>
  *  https://github.com/MikeMcl/big.js/LICENCE
  */
 ;(function (GLOBAL) {
@@ -9730,7 +9846,7 @@ module.exports = {
     Big.RM = RM;
     Big.NE = NE;
     Big.PE = PE;
-    Big.version = '5.0.2';
+    Big.version = '5.2.2';
 
     return Big;
   }
@@ -9814,7 +9930,7 @@ module.exports = {
         more = xc[i] > 5 || xc[i] == 5 &&
           (more || i < 0 || xc[i + 1] !== UNDEFINED || xc[i - 1] & 1);
       } else if (rm === 3) {
-        more = more || xc[i] !== UNDEFINED || i < 0;
+        more = more || !!xc[0];
       } else {
         more = false;
         if (rm !== 0) throw Error(INVALID_RM);
@@ -10281,7 +10397,7 @@ module.exports = {
     xc = xc.slice();
 
     // Prepend zeros to equalise exponents.
-    // Note: Faster to use reverse then do unshifts.
+    // Note: reverse faster than unshifts.
     if (a = xe - ye) {
       if (a > 0) {
         ye = xe;
@@ -10353,18 +10469,19 @@ module.exports = {
 
 
   /*
-   * Return a new Big whose value is the value of this Big rounded to a maximum of dp decimal
-   * places using rounding mode rm.
+   * Return a new Big whose value is the value of this Big rounded using rounding mode rm
+   * to a maximum of dp decimal places, or, if dp is negative, to an integer which is a
+   * multiple of 10**-dp.
    * If dp is not specified, round to 0 decimal places.
    * If rm is not specified, use Big.RM.
    *
-   * dp? {number} Integer, 0 to MAX_DP inclusive.
+   * dp? {number} Integer, -MAX_DP to MAX_DP inclusive.
    * rm? 0, 1, 2 or 3 (ROUND_DOWN, ROUND_HALF_UP, ROUND_HALF_EVEN, ROUND_UP)
    */
   P.round = function (dp, rm) {
     var Big = this.constructor;
     if (dp === UNDEFINED) dp = 0;
-    else if (dp !== ~~dp || dp < 0 || dp > MAX_DP) throw Error(INVALID_DP);
+    else if (dp !== ~~dp || dp < -MAX_DP || dp > MAX_DP) throw Error(INVALID_DP);
     return round(new Big(this), dp, rm === UNDEFINED ? Big.RM : rm);
   };
 
@@ -10388,17 +10505,18 @@ module.exports = {
     if (s < 0) throw Error(NAME + 'No square root');
 
     // Estimate.
-    s = Math.sqrt(x.toString());
+    s = Math.sqrt(x + '');
 
     // Math.sqrt underflow/overflow?
-    // Re-estimate: pass x to Math.sqrt as integer, then adjust the result exponent.
+    // Re-estimate: pass x coefficient to Math.sqrt as integer, then adjust the result exponent.
     if (s === 0 || s === 1 / 0) {
       c = x.c.join('');
       if (!(c.length + e & 1)) c += '0';
-      r = new Big(Math.sqrt(c).toString());
-      r.e = ((e + 1) / 2 | 0) - (e < 0 || e & 1);
+      s = Math.sqrt(c);
+      e = ((e + 1) / 2 | 0) - (e < 0 || e & 1);
+      r = new Big((s == 1 / 0 ? '1e' : (s = s.toExponential()).slice(0, s.indexOf('e') + 1)) + e);
     } else {
-      r = new Big(s.toString());
+      r = new Big(s);
     }
 
     e = r.e + (Big.DP += 4);
@@ -10561,7 +10679,7 @@ module.exports = {
   }
 })(this);
 
-},{}],82:[function(require,module,exports){
+},{}],83:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -10746,19 +10864,6 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 process.umask = function() { return 0; };
-
-},{}],83:[function(require,module,exports){
-/*!
- * Determine if an object is a Buffer
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-
-module.exports = function isBuffer (obj) {
-  return obj != null && obj.constructor != null &&
-    typeof obj.constructor.isBuffer === 'function' && obj.constructor.isBuffer(obj)
-}
 
 },{}],84:[function(require,module,exports){
 module.exports={
