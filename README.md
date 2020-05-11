@@ -8,8 +8,8 @@ A **public** JavaScript SDK for interfacing with Barchart's Event Tracking Syste
 
 The Barchart Event Tracking System collects usage statistics from various software systems and exposes the following functionality:
 
-- Accepts and _saves events_ (e.g. Job Started, Pizza Ordered, Lightning Struck, etc).
-- Accepts _requests to generate log files_ containing events, given a customer, product type, and optional start and end dates.
+- Accepts and **saves events** (e.g. Job Started, Pizza Ordered, Lightning Struck, etc).
+- Accepts requests to **generate log files** containing events, given a customer, product type, and optional start and end dates.
 
 This SDK simplifies interaction with the Barchart Event Tracking System, by exposing JavaScript classes with simple functions:
 
