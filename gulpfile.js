@@ -12,6 +12,7 @@ const AWS = require('aws-sdk'),
 	glob = require('glob'),
 	jasmine = require('gulp-jasmine'),
 	jshint = require('gulp-jshint'),
+	prompt = require('gulp-prompt'),
 	rename = require('gulp-rename'),
 	replace = require('gulp-replace'),
 	source = require('vinyl-source-stream');
