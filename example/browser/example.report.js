@@ -478,7 +478,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.4.2'
+    version: '1.5.0'
   };
 })();
 
@@ -6043,6 +6043,18 @@ module.exports = (() => {
     },
 
     /**
+     * Returns true if the argument is iterable.
+     *
+     * @static
+     * @public
+     * @param {*} candidate
+     * @returns {boolean}
+     */
+    iterable(candidate) {
+      return !this.null(candidate) && !this.undefined(candidate) && this.fn(candidate[Symbol.iterator]);
+    },
+
+    /**
      * Returns true if the argument is a string.
      *
      * @static
@@ -7674,6 +7686,10 @@ module.exports = (() => {
 			return portfolioWatchlistAddScreenInvoked;
 		}
 
+		static get PORTFOLIO_WEALTHSCOPE_REPORT_VIEWED() {
+			return portfolioWealthscopeReportViewed;
+		}
+
 		/**
 		 * Get all context keys for productType.
 		 *
@@ -7741,6 +7757,7 @@ module.exports = (() => {
 	const portfolioEditPortfolioScreenInvoked = new EventType('PORTFOLIO-SCREEN-INVOKED-EDIT-PORTFOLIO', 'Portfolio Edit Screen Invoked', ProductType.PORTFOLIO, ['userId', 'portfolioId']);
 	const portfolioEditTransactionScreenInvoked = new EventType('PORTFOLIO-SCREEN-INVOKED-EDIT-TRANSACTION', 'Transaction Edit Screen Invoked', ProductType.PORTFOLIO, ['userId', 'portfolioId', 'positionId']);
 	const portfolioWatchlistAddScreenInvoked = new EventType('PORTFOLIO-SCREEN-INVOKED-WATCHLIST-ADD', 'Watchlist Add Edit Screen Invoked', ProductType.PORTFOLIO, ['userId', 'portfolioId', 'positionId']);
+	const portfolioWealthscopeReportViewed = new EventType('PORTFOLIO-WEALTHSCOPE-REPORT-VIEWED', 'Wealthscope Report Viewed', ProductType.PORTFOLIO, ['userId', 'portfolioId']);
 
 	return EventType;
 })();
