@@ -1,12 +1,12 @@
 const gulp = require('gulp');
 
-const fs = require('fs');
+const exec = require('child_process').exec,
+	fs = require('fs');
 
 const AWS = require('aws-sdk'),
 	awspublish = require('gulp-awspublish'),
 	browserify = require('browserify'),
 	buffer = require('vinyl-buffer'),
-	bump = require('gulp-bump'),
 	git = require('gulp-git'),
 	gitStatus = require('git-get-status'),
 	glob = require('glob'),
@@ -30,10 +30,31 @@ gulp.task('ensure-clean-working-directory', (cb) => {
 	});
 });
 
-gulp.task('bump-version', () => {
-	return gulp.src([ './package.json' ])
-		.pipe(bump({ type: 'patch' }))
-		.pipe(gulp.dest('./'));
+gulp.task('bump-choice', (cb) => {
+	const processor = prompt.prompt({
+		type: 'list',
+		name: 'bump',
+		message: 'What type of bump would you like to do?',
+		choices: ['patch', 'minor', 'major'],
+	}, (res) => {
+		global.bump = res.bump;
+
+		return cb();
+	});
+
+	return gulp.src(['./package.json']).pipe(processor);
+});
+
+gulp.task('bump-version', (cb) => {
+	exec(`npm version ${global.bump || 'patch'} --no-git-tag-version`, {
+		cwd: './'
+	}, (error) => {
+		if (error) {
+			cb(error);
+		}
+
+		cb();
+	});
 });
 
 gulp.task('embed-version', () => {
@@ -139,6 +160,7 @@ gulp.task('execute-tests', gulp.series(
 gulp.task('release', gulp.series(
 	'ensure-clean-working-directory',
 	'execute-tests',
+	'bump-choice',
 	'bump-version',
 	'embed-version',
 	'build-example-bundles',
