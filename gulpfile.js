@@ -175,7 +175,7 @@ gulp.task('watch', () => {
 });
 
 gulp.task('lint', () => {
-	return gulp.src([ './**/*.js', './test/specs/**/*.js', '!./node_modules/**', '!./test/SpecRunner.js', '!./example/browser/example.event.js', '!./example/browser/example.report.js' ])
+	return gulp.src([ './**/*.js', './test/specs/**/*.js', '!./node_modules/**', '!./test/SpecRunner.js', '!./example/browser/example.event.js', '!./example/browser/example.report.js', '!./docs/**' ])
 		.pipe(jshint({'esversion': 9}))
 		.pipe(jshint.reporter('default'))
 		.pipe(jshint.reporter('fail'));
