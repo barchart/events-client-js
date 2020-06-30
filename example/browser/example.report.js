@@ -478,7 +478,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.5.0'
+    version: '1.6.0'
   };
 })();
 
@@ -5048,8 +5048,11 @@ const moment = require('moment-timezone');
 
 module.exports = (() => {
   'use strict';
+
+  const MILLISECONDS_PER_SECOND = 1000;
   /**
-   * A data structure encapsulates (and lazy loads) a moment (see https://momentjs.com/).
+   * An immutable data structure that encapsulates (and lazy loads)
+   * a moment (see https://momentjs.com/).
    *
    * @public
    * @param {Number} timestamp
@@ -5065,7 +5068,7 @@ module.exports = (() => {
       this._moment = null;
     }
     /**
-     * The timestamp.
+     * The timestamp (milliseconds since epoch).
      *
      * @public
      * @returns {Number}
@@ -5093,6 +5096,34 @@ module.exports = (() => {
       }
 
       return this._moment;
+    }
+    /**
+     * Returns a new {@link Timestamp} instance shifted forward (or backward)
+     * by a specific number of seconds.
+     *
+     * @public
+     * @param {Number} milliseconds
+     * @returns {Timestamp}
+     */
+
+
+    add(milliseconds) {
+      assert.argumentIsRequired(milliseconds, 'seconds', Number);
+      return new Timestamp(this._timestamp + milliseconds, this._timezone);
+    }
+    /**
+     * Returns a new {@link Timestamp} instance shifted forward (or backward)
+     * by a specific number of seconds.
+     *
+     * @public
+     * @param {Number} seconds
+     * @returns {Timestamp}
+     */
+
+
+    addSeconds(seconds) {
+      assert.argumentIsRequired(seconds, 'seconds', Number);
+      return this.add(seconds * MILLISECONDS_PER_SECOND);
     }
     /**
      * Returns the JSON representation.
@@ -7690,6 +7721,14 @@ module.exports = (() => {
 			return portfolioWealthscopeReportViewed;
 		}
 
+		static get PORTFOLIO_VALUE_GRAPH_OPENED() {
+			return portfolioValueGraphOpened;
+		}
+
+		static get PORTFOLIO_VALUE_GRAPH_DURATION_CHANGED() {
+			return portfolioValueGraphDurationChanged;
+		}
+
 		/**
 		 * Get all context keys for productType.
 		 *
@@ -7758,6 +7797,8 @@ module.exports = (() => {
 	const portfolioEditTransactionScreenInvoked = new EventType('PORTFOLIO-SCREEN-INVOKED-EDIT-TRANSACTION', 'Transaction Edit Screen Invoked', ProductType.PORTFOLIO, ['userId', 'portfolioId', 'positionId']);
 	const portfolioWatchlistAddScreenInvoked = new EventType('PORTFOLIO-SCREEN-INVOKED-WATCHLIST-ADD', 'Watchlist Add Edit Screen Invoked', ProductType.PORTFOLIO, ['userId', 'portfolioId', 'positionId']);
 	const portfolioWealthscopeReportViewed = new EventType('PORTFOLIO-WEALTHSCOPE-REPORT-VIEWED', 'Wealthscope Report Viewed', ProductType.PORTFOLIO, ['userId', 'portfolioId']);
+	const portfolioValueGraphOpened = new EventType('PORTFOLIO-VALUE-GRAPH-OPENED', 'Portfolio Value Graph Opened', ProductType.PORTFOLIO, ['userId', 'portfolioId']);
+	const portfolioValueGraphDurationChanged = new EventType('PORTFOLIO-VALUE-GRAPH-DURATION-CHANGED', 'Portfolio Value Graph Duration Changed', ProductType.PORTFOLIO, ['userId', 'portfolioId', 'duration']);
 
 	return EventType;
 })();
