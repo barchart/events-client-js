@@ -13,13 +13,13 @@ The concept of an event is intuitive.
 
 Your software identifies events as they occur. It sends information regarding these events to the Barchart Event Tracking Service. The backed records the data, making it available for query.
 
-**Embedded within your software, this SDK simplifies the process of transmitting data to the backend.**
+**Embedded within your software, this SDK simplifies the process of transmitting event data to the backend.**
 
 ## Event Analysis
 
 The Barchart Event Tracking Service can emit a listing of events, filtered according to your criteria. However, statistical analysis and visualization must be performed by external tools (e.g. [Tableau](https://www.tableau.com/) or [Grafana](https://grafana.com/)).
 
-**Embedded within your software, this SDK simplifies the process of requesting and downloading event reports from the backend.**
+**Embedded within your software, this SDK simplifies the process of requesting and downloading reports from the backend.**
 
 ## Supported Environments
 
