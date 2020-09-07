@@ -19,7 +19,7 @@
         * [.start()](#EventGatewaystart) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)
         * [.createEvents(events)](#EventGatewaycreateEvents) ⇒ <code>Promise.&lt;Array.&lt;Events&gt;&gt;</code>
     * _static_
-        * [.for(stage)](#EventGatewayfor) ⇒ <code>Promise.&lt;(ReportGateway\|null)&gt;</code>
+        * [.for(stage)](#EventGatewayfor) ⇒ <code>Promise.&lt;(EventGateway\|null)&gt;</code>
         * [.forDevelopment()](#EventGatewayforDevelopment) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)
         * [.forStaging()](#EventGatewayforStaging) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)
         * [.forProduction()](#EventGatewayforProduction) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)
@@ -57,7 +57,7 @@
 > <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the provided environment.</p>
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
-**Returns**: <code>Promise.&lt;(ReportGateway\|null)&gt;</code>  
+**Returns**: <code>Promise.&lt;(EventGateway\|null)&gt;</code>  
 
 | Param | Type |
 | --- | --- |
