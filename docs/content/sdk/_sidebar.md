@@ -7,7 +7,6 @@
 <!-- api_close -->
 <!-- sdk_open -->
 * [SDK Reference](/content/sdk_reference)
-	* [lib/common](/content/sdk/lib-common)
 	* [lib/engine](/content/sdk/lib-engine)
 	* [lib/gateway](/content/sdk/lib-gateway)
 <!-- sdk_close -->
