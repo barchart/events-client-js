@@ -11,9 +11,9 @@ The concept of an event is intuitive.
 
 ## Event Tracking
 
-Your software identifies events as they occur. It sends information regarding these events to the remote service. The remote service saves the information in its databases.
+Your software identifies events as they occur. It sends information regarding these events to the Barchart Event Tracking Service. The remote service saves the information in its databases.
 
-**Embedded within your software, this SDK simplifies the process of communicating with the Barchart Event Tracking Service.**
+**Embedded within your software, this SDK simplifies the process of transmitting data to the backend.**
 
 ## Event Analysis
 
