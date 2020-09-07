@@ -1,8 +1,9 @@
 * [Overview](/content/product_overview)
 * [Quick Start](/content/quick_start)
 * Key Concepts
-    * [Key Concept One](/content/concepts/concept_one)
-    * [Key Concept Two](/content/concepts/concept_two)
+    * [Data Structures](/content/concepts/data_structures)
+    * [Capturing Events](/content/concepts/capturing_events)
+    * [Querying Events](/content/concepts/querying_events)
 <!-- api_open -->
 <!-- api_close -->
 <!-- sdk_open -->
