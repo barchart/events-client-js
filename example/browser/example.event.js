@@ -5,7 +5,7 @@ const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'
       EventType = require('@barchart/events-api-common/lib/data/EventType'),
       ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
-const version = require('../../../lib/meta').version;
+const version = require('../../../lib/index').version;
 
 module.exports = (() => {
   'use strict';
@@ -22,7 +22,7 @@ module.exports = (() => {
   };
 })();
 
-},{"../../../lib/meta":6,"@barchart/common-js/lang/Enum":35,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventType":53,"@barchart/events-api-common/lib/data/ProductType":54}],2:[function(require,module,exports){
+},{"../../../lib/index":6,"@barchart/common-js/lang/Enum":35,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventType":53,"@barchart/events-api-common/lib/data/ProductType":54}],2:[function(require,module,exports){
 const Config = require('./example.config');
 
 const Timestamp = require('@barchart/common-js/lang/Timestamp');
@@ -151,6 +151,7 @@ module.exports = (() => {
    * Static configuration data.
    *
    * @public
+   * @ignore
    */
 
   class Configuration {
@@ -210,8 +211,8 @@ const EventGateway = require('../gateway/EventGateway');
 module.exports = (() => {
   'use strict';
   /**
-   * A wrapper utility for an {@link @EventGateway} which caches and
-   * periodically sends new {@link Event} objects to the server.
+   * A utility which buffers {@link Schema.Event} objects and periodically
+   * transmits them to backend in batches.
    *
    * @public
    * @param {EventGateway}
@@ -229,8 +230,8 @@ module.exports = (() => {
       this._running = false;
     }
     /**
-     * Starts the scheduler for transmitting events, causing
-     * events to be periodically flushed from the buffer.
+     * Begins queue processing. Items in the buffer will begin to be transmitted
+     * to the remote service.
      *
      * @public
      */
@@ -243,12 +244,12 @@ module.exports = (() => {
 
       this._scheduler = new Scheduler();
       this._running = true;
-      watch.call(this);
+      processBuffer.call(this);
     }
     /**
-     * Stops the scheduler, causing events to accumulate in
-     * the buffer.
-     *
+     * Stops the queue processing. Items in the buffer accumulate without being
+     * transmitted to the remote service.
+     * 
      * @public
      */
 
@@ -263,8 +264,7 @@ module.exports = (() => {
       }
     }
     /**
-     * Clears the internal buffer of any events waiting to be
-     * sent to the server.
+     * Clears the internal buffer.
      *
      * @public
      */
@@ -277,7 +277,7 @@ module.exports = (() => {
      * Adds a new event to the buffer.
      *
      * @public
-     * @param {Event} event
+     * @param {Schema.Event} event
      */
 
 
@@ -291,13 +291,13 @@ module.exports = (() => {
 
   }
 
-  function watch() {
+  function processBuffer() {
     if (!this._running) {
       return;
     }
 
     if (this._buffer.length === 0) {
-      return this._scheduler.schedule(watch.bind(this), 5000, 'Watch');
+      return this._scheduler.schedule(processBuffer.bind(this), 5000, 'processBuffer');
     }
 
     const batch = this._buffer;
@@ -308,12 +308,12 @@ module.exports = (() => {
       }
 
       return response;
-    }).catch(err => {
-      console.error('Failed to transmit events to server', err);
-      return err;
+    }).catch(e => {
+      console.error('Failed to transmit events to Barchart Usage Tracking Service', e);
+      return null;
     }).then(() => {
       if (this._running) {
-        this._scheduler.schedule(watch.bind(this), 5000, 'Watch');
+        this._scheduler.schedule(processBuffer.bind(this), 5000, 'processBuffer');
       }
     });
   }
@@ -407,7 +407,7 @@ module.exports = (() => {
      * Creates and starts a new {@link EventGateway} for the provided environment.
      *
      * @param {String} stage
-     * @returns {Promise<ReportGateway|null>}
+     * @returns {Promise<EventGateway|null>}
      */
 
 
@@ -510,7 +510,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.6.0'
+    version: '2.0.0'
   };
 })();
 
@@ -617,6 +617,24 @@ module.exports = (() => {
 
     getIsSevere() {
       return this._head.search(item => item.type.severe, false, false) !== null;
+    }
+    /**
+     * Searches the tree of {@link FailureReasonItem} instances for a non-standard
+     * http error code.
+     *
+     * @public
+     * @returns {Number|null}
+     */
+
+
+    getErrorCode() {
+      const node = this._head.search(item => item.type.error !== null, true, false);
+
+      if (node !== null) {
+        return node.getValue().type.error;
+      } else {
+        return null;
+      }
     }
 
     toJSON() {
@@ -822,13 +840,15 @@ module.exports = (() => {
    * @param {String} code - The enumeration code (and description).
    * @param {String} template - The template string for formatting human-readable messages.
    * @param {Boolean=} severe - Indicates if the failure is severe (default is true).
+   * @param {Number=} error - The HTTP error code which should be used as part of an HTTP response.
    */
 
   class FailureType extends Enum {
-    constructor(code, template, severe) {
+    constructor(code, template, severe, error) {
       super(code, code);
       assert.argumentIsRequired(template, 'template', String);
       assert.argumentIsOptional(severe, 'severe', Boolean);
+      assert.argumentIsOptional(error, 'error', Number);
       this._template = template;
 
       if (is.boolean(severe)) {
@@ -836,6 +856,8 @@ module.exports = (() => {
       } else {
         this._severe = true;
       }
+
+      this._error = error || null;
     }
     /**
      * The template string for formatting human-readable messages.
@@ -858,6 +880,17 @@ module.exports = (() => {
 
     get severe() {
       return this._severe;
+    }
+    /**
+     * The HTTP error code which should be used as part of an HTTP response.
+     *
+     * @public
+     * @return {Number|null}
+     */
+
+
+    get error() {
+      return this._error;
     }
     /**
      * One or more data points is missing.
@@ -6540,6 +6573,31 @@ module.exports = (() => {
     },
 
     /**
+     * Given an array of functions, where each returns a promise, runs
+     * the functions in sequential order, until one of the function
+     * returns a successful promise with a non-null result. Any
+     * rejected promise is ignored.
+     *
+     * @public
+     * @param {Function[]} executors
+     * @returns {Promise}
+     */
+    first(executors) {
+      return Promise.resolve().then(() => {
+        assert.argumentIsArray(executors, 'executors', Function);
+        return executors.reduce((previous, executor) => {
+          return previous.then(result => {
+            if (result === null) {
+              return executor().catch(() => Promise.resolve(null));
+            } else {
+              return previous;
+            }
+          });
+        }, Promise.resolve(null));
+      });
+    },
+
+    /**
      * Creates a new promise, given an executor.
      *
      * This is a wrapper for the {@link Promise} constructor; however, any error
@@ -8022,6 +8080,14 @@ module.exports = (() => {
 			return portfolioValueGraphDurationChanged;
 		}
 
+		static get CMDTYVIEW_LOGIN() {
+			return cmdtyViewLogin;
+		}
+
+		static get CMDTYVIEW_LOGOUT() {
+			return cmdtyViewLogout;
+		}
+
 		/**
 		 * Get all context keys for productType.
 		 *
@@ -8093,6 +8159,11 @@ module.exports = (() => {
 	const portfolioValueGraphOpened = new EventType('PORTFOLIO-VALUE-GRAPH-OPENED', 'Portfolio Value Graph Opened', ProductType.PORTFOLIO, ['userId', 'portfolioId']);
 	const portfolioValueGraphDurationChanged = new EventType('PORTFOLIO-VALUE-GRAPH-DURATION-CHANGED', 'Portfolio Value Graph Duration Changed', ProductType.PORTFOLIO, ['userId', 'portfolioId', 'duration']);
 
+	// cmdtyView
+
+	const cmdtyViewLogin = new EventType('CMDTYVIEW-LOGIN', 'User logged in', ProductType.PORTFOLIO, ['userId', 'sessionId']);
+	const cmdtyViewLogout = new EventType('CMDTYVIEW-LOGOUT', 'User logged out', ProductType.PORTFOLIO, ['userId', 'sessionId']);
+
 	return EventType;
 })();
 
@@ -8137,6 +8208,17 @@ module.exports = (() => {
 			return watchlist;
 		}
 
+		/**
+		 * The cmdtyView trading platform.
+		 *
+		 * @public
+		 * @static
+		 * @returns {ProductType}
+		 */
+		static get CMDTYVIEW() {
+			return cmdtyView;
+		}
+
 		toString() {
 			return `[ProductType (code=${this.code})]`;
 		}
@@ -8144,6 +8226,7 @@ module.exports = (() => {
 
 	const portfolio = new ProductType('PORTFOLIO', 'PORTFOLIO');
 	const watchlist = new ProductType('WATCHLIST', 'WATCHLIST');
+	const cmdtyView = new ProductType('CMDTYVIEW', 'CMDTYVIEW');
 
 	return ProductType;
 })();

@@ -5,7 +5,7 @@ const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'
       EventType = require('@barchart/events-api-common/lib/data/EventType'),
       ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
-const version = require('../../../lib/meta').version;
+const version = require('../../../lib/index').version;
 
 module.exports = (() => {
   'use strict';
@@ -22,7 +22,7 @@ module.exports = (() => {
   };
 })();
 
-},{"../../../lib/meta":5,"@barchart/common-js/lang/Enum":34,"@barchart/events-api-common/lib/data/CustomerType":49,"@barchart/events-api-common/lib/data/EventType":51,"@barchart/events-api-common/lib/data/ProductType":52}],2:[function(require,module,exports){
+},{"../../../lib/index":5,"@barchart/common-js/lang/Enum":34,"@barchart/events-api-common/lib/data/CustomerType":49,"@barchart/events-api-common/lib/data/EventType":51,"@barchart/events-api-common/lib/data/ProductType":52}],2:[function(require,module,exports){
 const FailureType = require('@barchart/common-js/api/failures/FailureType');
 
 const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
@@ -178,6 +178,7 @@ module.exports = (() => {
    * Static configuration data.
    *
    * @public
+   * @ignore
    */
 
   class Configuration {
@@ -478,7 +479,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '1.6.0'
+    version: '2.0.0'
   };
 })();
 
@@ -585,6 +586,24 @@ module.exports = (() => {
 
     getIsSevere() {
       return this._head.search(item => item.type.severe, false, false) !== null;
+    }
+    /**
+     * Searches the tree of {@link FailureReasonItem} instances for a non-standard
+     * http error code.
+     *
+     * @public
+     * @returns {Number|null}
+     */
+
+
+    getErrorCode() {
+      const node = this._head.search(item => item.type.error !== null, true, false);
+
+      if (node !== null) {
+        return node.getValue().type.error;
+      } else {
+        return null;
+      }
     }
 
     toJSON() {
@@ -790,13 +809,15 @@ module.exports = (() => {
    * @param {String} code - The enumeration code (and description).
    * @param {String} template - The template string for formatting human-readable messages.
    * @param {Boolean=} severe - Indicates if the failure is severe (default is true).
+   * @param {Number=} error - The HTTP error code which should be used as part of an HTTP response.
    */
 
   class FailureType extends Enum {
-    constructor(code, template, severe) {
+    constructor(code, template, severe, error) {
       super(code, code);
       assert.argumentIsRequired(template, 'template', String);
       assert.argumentIsOptional(severe, 'severe', Boolean);
+      assert.argumentIsOptional(error, 'error', Number);
       this._template = template;
 
       if (is.boolean(severe)) {
@@ -804,6 +825,8 @@ module.exports = (() => {
       } else {
         this._severe = true;
       }
+
+      this._error = error || null;
     }
     /**
      * The template string for formatting human-readable messages.
@@ -826,6 +849,17 @@ module.exports = (() => {
 
     get severe() {
       return this._severe;
+    }
+    /**
+     * The HTTP error code which should be used as part of an HTTP response.
+     *
+     * @public
+     * @return {Number|null}
+     */
+
+
+    get error() {
+      return this._error;
     }
     /**
      * One or more data points is missing.
@@ -6348,6 +6382,31 @@ module.exports = (() => {
     },
 
     /**
+     * Given an array of functions, where each returns a promise, runs
+     * the functions in sequential order, until one of the function
+     * returns a successful promise with a non-null result. Any
+     * rejected promise is ignored.
+     *
+     * @public
+     * @param {Function[]} executors
+     * @returns {Promise}
+     */
+    first(executors) {
+      return Promise.resolve().then(() => {
+        assert.argumentIsArray(executors, 'executors', Function);
+        return executors.reduce((previous, executor) => {
+          return previous.then(result => {
+            if (result === null) {
+              return executor().catch(() => Promise.resolve(null));
+            } else {
+              return previous;
+            }
+          });
+        }, Promise.resolve(null));
+      });
+    },
+
+    /**
      * Creates a new promise, given an executor.
      *
      * This is a wrapper for the {@link Promise} constructor; however, any error
@@ -7729,6 +7788,14 @@ module.exports = (() => {
 			return portfolioValueGraphDurationChanged;
 		}
 
+		static get CMDTYVIEW_LOGIN() {
+			return cmdtyViewLogin;
+		}
+
+		static get CMDTYVIEW_LOGOUT() {
+			return cmdtyViewLogout;
+		}
+
 		/**
 		 * Get all context keys for productType.
 		 *
@@ -7800,6 +7867,11 @@ module.exports = (() => {
 	const portfolioValueGraphOpened = new EventType('PORTFOLIO-VALUE-GRAPH-OPENED', 'Portfolio Value Graph Opened', ProductType.PORTFOLIO, ['userId', 'portfolioId']);
 	const portfolioValueGraphDurationChanged = new EventType('PORTFOLIO-VALUE-GRAPH-DURATION-CHANGED', 'Portfolio Value Graph Duration Changed', ProductType.PORTFOLIO, ['userId', 'portfolioId', 'duration']);
 
+	// cmdtyView
+
+	const cmdtyViewLogin = new EventType('CMDTYVIEW-LOGIN', 'User logged in', ProductType.PORTFOLIO, ['userId', 'sessionId']);
+	const cmdtyViewLogout = new EventType('CMDTYVIEW-LOGOUT', 'User logged out', ProductType.PORTFOLIO, ['userId', 'sessionId']);
+
 	return EventType;
 })();
 
@@ -7844,6 +7916,17 @@ module.exports = (() => {
 			return watchlist;
 		}
 
+		/**
+		 * The cmdtyView trading platform.
+		 *
+		 * @public
+		 * @static
+		 * @returns {ProductType}
+		 */
+		static get CMDTYVIEW() {
+			return cmdtyView;
+		}
+
 		toString() {
 			return `[ProductType (code=${this.code})]`;
 		}
@@ -7851,6 +7934,7 @@ module.exports = (() => {
 
 	const portfolio = new ProductType('PORTFOLIO', 'PORTFOLIO');
 	const watchlist = new ProductType('WATCHLIST', 'WATCHLIST');
+	const cmdtyView = new ProductType('CMDTYVIEW', 'CMDTYVIEW');
 
 	return ProductType;
 })();
