@@ -4,7 +4,7 @@ const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'
 	EventType = require('@barchart/events-api-common/lib/data/EventType'),
 	ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
-const version = require('../../../lib/meta').version;
+const version = require('../../../lib/index').version;
 
 module.exports = (() => {
 	'use strict';
