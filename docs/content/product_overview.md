@@ -11,7 +11,7 @@ The concept of an event is intuitive.
 
 ## Event Tracking
 
-Your software identifies events as they occur. It sends information regarding these events to the Barchart Event Tracking Service. The backed records the data, making it available for query.
+Your software identifies events as they occur. It sends information regarding these events to the Barchart Event Tracking Service which records the data, making it available for subsequent query.
 
 **Embedded within your software, this SDK simplifies the process of transmitting event data to the backend.**
 
@@ -35,4 +35,4 @@ This SDK is compatible with Node.js.
 
 #### Direct Access
 
-The remote service implements a REST interface. If desired, you may bypassing this SDK entirely. The interface is documented with [OpenAPI](https://www.openapis.org/). See the [API Reference](/content/api_reference) section for more details.
+The remote service implements a REST interface. If desired, you may bypass this SDK entirely. The interface is documented with [OpenAPI](https://www.openapis.org/). See the [API Reference](/content/api_reference) section for more details.

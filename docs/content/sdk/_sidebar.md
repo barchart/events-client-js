@@ -1,13 +1,15 @@
 * [Overview](/content/product_overview)
 * [Quick Start](/content/quick_start)
 * Key Concepts
-    * [Data Structures](/content/concepts/data_structures)
-    * [Capturing Events](/content/concepts/capturing_events)
-    * [Querying Events](/content/concepts/querying_events)
+    * [Event Structure](/content/concepts/event_structure)
+    * [Event Capture](/content/concepts/event_capture)
+    * [Event Queries](/content/concepts/event_query)
 <!-- api_open -->
+* [API Reference](/content/api_reference)
 <!-- api_close -->
 <!-- sdk_open -->
 * [SDK Reference](/content/sdk_reference)
+	* [lib/data](/content/sdk/lib-data)
 	* [lib/engine](/content/sdk/lib-engine)
 	* [lib/gateway](/content/sdk/lib-gateway)
 <!-- sdk_close -->

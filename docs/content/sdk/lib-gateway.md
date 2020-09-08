@@ -48,7 +48,7 @@
 
 | Param | Type |
 | --- | --- |
-| events | [<code>Array.&lt;Event&gt;</code>](/content/sdk/lib-engine?id=event) | 
+| events | <code>Array.&lt;Event&gt;</code> | 
 
 
 * * *
