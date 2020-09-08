@@ -28,7 +28,7 @@ EventGateway.forProduction()
 
 ## Immediate Capture
 
-Assuming you have defined an event, described in the [Key Concepts: Event Structure](content/concepts/event_structure) section, it can be sent to the remote service as follows:
+Assuming you have defined an event as described in the [Key Concepts: Event Structure](content/concepts/event_structure) section, it can be sent to the remote service as follows:
 
 ```js
 const events = [ eventA, eventB, eventC ];

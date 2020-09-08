@@ -46,7 +46,7 @@ No explicit initialization is required. Each HTTP request is processed independe
 
 ## Defining an Event
 
-When your software identifies an event for capture, you need to collect the relevant information regarding the event. Please refer to [Key Concepts: Event Structure](content/concepts/event_structure) for detailed information.
+As your software identifies an event for capture, it will need to collect the relevant information regarding the event. Please refer to [Key Concepts: Event Structure](content/concepts/event_structure) for a detailed discussion of the data to collect.
 
 ### Using the SDK
 
@@ -95,7 +95,7 @@ eventGateway.createEvents(events)
 	});
 ```
 
-Alternately, a simple utility was included with the SDK to buffer event transmission. See [Key Concepts: Event Capture](content/concepts/event_capture) for more information.
+Alternately, event transmission can be buffered. See [Key Concepts: Event Capture](content/concepts/event_capture?id=buffered-capture) for more information.
 
 #### Using the API
 

@@ -1,6 +1,6 @@
 ## Overview
 
-Depending on your environment, you will either work with JavaScript objects or JSON data. Regardless, [Schema.Event](content/sdk/lib-data?id=schemaevent) represents an event occurrence. It describes five vital attributes:
+Depending on your environment, you will either work with JavaScript objects or JSON data. Regardless, [Schema.Event](content/sdk/lib-data?id=schemaevent) defines five basic attributes:
 
 * Customer
 * Product
@@ -10,7 +10,7 @@ Depending on your environment, you will either work with JavaScript objects or J
 
 ## Customers
 
-Each event must be associated with a known customer. Known customers are enumerated in an external library. Specifically, refer to the the [CustomerType](https://github.com/barchart/events-api-common/blob/master/lib/data/CustomerType.js) enumeration for a current listing.
+Each event must be associated with a known customer. Known customers are enumerated in an external library. Refer to the the [CustomerType](https://github.com/barchart/events-api-common/blob/master/lib/data/CustomerType.js) enumeration for an exact listing.
 
 When constructing a JavaScript object use an enumeration item for the ```customer``` property, as follows:
 
@@ -29,7 +29,7 @@ When constructing a JSON string, use the enumeration item's code, as follows:
 
 ## Products
 
-Each event must be associated with a known product. Known products are enumerated in an external library. Specifically, refer to the the [ProductType](https://github.com/barchart/events-api-common/blob/master/lib/data/ProductType.js) enumeration.
+Each event must be associated with a known product. Known products are enumerated in an external library. Refer to the the [ProductType](https://github.com/barchart/events-api-common/blob/master/lib/data/ProductType.js) enumeration for an exact listing.
 
 When constructing a JavaScript object use an enumeration item for the ```product``` property, as follows:
 
@@ -48,7 +48,7 @@ When constructing a JSON string, use the enumeration item's code, as follows:
 
 ## Types
 
-Each event must be categorized. In other words, we are describing what happened. For example:
+Each event must be categorized. For example:
 
 * User Logged In,
 * User Logged Out,
@@ -56,7 +56,7 @@ Each event must be categorized. In other words, we are describing what happened.
 * Broker Acknowledged Trade,
 * etc...
 
-Like customers and products, ad hoc categories are not permitted. Refer to the the [EventType](https://github.com/barchart/events-api-common/blob/master/lib/data/EventType.js) enumeration for a listing of categories.
+Ad hoc categories are not permitted. Refer to the the [EventType](https://github.com/barchart/events-api-common/blob/master/lib/data/EventType.js) enumeration for an exact listing of categories.
 
 When constructing a JavaScript object use an enumeration item for the ```type``` property, as follows:
 
@@ -77,7 +77,7 @@ When constructing a JSON string, use the enumeration item's code, as follows:
 
 ## Context
 
-Depending on the event's type, we may be required to describe the exact circumstances for the event. For example, the ```EventType.WATCHLIST_SYMBOL_ADDED``` event requires three additional pieces of information:
+Depending on the event's type, additional information regarding the exact circumstances for the event may be required. For example, ```EventType.WATCHLIST_SYMBOL_ADDED``` requires three additional pieces of information:
 
 * userId,
 * watchlistId, and
@@ -92,8 +92,6 @@ for (let i = 0; i < context.keys.length; i++) {
 	console.log(contextKeys[i]);
 }
 ```
-
-When recording a ```EventType.WATCHLIST_SYMBOL_ADDED``` event, the ```context``` property will be an array of three items.
 
 Here is a JavaScript example:
 
