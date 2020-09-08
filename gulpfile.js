@@ -61,9 +61,15 @@ gulp.task('bump-version', (cb) => {
 gulp.task('embed-version', () => {
 	const version = getVersionFromPackage();
 
-	return gulp.src(['./lib/meta.js'])
+	const index = gulp.src(['./lib/index.js'])
 		.pipe(replace(/(version:\s*')([0-9]+\.[0-9]+\.[0-9]+)(')/g, '$1' + version + '$3'))
 		.pipe(gulp.dest('./lib/'));
+
+	const coverpage = gulp.src(['./docs/_coverpage.md'])
+		.pipe(replace(/[0-9]+\.[0-9]+\.[0-9]+/g, version))
+		.pipe(gulp.dest('./docs/'));
+
+	return merge(index, coverpage);
 });
 
 gulp.task('commit-changes', () => {
