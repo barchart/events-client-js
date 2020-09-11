@@ -8,7 +8,8 @@
 * * *
 
 ## EventGateway :id=eventgateway
-> <p>Web service gateway for invoking the Events API.</p>
+> <p>The <strong>central component of the SDK</strong>. It is responsible for connecting to Barchart's
+> Event Tracking Service. It can be used to save new events (i.e. usage statistics).</p>
 
 **Kind**: global class  
 **Extends**: <code>Disposable</code>  
@@ -17,9 +18,9 @@
 * [EventGateway](#EventGateway) ⇐ <code>Disposable</code>
     * _instance_
         * [.start()](#EventGatewaystart) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)
-        * [.createEvents(events)](#EventGatewaycreateEvents) ⇒ <code>Promise.&lt;Array.&lt;Events&gt;&gt;</code>
+        * [.createEvents(events)](#EventGatewaycreateEvents) ⇒ [<code>Promise.&lt;Array.&lt;Schema.Event&gt;&gt;</code>](/content/sdk/lib-data?id=schemaevent)
     * _static_
-        * [.for(stage)](#EventGatewayfor) ⇒ <code>Promise.&lt;(EventGateway\|null)&gt;</code>
+        * [.for(stage)](#EventGatewayfor) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway) \| <code>Promise.&lt;null&gt;</code>
         * [.forDevelopment()](#EventGatewayforDevelopment) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)
         * [.forStaging()](#EventGatewayforStaging) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)
         * [.forProduction()](#EventGatewayforProduction) ⇒ [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)
@@ -40,24 +41,25 @@
 * * *
 
 ### eventGateway.createEvents(events) :id=eventgatewaycreateevents
-> <p>Creates an events.</p>
+> <p>Saves one (or many) events.</p>
 
 **Kind**: instance method of [<code>EventGateway</code>](#EventGateway)  
-**Returns**: <code>Promise.&lt;Array.&lt;Events&gt;&gt;</code>  
+**Returns**: [<code>Promise.&lt;Array.&lt;Schema.Event&gt;&gt;</code>](/content/sdk/lib-data?id=schemaevent)  
 **Access**: public  
 
 | Param | Type |
 | --- | --- |
-| events | <code>Array.&lt;Event&gt;</code> | 
+| events | [<code>Array.&lt;Schema.Event&gt;</code>](/content/sdk/lib-data?id=schemaevent) | 
 
 
 * * *
 
 ### EventGateway.for(stage) :id=eventgatewayfor
-> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the provided environment.</p>
+> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for an environment.</p>
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
-**Returns**: <code>Promise.&lt;(EventGateway\|null)&gt;</code>  
+**Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway) \| <code>Promise.&lt;null&gt;</code>  
+**Access**: public  
 
 | Param | Type |
 | --- | --- |
@@ -67,7 +69,7 @@
 * * *
 
 ### EventGateway.forDevelopment() :id=eventgatewayfordevelopment
-> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for use in the development environment.</p>
+> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the development environment.</p>
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)  
@@ -76,7 +78,7 @@
 * * *
 
 ### EventGateway.forStaging() :id=eventgatewayforstaging
-> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for use in the staging environment.</p>
+> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the staging environment.</p>
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)  
@@ -85,7 +87,7 @@
 * * *
 
 ### EventGateway.forProduction() :id=eventgatewayforproduction
-> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for use in the production environment.</p>
+> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the production environment.</p>
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)  

@@ -60,7 +60,7 @@
 
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| filter | [<code>#/Components/schemas/filter</code>](/content/api/components?id=schemasFilter) |  | false |  |
+| filter | [<code>Filter</code>](/content/api/components?id=schemasFilter) |  | false |  |
 
 **Example**:
 
