@@ -8,8 +8,8 @@
 * * *
 
 ## EventGateway :id=eventgateway
-> <p>The <strong>central component of the SDK</strong>. It is responsible for connecting to Barchart's
-> Event Tracking Service. It can be used to save new events (i.e. usage statistics).</p>
+> <p>A <strong>central component of the SDK</strong> which is responsible for sending events (i.e. usage
+> statistics to the backend).</p>
 
 **Kind**: global class  
 **Extends**: <code>Disposable</code>  
@@ -108,7 +108,9 @@
 * * *
 
 ## ReportGateway :id=reportgateway
-> <p>Web service gateway for invoking the Reports API.</p>
+> <p>A <strong>central component of the SDK</strong> which is responsible for requesting a new
+> usage statistic report, checking on report progress, and downloading the
+> report when completed.</p>
 
 **Kind**: global class  
 **Extends**: <code>Disposable</code>  
@@ -117,8 +119,8 @@
 * [ReportGateway](#ReportGateway) ⇐ <code>Disposable</code>
     * _instance_
         * [.start()](#ReportGatewaystart) ⇒ [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)
-        * [.startReport(filter)](#ReportGatewaystartReport) ⇒ <code>Promise.&lt;Object&gt;</code>
-        * [.getReportAvailability(source)](#ReportGatewaygetReportAvailability) ⇒ <code>Promise.&lt;Object&gt;</code>
+        * [.startReport(filter)](#ReportGatewaystartReport) ⇒ [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)
+        * [.getReportAvailability(source)](#ReportGatewaygetReportAvailability) ⇒ [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)
         * [.getReport(source)](#ReportGatewaygetReport) ⇒ <code>Promise.&lt;Object&gt;</code>
         * [.getVersion()](#ReportGatewaygetVersion) ⇒ <code>Promise.&lt;String&gt;</code>
     * _static_
@@ -145,21 +147,21 @@
 > <p>Starts a report.</p>
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
-**Returns**: <code>Promise.&lt;Object&gt;</code>  
+**Returns**: [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)  
 **Access**: public  
 
 | Param | Type |
 | --- | --- |
-| filter | <code>Object</code> | 
+| filter | [<code>Schema.ReportFilter</code>](/content/sdk/lib-data?id=schemareportfilter) | 
 
 
 * * *
 
 ### reportGateway.getReportAvailability(source) :id=reportgatewaygetreportavailability
-> <p>Returns a report availability.</p>
+> <p>Returns data regarding the status of a report (i.e. running, finished, etc).</p>
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
-**Returns**: <code>Promise.&lt;Object&gt;</code>  
+**Returns**: [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)  
 **Access**: public  
 
 | Param | Type |
@@ -170,7 +172,7 @@
 * * *
 
 ### reportGateway.getReport(source) :id=reportgatewaygetreport
-> <p>Downloads a report (as a CSV)</p>
+> <p>Downloads a report (as a CSV), assuming the report has been completed.</p>
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: <code>Promise.&lt;Object&gt;</code>  
@@ -184,7 +186,7 @@
 * * *
 
 ### reportGateway.getVersion() :id=reportgatewaygetversion
-> <p>Returns the server version.</p>
+> <p>Returns the version of the remote service.</p>
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: <code>Promise.&lt;String&gt;</code>  
@@ -193,10 +195,11 @@
 * * *
 
 ### ReportGateway.for(stage, credentials) :id=reportgatewayfor
-> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the provided environment.</p>
+> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for an environment.</p>
 
 **Kind**: static method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: <code>Promise.&lt;(ReportGateway\|null)&gt;</code>  
+**Access**: public  
 
 | Param | Type |
 | --- | --- |
@@ -207,7 +210,7 @@
 * * *
 
 ### ReportGateway.forStaging() :id=reportgatewayforstaging
-> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for use in the staging environment.</p>
+> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the staging environment.</p>
 
 **Kind**: static method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)  
@@ -216,7 +219,7 @@
 * * *
 
 ### ReportGateway.forProduction() :id=reportgatewayforproduction
-> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for use in the production environment.</p>
+> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the production environment.</p>
 
 **Kind**: static method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)  
@@ -232,7 +235,9 @@
 | protocol | <code>String</code> | <p>The protocol to use (either HTTP or HTTPS).</p> |
 | host | <code>String</code> | <p>The host name of the Events web service.</p> |
 | port | <code>Number</code> | <p>The TCP port number of the Events web service.</p> |
-| credentials | <code>Object</code> | <p>The credentials of the Report API.</p> |
+| credentials | <code>Object</code> | <p>The credentials for the API.</p> |
+| credentials.username | <code>String</code> | <p>The username for the API.</p> |
+| credentials.password | <code>String</code> | <p>The password for the API.</p> |
 
 
 * * *
