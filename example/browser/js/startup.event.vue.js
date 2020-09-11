@@ -1,13 +1,13 @@
-const Config = require('./example.config');
-
-const Timestamp = require('@barchart/common-js/lang/Timestamp');
-
 const EventBatcher = require('./../../../lib/engine/EventBatcher'),
 	EventGateway = require('./../../../lib/gateway/EventGateway');
 
 const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
 	ProductType = require('@barchart/events-api-common/lib/data/ProductType'),
 	EventType = require('@barchart/events-api-common/lib/data/EventType');
+
+const Timestamp = require('@barchart/common-js/lang/Timestamp');
+
+const Config = require('./example.config');
 
 module.exports = (() => {
 	'use strict';

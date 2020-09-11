@@ -122,7 +122,7 @@
         * [.startReport(filter)](#ReportGatewaystartReport) ⇒ [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)
         * [.getReportAvailability(source)](#ReportGatewaygetReportAvailability) ⇒ [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)
         * [.getReport(source)](#ReportGatewaygetReport) ⇒ <code>Promise.&lt;Object&gt;</code>
-        * [.getVersion()](#ReportGatewaygetVersion) ⇒ <code>Promise.&lt;String&gt;</code>
+        * [.getVersion()](#ReportGatewaygetVersion) ⇒ <code>Promise.&lt;ServiceMetadata&gt;</code>
     * _static_
         * [.for(stage, credentials)](#ReportGatewayfor) ⇒ <code>Promise.&lt;(ReportGateway\|null)&gt;</code>
         * [.forStaging()](#ReportGatewayforStaging) ⇒ [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)
@@ -189,7 +189,7 @@
 > <p>Returns the version of the remote service.</p>
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
-**Returns**: <code>Promise.&lt;String&gt;</code>  
+**Returns**: <code>Promise.&lt;ServiceMetadata&gt;</code>  
 **Access**: public  
 
 * * *

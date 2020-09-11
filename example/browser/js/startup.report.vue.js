@@ -1,8 +1,12 @@
-const FailureType = require('@barchart/common-js/api/failures/FailureType');
+const ReportGateway = require('./../../../lib/gateway/ReportGateway');
+
+const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+	ProductType = require('@barchart/events-api-common/lib/data/ProductType'),
+	EventType = require('@barchart/events-api-common/lib/data/EventType');
 
 const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
 
-const ReportGateway = require('./../../../lib/gateway/ReportGateway');
+const FailureType = require('@barchart/common-js/api/failures/FailureType');
 
 const Config = require('./example.config');
 
@@ -85,8 +89,8 @@ module.exports = (() => {
 				this.message = 'Sending...';
 
 				const filter = {
-					customer: this.selectedCustomer,
-					product: this.selectedProduct
+					customer: CustomerType.parse(this.selectedCustomer),
+					product: ProductType.parse(this.selectedProduct)
 				};
 
 				if (this.startTime) {

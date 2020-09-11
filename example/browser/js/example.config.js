@@ -16,7 +16,8 @@ module.exports = (() => {
 			'production',
 		],
 		customers: [
-			CustomerType.TGAM,
+			CustomerType.BARCHART,
+			CustomerType.TGAM
 		],
 		products: [
 			ProductType.PORTFOLIO,

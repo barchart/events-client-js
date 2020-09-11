@@ -4,7 +4,7 @@
 **Other**
 
 * Added ```openapi.yaml``` file, defining the remote web service. Updated documentation to include [API Reference](https://barchart.github.io/events-client-js/#/content/api_reference) section.
-* Updated SDK documentation for ```EventGateway``` and ```ReportGateway``` classes.
+* Updated SDK documentation for ```EventGateway``` and ```ReportGateway``` classes, adding documentation for data structures.
 
 ## 2.0.0
 **Breaking Changes**

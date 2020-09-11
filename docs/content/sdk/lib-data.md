@@ -8,6 +8,7 @@
         * [.Event](#SchemaEvent) : <code>Object</code>
         * [.ReportFilter](#SchemaReportFilter) : <code>Object</code>
         * [.ReportStatus](#SchemaReportStatus) : <code>Object</code>
+        * [.ServiceMetadata](#SchemaServiceMetadata) : <code>Object</code>
 
 
 * * *
@@ -58,6 +59,22 @@
 | source | <code>String</code> | <p>The job's identifier (used for must purposes).</p> |
 | status | <code>EventJobStatus</code> | <p>Current status of report generation (e.g. running, complete, timeout, or failed).</p> |
 | filter | [<code>ReportFilter</code>](#SchemaReportFilter) | <p>The criteria used for report generation.</p> |
+| timing.day | <code>Day</code> | <p>The day the report was started.</p> |
+| timing.start | <code>Timestamp</code> | <p>The moment the report was started.</p> |
+| [timing.end] | <code>Timestamp</code> | <p>The moment the report was finished.</p> |
+
+
+* * *
+
+### Schema.ServiceMetadata :id=schemaservicemetadata
+> <p>Information regarding the remote service.</p>
+
+**Kind**: static typedef of [<code>Schema</code>](#Schema)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| version | <code>String</code> | <p>The version of the remote service (<a href="https://semver.org/">semver</a>).</p> |
 
 
 * * *
