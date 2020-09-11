@@ -57,6 +57,10 @@ A ```BARCHART``` user identified as ```user-123``` added ```AAPL``` to his/her w
 Here is the JavaScript object representing that event:
 
 ```js
+const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+	ProductType = require('@barchart/events-api-common/lib/data/ProductType'),
+	EventType = require('@barchart/events-api-common/lib/data/EventType');
+
 const event = { 
 	customer: CustomerType.BARCHART,
 	product: ProductType.WATCHLIST,

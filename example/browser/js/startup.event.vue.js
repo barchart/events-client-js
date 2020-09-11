@@ -5,6 +5,10 @@ const Timestamp = require('@barchart/common-js/lang/Timestamp');
 const EventBatcher = require('./../../../lib/engine/EventBatcher'),
 	EventGateway = require('./../../../lib/gateway/EventGateway');
 
+const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+	ProductType = require('@barchart/events-api-common/lib/data/ProductType'),
+	EventType = require('@barchart/events-api-common/lib/data/EventType');
+
 module.exports = (() => {
 	'use strict';
 
@@ -54,10 +58,10 @@ module.exports = (() => {
 				}
 
 				const event = {
-					customer: this.selectedCustomer,
-					product: this.selectedProduct,
-					type: this.selectedType,
-					timestamp: Timestamp.now().timestamp,
+					customer: CustomerType.parse(this.selectedCustomer),
+					product: ProductType.parse(this.selectedProduct),
+					type: EventType.parse(this.selectedType),
+					timestamp: Timestamp.now(),
 					context: this.inputContext.replace(' ', '').split(','),
 				};
 
