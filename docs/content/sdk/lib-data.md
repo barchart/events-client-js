@@ -57,7 +57,7 @@
 | job | <code>String</code> | <p>The job's &quot;short&quot; identifier.</p> |
 | source | <code>String</code> | <p>The job's identifier (used for must purposes).</p> |
 | status | <code>EventJobStatus</code> | <p>Current status of report generation (e.g. running, complete, timeout, or failed).</p> |
-| filter | <code>ReportFilter</code> | <p>The criteria used for report generation.</p> |
+| filter | [<code>ReportFilter</code>](#SchemaReportFilter) | <p>The criteria used for report generation.</p> |
 
 
 * * *
