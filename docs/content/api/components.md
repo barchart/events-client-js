@@ -60,11 +60,11 @@
     
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| customer | <code>String</code> | true | false | A name of a customer. |
-| product | <code>String</code> | true | false | A title of a product |
-| type | <code>String</code> | true | false | An event type |
-| timestamp | <code>Number</code> | true | false |  |
-| context | <code>Array</code> | true | false | An array of context items. |
+| customer | <code>String</code> | true | false | Code for customer using the software which generated the event. |
+| product | <code>String</code> | true | false | Code for software system which generated the event. |
+| type | <code>String</code> | true | false | Code for event type. |
+| timestamp | <code>Number</code> | true | false | The time of the event's occurrence — milliseconds since epoch. |
+| context | <code>Array</code> | true | false | An array data which qualifies the event (differnt items are required based on event's type). |
 | context[i] | <code>String</code> | false | false |  |
 
 **Example**:
@@ -88,14 +88,14 @@
     
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| customer | <code>String</code> | true | false | A name of a customer. |
-| product | <code>String</code> | true | false | A title of a product. |
-| type | <code>String</code> | true | false | An event type |
-| timestamp | <code>Number</code> | true | false |  |
-| context | <code>Array</code> | true | false | An array of context items. |
+| customer | <code>String</code> | true | false | Code for customer using the software which generated the event. |
+| product | <code>String</code> | true | false | Code for software system which generated the event. |
+| type | <code>String</code> | true | false | Code for event type. |
+| timestamp | <code>Number</code> | true | false | The time of the event's occurrence — milliseconds since epoch. |
+| context | <code>Array</code> | true | false | An of additional data which qualifies the event's type. |
 | context[i] | <code>String</code> | false | false |  |
-| sequence | <code>Number</code> | true | false |  |
-| batch | <code>String</code> | true | false |  |
+| sequence | <code>Number</code> | true | false | The event's order within the batch. Irrelevant to most consumers. |
+| batch | <code>String</code> | true | false | The identifier for the batch this event was inserted with. Irrelevant to most consumers. |
 
 **Example**:
 
@@ -115,15 +115,15 @@
 
 * * *
 
-### Filter :id=schemasfilter
+### ReportFilter :id=schemasreportfilter
 **Type**: <code>Object</code>
     
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| customer | <code>String</code> | true | false | A name of a customer. |
-| product | <code>String</code> | true | false | A title of a product. |
-| start | <code>String</code> | false | false | Start timestamp. |
-| end | <code>String</code> | false | false | End timestamp. |
+| customer | <code>String</code> | true | false | The customer code to extract events for. |
+| product | <code>String</code> | true | false | The code of the software system to extract events for. |
+| start | <code>String</code> | false | false | The time of the first event to extract — milliseconds since epoch. |
+| end | <code>String</code> | false | false | The time of the final event to extract — milliseconds since epoch. |
 
 **Example**:
 
@@ -138,18 +138,19 @@
 
 * * *
 
-### Job :id=schemasjob
+### ReportStatus :id=schemasreportstatus
 **Type**: <code>Object</code>
     
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| job | <code>String</code> | true | false | A job uuid. |
-| source | <code>String</code> | true | false | The identifier of the export job. |
-| status | <code>String</code> | true | false | A status of the job. |
-| filter | [<code>#/Components/schemas/filter</code>](#schemasFilter) | true | false |  |
+| job | <code>String</code> | true | false | Short identifier for job. Irrelevant to most consumers. |
+| source | <code>String</code> | true | false | Identifier for job. Used in other API calls to refer to job. |
+| status | <code>String</code> | true | false | Current status of report generation job. |
+| filter | [<code>ReportFilter</code>](#schemasReportFilter) | true | false |  |
 | timing | <code>Object</code> | true | false |  |
-| timing.day | <code>String</code> | false | false |  |
-| timing.start | <code>Number</code> | false | false |  |
+| timing.day | <code>String</code> | false | false | The day the report was started. |
+| timing.start | <code>Number</code> | false | false | The moment the report was started — milliseconds since epoch. |
+| timing.end | <code>Number</code> | false | false | The moment the report was finished — milliseconds since epoch. |
 
 **Example**:
 
@@ -165,8 +166,9 @@
     "end": 1571115600000
   },
   "timing": {
-    "day": "2020-09-10T15:59:30.198Z",
-    "start": 1571073977278
+    "day": "2020-09-12T11:35:06.669Z",
+    "start": 1571073977278,
+    "end": 1571073977279
   }
 }
 ```

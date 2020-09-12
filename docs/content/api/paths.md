@@ -10,22 +10,28 @@
     
 **Content Type**: application/json
 
-**Type**: [<code>Array&lt;Event&gt;</code>](/content/api/components?id=schemasEvent)
+**Type**: <code>Object</code>
+
+| Name | Type | Required | Nullable | Description |
+| ---- | ---- | -------- | -------- | ----------- |
+| events | [<code>Array&lt;Event&gt;</code>](/content/api/components?id=schemasEvent) |  | false | An array of Events. |
 
 **Example**:
 
 ```json
-[
-  {
-    "customer": "BARCHART",
-    "product": "PORTFOLIO",
-    "type": "PORTFOLIO-APPLICATION-LOADED",
-    "timestamp": 1568381886060,
-    "context": [
-      "string"
-    ]
-  }
-]
+{
+  "events": [
+    {
+      "customer": "BARCHART",
+      "product": "PORTFOLIO",
+      "type": "PORTFOLIO-APPLICATION-LOADED",
+      "timestamp": 1568381886060,
+      "context": [
+        "string"
+      ]
+    }
+  ]
+}
 ```
 
 #### Responses
@@ -36,11 +42,11 @@
 
 **Content Type**: <code>application/json</code>
 
-**Response Type:** [<code>Array&lt;Eventfull&gt;</code>](/content/api/components?id=schemasEventFull)
+**Response Type:** [<code>Array&lt;EventFull&gt;</code>](/content/api/components?id=schemasEventFull)
 
 * * *
 
-**Status Code**: 500 - [ServerError](/content/api/components?id&#x3D;responsesservererror)
+**Status Code**: 500 - [ServerError](/content/api/components?id=responsesservererror)
 
 * * *
 
@@ -60,7 +66,7 @@
 
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| filter | [<code>Reportfilter</code>](/content/api/components?id=schemasReportFilter) |  | false |  |
+| filter | [<code>ReportFilter</code>](/content/api/components?id=schemasReportFilter) |  | false |  |
 
 **Example**:
 
@@ -83,15 +89,15 @@
 
 **Content Type**: <code>application/json</code>
 
-**Response Type:** [<code>Array&lt;Reportstatus&gt;</code>](/content/api/components?id=schemasReportStatus)
+**Response Type:** [<code>Array&lt;ReportStatus&gt;</code>](/content/api/components?id=schemasReportStatus)
 
 * * *
 
-**Status Code**: 401 - [Unauthorized](/content/api/components?id&#x3D;responsesunauthorized)
+**Status Code**: 401 - [Unauthorized](/content/api/components?id=responsesunauthorized)
 
 * * *
 
-**Status Code**: 500 - [ServerError](/content/api/components?id&#x3D;responsesservererror)
+**Status Code**: 500 - [ServerError](/content/api/components?id=responsesservererror)
 
 * * *
 
@@ -101,6 +107,8 @@
 
 **Summary**: Check Report Progress
 
+**Security**: 
+[Basic](/content/api/components?id=securityBasic)
 #### Path Parameters
 
 | Name | Type | Required | Nullable | Description |
@@ -115,15 +123,15 @@
 
 **Content Type**: <code>application/json</code>
 
-**Response Type:** [<code>Array&lt;Reportstatus&gt;</code>](/content/api/components?id=schemasReportStatus)
+**Response Type:** [<code>Array&lt;ReportStatus&gt;</code>](/content/api/components?id=schemasReportStatus)
 
 * * *
 
-**Status Code**: 401 - [Unauthorized](/content/api/components?id&#x3D;responsesunauthorized)
+**Status Code**: 401 - [Unauthorized](/content/api/components?id=responsesunauthorized)
 
 * * *
 
-**Status Code**: 500 - [ServerError](/content/api/components?id&#x3D;responsesservererror)
+**Status Code**: 500 - [ServerError](/content/api/components?id=responsesservererror)
 
 * * *
 
@@ -171,11 +179,11 @@
 
 * * *
 
-**Status Code**: 401 - [Unauthorized](/content/api/components?id&#x3D;responsesunauthorized)
+**Status Code**: 401 - [Unauthorized](/content/api/components?id=responsesunauthorized)
 
 * * *
 
-**Status Code**: 500 - [ServerError](/content/api/components?id&#x3D;responsesservererror)
+**Status Code**: 500 - [ServerError](/content/api/components?id=responsesservererror)
 
 * * *
 
@@ -211,7 +219,7 @@
 
 * * *
 
-**Status Code**: 401 - [Unauthorized](/content/api/components?id&#x3D;responsesunauthorized)
+**Status Code**: 401 - [Unauthorized](/content/api/components?id=responsesunauthorized)
 
 * * *
 

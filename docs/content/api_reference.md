@@ -13,7 +13,7 @@
 * [Servers](#Servers)
 * [Components](#Components)
 * [Paths](#Paths)
-
+* [Try Me](#tryme)
 
 ## Servers {docsify-ignore}
 
@@ -45,3 +45,9 @@
 * [GET /reports/{source}/availability](/content/api/paths?id=get-reportssourceavailability)
 * [GET /reports/{source}](/content/api/paths?id=get-reportssource)
 * [GET /system/version](/content/api/paths?id=get-systemversion)
+
+## Try Me :id=tryme {docsify-ignore}
+
+**Try Me** page allows anyone to interact with the API’s resources without having any of the implementation logic in place. It’s automatically generated from a OpenAPI Specification, with the visual documentation making it easy for back end implementation and client side consumption.
+
+> You can test the API by following link: [Try Me](content/api/try)

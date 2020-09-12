@@ -99,7 +99,7 @@ components:
           example: BARCHART
         product:
           type: string
-          description: The code of the sortware system to extract events for.
+          description: The code of the software system to extract events for.
           example: PORTFOLIO
         start:
           type: string
@@ -211,10 +211,14 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              description: An array of Events.
-              items:
-                $ref: "#/components/schemas/Event"
+              type: object
+              properties:
+                events:
+                  type: array
+                  description: An array of Events.
+                  items:
+                    $ref: "#/components/schemas/Event"
+            
       responses:
         '200':
           description: The array of newly created events.
@@ -261,6 +265,8 @@ paths:
       description: Once you have started an export, you will need to check its status (before attempting a download).
       tags:
         - Reports
+      security:
+        - Basic: []
       parameters:
         - name: source
           in: path

@@ -8,8 +8,8 @@
 * * *
 
 ## EventGateway :id=eventgateway
-> <p>A <strong>central component of the SDK</strong> which is responsible for sending events (i.e. usage
-> statistics to the backend).</p>
+> A <strong>central component of the SDK</strong> which is responsible for sending events (i.e. usage
+> statistics to the backend).
 
 **Kind**: global class  
 **Extends**: <code>Disposable</code>  
@@ -31,8 +31,8 @@
 * * *
 
 ### eventGateway.start() :id=eventgatewaystart
-> <p>Initializes the connection to the remote server and returns a promise
-> containing the current instance.</p>
+> Initializes the connection to the remote server and returns a promise
+> containing the current instance.
 
 **Kind**: instance method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)  
@@ -41,7 +41,7 @@
 * * *
 
 ### eventGateway.createEvents(events) :id=eventgatewaycreateevents
-> <p>Saves one (or many) events.</p>
+> Saves one (or many) events.
 
 **Kind**: instance method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;Array.&lt;Schema.Event&gt;&gt;</code>](/content/sdk/lib-data?id=schemaevent)  
@@ -55,7 +55,7 @@
 * * *
 
 ### EventGateway.for(stage) :id=eventgatewayfor
-> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for an environment.</p>
+> Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for an environment.
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway) \| <code>Promise.&lt;null&gt;</code>  
@@ -69,7 +69,7 @@
 * * *
 
 ### EventGateway.forDevelopment() :id=eventgatewayfordevelopment
-> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the development environment.</p>
+> Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the development environment.
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)  
@@ -78,7 +78,7 @@
 * * *
 
 ### EventGateway.forStaging() :id=eventgatewayforstaging
-> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the staging environment.</p>
+> Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the staging environment.
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)  
@@ -87,7 +87,7 @@
 * * *
 
 ### EventGateway.forProduction() :id=eventgatewayforproduction
-> <p>Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the production environment.</p>
+> Creates and starts a new [EventGateway](/content/sdk/lib-gateway?id=eventgateway) for the production environment.
 
 **Kind**: static method of [<code>EventGateway</code>](#EventGateway)  
 **Returns**: [<code>Promise.&lt;EventGateway&gt;</code>](#EventGateway)  
@@ -108,9 +108,9 @@
 * * *
 
 ## ReportGateway :id=reportgateway
-> <p>A <strong>central component of the SDK</strong> which is responsible for requesting a new
+> A <strong>central component of the SDK</strong> which is responsible for requesting a new
 > usage statistic report, checking on report progress, and downloading the
-> report when completed.</p>
+> report when completed.
 
 **Kind**: global class  
 **Extends**: <code>Disposable</code>  
@@ -134,8 +134,8 @@
 * * *
 
 ### reportGateway.start() :id=reportgatewaystart
-> <p>Initializes the connection to the remote server and returns a promise
-> containing the current instance.</p>
+> Initializes the connection to the remote server and returns a promise
+> containing the current instance.
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)  
@@ -144,7 +144,7 @@
 * * *
 
 ### reportGateway.startReport(filter) :id=reportgatewaystartreport
-> <p>Starts a report.</p>
+> Starts a report.
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)  
@@ -158,7 +158,7 @@
 * * *
 
 ### reportGateway.getReportAvailability(source) :id=reportgatewaygetreportavailability
-> <p>Returns data regarding the status of a report (i.e. running, finished, etc).</p>
+> Returns data regarding the status of a report (i.e. running, finished, etc).
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)  
@@ -172,8 +172,8 @@
 * * *
 
 ### reportGateway.getReport(source) :id=reportgatewaygetreport
-> <p>Assuming the report has completed, gets a link which can be used to
-> download the actual report in CSV format.</p>
+> Assuming the report has completed, gets a link which can be used to
+> download the actual report in CSV format.
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: <code>Promise.&lt;ReportDownloadLink&gt;</code>  
@@ -187,7 +187,7 @@
 * * *
 
 ### reportGateway.getVersion() :id=reportgatewaygetversion
-> <p>Returns the version of the remote service.</p>
+> Returns the version of the remote service.
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: <code>Promise.&lt;ServiceMetadata&gt;</code>  
@@ -196,7 +196,7 @@
 * * *
 
 ### ReportGateway.for(stage, credentials) :id=reportgatewayfor
-> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for an environment.</p>
+> Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for an environment.
 
 **Kind**: static method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: <code>Promise.&lt;(ReportGateway\|null)&gt;</code>  
@@ -211,7 +211,7 @@
 * * *
 
 ### ReportGateway.forStaging(credentials) :id=reportgatewayforstaging
-> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the staging environment.</p>
+> Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the staging environment.
 
 **Kind**: static method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)  
@@ -225,7 +225,7 @@
 * * *
 
 ### ReportGateway.forProduction(credentials) :id=reportgatewayforproduction
-> <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the production environment.</p>
+> Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the production environment.
 
 **Kind**: static method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)  

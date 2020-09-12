@@ -1,5 +1,5 @@
 ## Schema :id=schema
-> <p>A meta namespace containing structural contracts of anonymous objects.</p>
+> A meta namespace containing structural contracts of anonymous objects.
 
 **Kind**: global namespace  
 
@@ -16,7 +16,7 @@
 * * *
 
 ### Schema.Event :id=schemaevent
-> <p>Describes the occurrence of a single event. In other words, a usage statistic.</p>
+> Describes the occurrence of a single event. In other words, a usage statistic.
 
 **Kind**: static typedef of [<code>Schema</code>](#Schema)  
 **Properties**
@@ -33,7 +33,7 @@
 * * *
 
 ### Schema.ReportCredentials :id=schemareportcredentials
-> <p>Credentials required to access reporting features.</p>
+> Credentials required to access reporting features.
 
 **Kind**: static typedef of [<code>Schema</code>](#Schema)  
 **Properties**
@@ -47,8 +47,8 @@
 * * *
 
 ### Schema.ReportFilter :id=schemareportfilter
-> <p>Criteria used to filter events (i.e. usage statistics) for extraction to a
-> report file.</p>
+> Criteria used to filter events (i.e. usage statistics) for extraction to a
+> report file.
 
 **Kind**: static typedef of [<code>Schema</code>](#Schema)  
 **Properties**
@@ -64,7 +64,7 @@
 * * *
 
 ### Schema.ReportStatus :id=schemareportstatus
-> <p>Describes the status (i.e. progress) of event extraction to a report file.</p>
+> Describes the status (i.e. progress) of event extraction to a report file.
 
 **Kind**: static typedef of [<code>Schema</code>](#Schema)  
 **Properties**
@@ -83,7 +83,7 @@
 * * *
 
 ### Schema.ReportDownloadLink :id=schemareportdownloadlink
-> <p>Information regarding the remote service.</p>
+> Information regarding the remote service.
 
 **Kind**: static typedef of [<code>Schema</code>](#Schema)  
 **Properties**
@@ -96,7 +96,7 @@
 * * *
 
 ### Schema.ServiceMetadata :id=schemaservicemetadata
-> <p>Information regarding the remote service.</p>
+> Information regarding the remote service.
 
 **Kind**: static typedef of [<code>Schema</code>](#Schema)  
 **Properties**

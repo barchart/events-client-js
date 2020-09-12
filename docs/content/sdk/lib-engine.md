@@ -8,8 +8,8 @@
 * * *
 
 ## EventBatcher :id=eventbatcher
-> <p>A utility which buffers [Schema.Event](/content/sdk/lib-data?id=schemaevent) objects and periodically
-> transmits them to backend in batches.</p>
+> A utility which buffers [Schema.Event](/content/sdk/lib-data?id=schemaevent) objects and periodically
+> transmits them to backend in batches.
 
 **Kind**: global class  
 **Access**: public  
@@ -27,8 +27,8 @@
 * * *
 
 ### eventBatcher.start() :id=eventbatcherstart
-> <p>Begins queue processing. Items in the buffer will begin to be transmitted
-> to the remote service.</p>
+> Begins queue processing. Items in the buffer will begin to be transmitted
+> to the remote service.
 
 **Kind**: instance method of [<code>EventBatcher</code>](#EventBatcher)  
 **Access**: public  
@@ -36,8 +36,8 @@
 * * *
 
 ### eventBatcher.stop() :id=eventbatcherstop
-> <p>Stops the queue processing. Items in the buffer accumulate without being
-> transmitted to the remote service.</p>
+> Stops the queue processing. Items in the buffer accumulate without being
+> transmitted to the remote service.
 
 **Kind**: instance method of [<code>EventBatcher</code>](#EventBatcher)  
 **Access**: public  
@@ -45,7 +45,7 @@
 * * *
 
 ### eventBatcher.clear() :id=eventbatcherclear
-> <p>Clears the internal buffer.</p>
+> Clears the internal buffer.
 
 **Kind**: instance method of [<code>EventBatcher</code>](#EventBatcher)  
 **Access**: public  
@@ -53,7 +53,7 @@
 * * *
 
 ### eventBatcher.push(event) :id=eventbatcherpush
-> <p>Adds a new event to the buffer.</p>
+> Adds a new event to the buffer.
 
 **Kind**: instance method of [<code>EventBatcher</code>](#EventBatcher)  
 **Access**: public  
@@ -77,7 +77,7 @@
 * * *
 
 ## EventFactory :id=eventfactory
-> <p>A utility for simplifying the construction of event.</p>
+> A utility for simplifying the construction of event.
 
 **Kind**: global class  
 **Access**: public  
@@ -94,7 +94,7 @@
 * * *
 
 ### eventFactory.build(type, context) :id=eventfactorybuild
-> <p>Creates a new [Schema.Event](/content/sdk/lib-data?id=schemaevent) object, using the factory's customer and product.</p>
+> Creates a new [Schema.Event](/content/sdk/lib-data?id=schemaevent) object, using the factory's customer and product.
 
 **Kind**: instance method of [<code>EventFactory</code>](#EventFactory)  
 **Returns**: [<code>Schema.Event</code>](/content/sdk/lib-data?id=schemaevent)  
@@ -109,7 +109,7 @@
 * * *
 
 ### EventFactory.for(customer, product) :id=eventfactoryfor
-> <p>Configures a new event factory, which will build events for a specific customer and product.</p>
+> Configures a new event factory, which will build events for a specific customer and product.
 
 **Kind**: static method of [<code>EventFactory</code>](#EventFactory)  
 **Returns**: [<code>EventFactory</code>](#EventFactory)  
