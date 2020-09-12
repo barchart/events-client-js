@@ -8,7 +8,7 @@ It can take the remote service several minutes to generate an export file. So, r
 
 ## Security
 
-Exporting data requires authentication. Contact Barchart to obtain your username and password.
+Exporting data requires authentication. **Contact Barchart to obtain your username and password.**
 
 #### Using the SDK
 
