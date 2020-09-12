@@ -121,7 +121,7 @@
         * [.start()](#ReportGatewaystart) ⇒ [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)
         * [.startReport(filter)](#ReportGatewaystartReport) ⇒ [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)
         * [.getReportAvailability(source)](#ReportGatewaygetReportAvailability) ⇒ [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)
-        * [.getReport(source)](#ReportGatewaygetReport) ⇒ <code>Promise.&lt;Object&gt;</code>
+        * [.getReport(source)](#ReportGatewaygetReport) ⇒ <code>Promise.&lt;ReportDownloadLink&gt;</code>
         * [.getVersion()](#ReportGatewaygetVersion) ⇒ <code>Promise.&lt;ServiceMetadata&gt;</code>
     * _static_
         * [.for(stage, credentials)](#ReportGatewayfor) ⇒ <code>Promise.&lt;(ReportGateway\|null)&gt;</code>
@@ -164,23 +164,24 @@
 **Returns**: [<code>Promise.&lt;Schema.ReportStatus&gt;</code>](/content/sdk/lib-data?id=schemareportstatus)  
 **Access**: public  
 
-| Param | Type |
-| --- | --- |
-| source | <code>Object</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| source | <code>String</code> | <p>The &quot;source&quot; identifier for the report.</p> |
 
 
 * * *
 
 ### reportGateway.getReport(source) :id=reportgatewaygetreport
-> <p>Downloads a report (as a CSV), assuming the report has been completed.</p>
+> <p>Assuming the report has completed, gets a link which can be used to
+> download the actual report in CSV format.</p>
 
 **Kind**: instance method of [<code>ReportGateway</code>](#ReportGateway)  
-**Returns**: <code>Promise.&lt;Object&gt;</code>  
+**Returns**: <code>Promise.&lt;ReportDownloadLink&gt;</code>  
 **Access**: public  
 
-| Param | Type |
-| --- | --- |
-| source | <code>String</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| source | <code>String</code> | <p>The &quot;source&quot; identifier for the report.</p> |
 
 
 * * *

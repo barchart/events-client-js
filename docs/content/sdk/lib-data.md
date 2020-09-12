@@ -9,6 +9,7 @@
         * [.ReportCredentials](#SchemaReportCredentials) : <code>Object</code>
         * [.ReportFilter](#SchemaReportFilter) : <code>Object</code>
         * [.ReportStatus](#SchemaReportStatus) : <code>Object</code>
+        * [.ReportDownloadLink](#SchemaReportDownloadLink) : <code>Object</code>
         * [.ServiceMetadata](#SchemaServiceMetadata) : <code>Object</code>
 
 
@@ -77,6 +78,19 @@
 | timing.day | <code>Day</code> | <p>The day the report was started.</p> |
 | timing.start | <code>Timestamp</code> | <p>The moment the report was started.</p> |
 | [timing.end] | <code>Timestamp</code> | <p>The moment the report was finished.</p> |
+
+
+* * *
+
+### Schema.ReportDownloadLink :id=schemareportdownloadlink
+> <p>Information regarding the remote service.</p>
+
+**Kind**: static typedef of [<code>Schema</code>](#Schema)  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| link | <code>String</code> | <p>A URL which can be used to download the actual report. Good for 15 minutes only.</p> |
 
 
 * * *
