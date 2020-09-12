@@ -2,9 +2,9 @@
 
 ## POST /events 
 
-> Accepts new events, adds them to SQS for async ingestion
+> Accepts and saves new events.
 
-**Summary**: Create events.
+**Summary**: Create Events
 
 #### Request Body
     
@@ -48,7 +48,7 @@
 
 > Notifies the system to begin generation of a new export file. This processing happens asynchronously. In other words, once you make the request, report processing will begin and receive an immediate response with the identifier for the job that&#x27;s in progress. You will need to check back periodically to determine if the job has completed.
 
-**Summary**: Start Report
+**Summary**: Start New Report
 
 **Security**: 
 [Basic](/content/api/components?id=securityBasic)
@@ -60,7 +60,7 @@
 
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| filter | [<code>Filter</code>](/content/api/components?id=schemasFilter) |  | false |  |
+| filter | [<code>Reportfilter</code>](/content/api/components?id=schemasReportFilter) |  | false |  |
 
 **Example**:
 
@@ -83,7 +83,39 @@
 
 **Content Type**: <code>application/json</code>
 
-**Response Type:** [<code>Array&lt;Job&gt;</code>](/content/api/components?id=schemasJob)
+**Response Type:** [<code>Array&lt;Reportstatus&gt;</code>](/content/api/components?id=schemasReportStatus)
+
+* * *
+
+**Status Code**: 401 - [Unauthorized](/content/api/components?id&#x3D;responsesunauthorized)
+
+* * *
+
+**Status Code**: 500 - [ServerError](/content/api/components?id&#x3D;responsesservererror)
+
+* * *
+
+## GET /reports/{source}/availability 
+
+> Once you have started an export, you will need to check its status (before attempting a download).
+
+**Summary**: Check Report Progress
+
+#### Path Parameters
+
+| Name | Type | Required | Nullable | Description |
+| ---- | ---- | -------- | -------- | ----------- |
+| source | <code>String</code> | true | false | The identifier of the export job (see source property of ReportStatus). |
+
+#### Responses
+
+**Status Code**: 200
+
+> Job object.
+
+**Content Type**: <code>application/json</code>
+
+**Response Type:** [<code>Array&lt;Reportstatus&gt;</code>](/content/api/components?id=schemasReportStatus)
 
 * * *
 
@@ -97,9 +129,9 @@
 
 ## GET /reports/{source} 
 
-> Download the report.
+> Gets a temporary link which can be used to download the report.
 
-**Summary**: Download Report
+**Summary**: Get Report Download Link.
 
 **Security**: 
 [Basic](/content/api/components?id=securityBasic)
@@ -113,7 +145,7 @@
 
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| source | <code>String</code> | true | false | The identifier of the export job. |
+| source | <code>String</code> | true | false | The identifier of the export job (see source property of ReportStatus). |
 
 #### Responses
 
@@ -127,7 +159,7 @@
     
 | Name | Type | Required | Nullable | Description |
 | ---- | ---- | -------- | -------- | ----------- |
-| link | <code>String</code> | false | false |  |
+| link | <code>String</code> | false | false | A link which can be used to used to download the report (good for 15 minutes only). |
 
 **Example**:
 
@@ -147,43 +179,11 @@
 
 * * *
 
-## GET /reports/{source}/availability 
-
-> Once you have started an export, you will need to check its status (before attempting a download).
-
-**Summary**: Check Export Status
-
-#### Path Parameters
-
-| Name | Type | Required | Nullable | Description |
-| ---- | ---- | -------- | -------- | ----------- |
-| source | <code>String</code> | true | false | The identifier of the export job. |
-
-#### Responses
-
-**Status Code**: 200
-
-> Job object.
-
-**Content Type**: <code>application/json</code>
-
-**Response Type:** [<code>Array&lt;Job&gt;</code>](/content/api/components?id=schemasJob)
-
-* * *
-
-**Status Code**: 401 - [Unauthorized](/content/api/components?id&#x3D;responsesunauthorized)
-
-* * *
-
-**Status Code**: 500 - [ServerError](/content/api/components?id&#x3D;responsesservererror)
-
-* * *
-
 ## GET /system/version 
 
-> Returns current application version
+> Gets version of remote service.
 
-**Summary**: Get Version.
+**Summary**: Gets Version
 
 **Security**: 
 [Basic](/content/api/components?id=securityBasic)

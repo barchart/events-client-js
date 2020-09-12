@@ -31,8 +31,8 @@
 
 * [Event](/content/api/components?id=schemasEvent)
 * [EventFull](/content/api/components?id=schemasEventFull)
-* [Filter](/content/api/components?id=schemasFilter)
-* [Job](/content/api/components?id=schemasJob)
+* [ReportFilter](/content/api/components?id=schemasReportFilter)
+* [ReportStatus](/content/api/components?id=schemasReportStatus)
 
 ### Security 
 
@@ -42,6 +42,6 @@
 
 * [POST /events](/content/api/paths?id=post-events)
 * [POST /reports](/content/api/paths?id=post-reports)
-* [GET /reports/{source}](/content/api/paths?id=get-reportssource)
 * [GET /reports/{source}/availability](/content/api/paths?id=get-reportssourceavailability)
+* [GET /reports/{source}](/content/api/paths?id=get-reportssource)
 * [GET /system/version](/content/api/paths?id=get-systemversion)
