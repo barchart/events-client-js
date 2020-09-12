@@ -130,7 +130,7 @@ components:
           description: Current status of report generation job.
           example: "RUNNING"
         filter:
-          $ref: '#/components/schemas/Filter'
+          $ref: '#/components/schemas/ReportFilter'
         timing:
           type: object
           properties:
