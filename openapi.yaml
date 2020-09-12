@@ -203,7 +203,7 @@ tags:
 paths:
   /events:
     post:
-      summary: Create events.
+      summary: Create Events
       description: Accepts and saves new events.
       tags:
         - Events
@@ -257,7 +257,7 @@ paths:
 
   /reports/{source}/availability:
     get:
-      summary: Check Report Status
+      summary: Check Report Progress
       description: Once you have started an export, you will need to check its status (before attempting a download).
       tags:
         - Reports
