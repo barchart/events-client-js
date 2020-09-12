@@ -46,7 +46,7 @@
 
 ## POST /reports 
 
-> Notifies the system to begin generation of a new export file. This processing happens asynchronously. In other words, once you make the request, report processing will begin and receive an immediate response with the identifier for the job that&#x27;s in progress. You will need to check back periodically to determine if the job has completed.
+> Notifies the system to begin generation of a new export file. This processing happens asynchronously. In other words, once you make the request, report processing will begin. You will receive an immediate response with the job identifier. You will need to check back periodically to determine if the job has completed.
 
 **Summary**: Start New Report
 
