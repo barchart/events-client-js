@@ -142,7 +142,7 @@ components:
               type: number
               description: The moment the report was started — milliseconds since epoch.
               example: 1571073977278
-            start:
+            end:
               type: number
               description: The moment the report was finished — milliseconds since epoch.
               example: 1571073977279
