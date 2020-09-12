@@ -13,7 +13,7 @@ module.exports = (() => {
   return {
     version: version,
     stages: ['staging', 'production'],
-    customers: [CustomerType.TGAM],
+    customers: [CustomerType.BARCHART, CustomerType.TGAM],
     products: [ProductType.PORTFOLIO, ProductType.WATCHLIST],
     types: {
       [ProductType.PORTFOLIO.code]: Enum.getItems(EventType).filter(eventType => eventType.product === ProductType.PORTFOLIO),
@@ -23,12 +23,16 @@ module.exports = (() => {
 })();
 
 },{"../../../lib/index":6,"@barchart/common-js/lang/Enum":35,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventType":53,"@barchart/events-api-common/lib/data/ProductType":54}],2:[function(require,module,exports){
-const Config = require('./example.config');
+const EventBatcher = require('./../../../lib/engine/EventBatcher'),
+      EventGateway = require('./../../../lib/gateway/EventGateway');
+
+const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+      ProductType = require('@barchart/events-api-common/lib/data/ProductType'),
+      EventType = require('@barchart/events-api-common/lib/data/EventType');
 
 const Timestamp = require('@barchart/common-js/lang/Timestamp');
 
-const EventBatcher = require('./../../../lib/engine/EventBatcher'),
-      EventGateway = require('./../../../lib/gateway/EventGateway');
+const Config = require('./example.config');
 
 module.exports = (() => {
   'use strict';
@@ -72,10 +76,10 @@ module.exports = (() => {
         }
 
         const event = {
-          customer: this.selectedCustomer,
-          product: this.selectedProduct,
-          type: this.selectedType,
-          timestamp: Timestamp.now().timestamp,
+          customer: CustomerType.parse(this.selectedCustomer),
+          product: ProductType.parse(this.selectedProduct),
+          type: EventType.parse(this.selectedType),
+          timestamp: Timestamp.now(),
           context: this.inputContext.replace(' ', '').split(',')
         };
         this.events.push(event);
@@ -144,7 +148,7 @@ module.exports = (() => {
   }
 })();
 
-},{"./../../../lib/engine/EventBatcher":4,"./../../../lib/gateway/EventGateway":5,"./example.config":1,"@barchart/common-js/lang/Timestamp":37}],3:[function(require,module,exports){
+},{"./../../../lib/engine/EventBatcher":4,"./../../../lib/gateway/EventGateway":5,"./example.config":1,"@barchart/common-js/lang/Timestamp":37,"@barchart/events-api-common/lib/data/CustomerType":52,"@barchart/events-api-common/lib/data/EventType":53,"@barchart/events-api-common/lib/data/ProductType":54}],3:[function(require,module,exports){
 module.exports = (() => {
   'use strict';
   /**
@@ -342,7 +346,8 @@ const Configuration = require('../common/Configuration');
 module.exports = (() => {
   'use strict';
   /**
-   * Web service gateway for invoking the Events API.
+   * A **central component of the SDK** which is responsible for sending events (i.e. usage
+   * statistics to the backend).
    *
    * @public
    * @extends {Disposable}
@@ -386,11 +391,11 @@ module.exports = (() => {
       });
     }
     /**
-     * Creates an events.
+     * Saves one (or many) events.
      *
      * @public
-     * @param {Array<Event>} events
-     * @returns {Promise<Array<Events>>}
+     * @param {Schema.Event[]} events
+     * @returns {Promise<Schema.Event[]>}
      */
 
 
@@ -404,10 +409,11 @@ module.exports = (() => {
       });
     }
     /**
-     * Creates and starts a new {@link EventGateway} for the provided environment.
+     * Creates and starts a new {@link EventGateway} for an environment.
      *
+     * @public
      * @param {String} stage
-     * @returns {Promise<EventGateway|null>}
+     * @returns {Promise<EventGateway>|Promise<null>}
      */
 
 
@@ -425,7 +431,7 @@ module.exports = (() => {
       return gatewayPromise;
     }
     /**
-     * Creates and starts a new {@link EventGateway} for use in the development environment.
+     * Creates and starts a new {@link EventGateway} for the development environment.
      *
      * @public
      * @static
@@ -439,7 +445,7 @@ module.exports = (() => {
       });
     }
     /**
-     * Creates and starts a new {@link EventGateway} for use in the staging environment.
+     * Creates and starts a new {@link EventGateway} for the staging environment.
      *
      * @public
      * @static
@@ -453,7 +459,7 @@ module.exports = (() => {
       });
     }
     /**
-     * Creates and starts a new {@link EventGateway} for use in the production environment.
+     * Creates and starts a new {@link EventGateway} for the production environment.
      *
      * @public
      * @static
@@ -489,7 +495,7 @@ module.exports = (() => {
   };
 
   const responseInterceptorForEventDeserialization = ResponseInterceptor.fromDelegate((response, ignored) => {
-    return response.data;
+    return JSON.parse(response.data);
   });
 
   function checkStart() {
@@ -510,7 +516,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '2.0.0'
+    version: '2.0.1'
   };
 })();
 
@@ -7814,11 +7820,11 @@ module.exports = (() => {
 
 		/**
 		 * Returns the {@link CustomerType} which corresponds to the code supplied.
-		 * If matching {@link CustomerType} exists, a null value is returned.
+		 * If no matching {@link CustomerType} exists, a null value is returned.
 		 *
 		 * @public
 		 * @param {String} code
-		 * @return {CustomerType/|null}
+		 * @returns {CustomerType|null}
 		 */
 		static parse(code) {
 			return Enum.fromCode(CustomerType, code);
@@ -7906,6 +7912,18 @@ module.exports = (() => {
 		 */
 		get contextKeys() {
 			return this._contextKeys;
+		}
+
+		/**
+		 * Returns the {@link EventType} which corresponds to the code supplied.
+		 * If no matching {@link EventType} exists, a null value is returned.
+		 *
+		 * @public
+		 * @param {String} code
+		 * @returns {EventType|null}
+		 */
+		static parse(code) {
+			return Enum.fromCode(EventType, code);
 		}
 
 		static get WATCHLIST_APPLICATION_LOADED() {
@@ -8186,6 +8204,18 @@ module.exports = (() => {
 			super(code, description);
 		}
 
+		/**
+		 * Returns the {@link ProductType} which corresponds to the code supplied.
+		 * If no matching {@link ProductType} exists, a null value is returned.
+		 *
+		 * @public
+		 * @param {String} code
+		 * @returns {ProductType|null}
+		 */
+		static parse(code) {
+			return Enum.fromCode(ProductType, code);
+		}
+		
 		/**
 		 * The portfolio system.
 		 *

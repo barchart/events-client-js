@@ -13,7 +13,7 @@ module.exports = (() => {
   return {
     version: version,
     stages: ['staging', 'production'],
-    customers: [CustomerType.TGAM],
+    customers: [CustomerType.BARCHART, CustomerType.TGAM],
     products: [ProductType.PORTFOLIO, ProductType.WATCHLIST],
     types: {
       [ProductType.PORTFOLIO.code]: Enum.getItems(EventType).filter(eventType => eventType.product === ProductType.PORTFOLIO),
@@ -23,11 +23,15 @@ module.exports = (() => {
 })();
 
 },{"../../../lib/index":5,"@barchart/common-js/lang/Enum":34,"@barchart/events-api-common/lib/data/CustomerType":49,"@barchart/events-api-common/lib/data/EventType":51,"@barchart/events-api-common/lib/data/ProductType":52}],2:[function(require,module,exports){
-const FailureType = require('@barchart/common-js/api/failures/FailureType');
+const ReportGateway = require('./../../../lib/gateway/ReportGateway');
+
+const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
+      ProductType = require('@barchart/events-api-common/lib/data/ProductType'),
+      EventType = require('@barchart/events-api-common/lib/data/EventType');
 
 const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
 
-const ReportGateway = require('./../../../lib/gateway/ReportGateway');
+const FailureType = require('@barchart/common-js/api/failures/FailureType');
 
 const Config = require('./example.config');
 
@@ -99,8 +103,8 @@ module.exports = (() => {
 
         this.message = 'Sending...';
         const filter = {
-          customer: this.selectedCustomer,
-          product: this.selectedProduct
+          customer: CustomerType.parse(this.selectedCustomer),
+          product: ProductType.parse(this.selectedProduct)
         };
 
         if (this.startTime) {
@@ -171,7 +175,7 @@ module.exports = (() => {
   }
 })();
 
-},{"./../../../lib/gateway/ReportGateway":4,"./example.config":1,"@barchart/common-js/api/failures/FailureType":8,"@barchart/events-api-common/lib/data/EventJobStatus":50}],3:[function(require,module,exports){
+},{"./../../../lib/gateway/ReportGateway":4,"./example.config":1,"@barchart/common-js/api/failures/FailureType":8,"@barchart/events-api-common/lib/data/CustomerType":49,"@barchart/events-api-common/lib/data/EventJobStatus":50,"@barchart/events-api-common/lib/data/EventType":51,"@barchart/events-api-common/lib/data/ProductType":52}],3:[function(require,module,exports){
 module.exports = (() => {
   'use strict';
   /**
@@ -249,14 +253,16 @@ const Configuration = require('../common/Configuration');
 module.exports = (() => {
   'use strict';
   /**
-   * Web service gateway for invoking the Reports API.
+   * A **central component of the SDK** which is responsible for requesting a new
+   * usage statistic report, checking on report progress, and downloading the
+   * report when completed.
    *
    * @public
    * @extends {Disposable}
    * @param {String} protocol - The protocol to use (either HTTP or HTTPS).
    * @param {String} host - The host name of the Events web service.
    * @param {Number} port - The TCP port number of the Events web service.
-   * @param {Object} credentials - The credentials of the Report API.
+   * @param {Schema.ReportCredentials} credentials - The credentials for authenticate.
    */
 
   class ReportGateway extends Disposable {
@@ -273,7 +279,7 @@ module.exports = (() => {
       const protocolType = Enum.fromCode(ProtocolType, protocol.toUpperCase());
       this._startReportEndpoint = EndpointBuilder.for('start-report', 'start report').withVerb(VerbType.POST).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(pb => {
         pb.withLiteralParameter('reports', 'reports');
-      }).withBody('filter').withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForReportDeserialization).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
+      }).withBody('filter').withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForReportStartDeserialization).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
       this._getReportAvailabilityEndpoint = EndpointBuilder.for('get-report-availability', 'get report availability').withVerb(VerbType.GET).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(pb => {
         pb.withLiteralParameter('reports', 'reports').withVariableParameter('source', 'source', 'source', false).withLiteralParameter('availability', 'availability');
       }).withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForReportAvailabilityDeserialization).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
@@ -282,7 +288,7 @@ module.exports = (() => {
       }).withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForGetReport).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
       this._getVersionEndpoint = EndpointBuilder.for('get-api-version', 'get API version').withVerb(VerbType.GET).withProtocol(protocolType).withHost(host).withPort(port).withPathBuilder(pb => {
         pb.withLiteralParameter('system', 'system').withLiteralParameter('version', 'version');
-      }).withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForGetReport).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
+      }).withBasicAuthentication(credentials.username, credentials.password).withRequestInterceptor(RequestInterceptor.PLAIN_TEXT_RESPONSE).withResponseInterceptor(responseInterceptorForGetVersion).withErrorInterceptor(ErrorInterceptor.GENERAL).endpoint;
     }
     /**
      * Initializes the connection to the remote server and returns a promise
@@ -312,8 +318,8 @@ module.exports = (() => {
      * Starts a report.
      *
      * @public
-     * @param {Object} filter
-     * @returns {Promise<Object>}
+     * @param {Schema.ReportFilter} filter
+     * @returns {Promise<Schema.ReportStatus>}
      */
 
 
@@ -322,16 +328,16 @@ module.exports = (() => {
         checkStart.call(this);
         assert.argumentIsRequired(filter, 'filter', Object);
         return Gateway.invoke(this._startReportEndpoint, EventJobSchema.START.schema.format({
-          filter: filter
+          filter
         }));
       });
     }
     /**
-     * Returns a report availability.
+     * Returns data regarding the status of a report (i.e. running, finished, etc).
      *
      * @public
-     * @param {Object} source
-     * @return {Promise<Object>}
+     * @param {String} source - The "source" identifier for the report.
+     * @return {Promise<Schema.ReportStatus>}
      */
 
 
@@ -339,17 +345,18 @@ module.exports = (() => {
       return Promise.resolve().then(() => {
         checkStart.call(this);
         assert.argumentIsRequired(source, 'source', String);
-        const payload = {};
-        payload.source = source;
-        return Gateway.invoke(this._getReportAvailabilityEndpoint, payload);
+        return Gateway.invoke(this._getReportAvailabilityEndpoint, {
+          source
+        });
       });
     }
     /**
-     * Downloads a report (as a CSV)
+     * Assuming the report has completed, gets a link which can be used to
+     * download the actual report in CSV format.
      *
      * @public
-     * @param {String} source
-     * @return {Promise<Object>}
+     * @param {String} source - The "source" identifier for the report.
+     * @return {Promise<ReportDownloadLink>}
      */
 
 
@@ -357,16 +364,16 @@ module.exports = (() => {
       return Promise.resolve().then(() => {
         checkStart.call(this);
         assert.argumentIsRequired(source, 'source', String);
-        const payload = {};
-        payload.source = source;
-        return Gateway.invoke(this._getReportEndpoint, payload);
+        return Gateway.invoke(this._getReportEndpoint, {
+          source
+        });
       });
     }
     /**
-     * Returns the server version.
+     * Returns the version of the remote service.
      *
      * @public
-     * @return {Promise<String>}
+     * @return {Promise<ServiceMetadata>}
      */
 
 
@@ -377,10 +384,11 @@ module.exports = (() => {
       });
     }
     /**
-     * Creates and starts a new {@link ReportGateway} for the provided environment.
+     * Creates and starts a new {@link ReportGateway} for an environment.
      *
+     * @public
      * @param {String} stage
-     * @param {Object} credentials
+     * @param {Schema.ReportCredentials} credentials
      * @returns {Promise<ReportGateway|null>}
      */
 
@@ -399,10 +407,11 @@ module.exports = (() => {
       return gatewayPromise;
     }
     /**
-     * Creates and starts a new {@link ReportGateway} for use in the staging environment.
+     * Creates and starts a new {@link ReportGateway} for the staging environment.
      *
      * @public
      * @static
+     * @param {Schema.ReportCredentials} credentials
      * @returns {Promise<ReportGateway>}
      */
 
@@ -413,10 +422,11 @@ module.exports = (() => {
       });
     }
     /**
-     * Creates and starts a new {@link ReportGateway} for use in the production environment.
+     * Creates and starts a new {@link ReportGateway} for the production environment.
      *
      * @public
      * @static
+     * @param {Schema.ReportCredentials} credentials
      * @returns {Promise<ReportGateway>}
      */
 
@@ -433,14 +443,7 @@ module.exports = (() => {
 
   }
 
-  const responseInterceptorForGetReport = ResponseInterceptor.fromDelegate(response => {
-    try {
-      return JSON.parse(response.data);
-    } catch (e) {
-      console.log('Error deserializing report', e);
-    }
-  });
-  const responseInterceptorForReportDeserialization = ResponseInterceptor.fromDelegate(response => {
+  const responseInterceptorForReportStartDeserialization = ResponseInterceptor.fromDelegate(response => {
     try {
       return JSON.parse(response.data, EventJobSchema.PROCESS.schema.getReviver());
     } catch (e) {
@@ -452,6 +455,20 @@ module.exports = (() => {
       return JSON.parse(response.data, EventJobSchema.PROCESS.schema.getReviver());
     } catch (e) {
       console.log('Error deserializing report availability (using EventJobSchema.PROCESS schema)', e);
+    }
+  });
+  const responseInterceptorForGetReport = ResponseInterceptor.fromDelegate(response => {
+    try {
+      return JSON.parse(response.data);
+    } catch (e) {
+      console.log('Error deserializing report', e);
+    }
+  });
+  const responseInterceptorForGetVersion = ResponseInterceptor.fromDelegate(response => {
+    try {
+      return JSON.parse(response.data);
+    } catch (e) {
+      console.log('Error deserializing report service version', e);
     }
   });
 
@@ -479,7 +496,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '2.0.0'
+    version: '2.0.1'
   };
 })();
 
@@ -7417,11 +7434,11 @@ module.exports = (() => {
 
 		/**
 		 * Returns the {@link CustomerType} which corresponds to the code supplied.
-		 * If matching {@link CustomerType} exists, a null value is returned.
+		 * If no matching {@link CustomerType} exists, a null value is returned.
 		 *
 		 * @public
 		 * @param {String} code
-		 * @return {CustomerType/|null}
+		 * @returns {CustomerType|null}
 		 */
 		static parse(code) {
 			return Enum.fromCode(CustomerType, code);
@@ -7614,6 +7631,18 @@ module.exports = (() => {
 		 */
 		get contextKeys() {
 			return this._contextKeys;
+		}
+
+		/**
+		 * Returns the {@link EventType} which corresponds to the code supplied.
+		 * If no matching {@link EventType} exists, a null value is returned.
+		 *
+		 * @public
+		 * @param {String} code
+		 * @returns {EventType|null}
+		 */
+		static parse(code) {
+			return Enum.fromCode(EventType, code);
 		}
 
 		static get WATCHLIST_APPLICATION_LOADED() {
@@ -7894,6 +7923,18 @@ module.exports = (() => {
 			super(code, description);
 		}
 
+		/**
+		 * Returns the {@link ProductType} which corresponds to the code supplied.
+		 * If no matching {@link ProductType} exists, a null value is returned.
+		 *
+		 * @public
+		 * @param {String} code
+		 * @returns {ProductType|null}
+		 */
+		static parse(code) {
+			return Enum.fromCode(ProductType, code);
+		}
+		
 		/**
 		 * The portfolio system.
 		 *
