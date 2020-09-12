@@ -125,8 +125,8 @@
         * [.getVersion()](#ReportGatewaygetVersion) ⇒ <code>Promise.&lt;ServiceMetadata&gt;</code>
     * _static_
         * [.for(stage, credentials)](#ReportGatewayfor) ⇒ <code>Promise.&lt;(ReportGateway\|null)&gt;</code>
-        * [.forStaging()](#ReportGatewayforStaging) ⇒ [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)
-        * [.forProduction()](#ReportGatewayforProduction) ⇒ [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)
+        * [.forStaging(credentials)](#ReportGatewayforStaging) ⇒ [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)
+        * [.forProduction(credentials)](#ReportGatewayforProduction) ⇒ [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)
     * _constructor_
         * [new ReportGateway(protocol, host, port, credentials)](#new_ReportGateway_new)
 
@@ -204,26 +204,36 @@
 | Param | Type |
 | --- | --- |
 | stage | <code>String</code> | 
-| credentials | <code>Object</code> | 
+| credentials | [<code>Schema.ReportCredentials</code>](/content/sdk/lib-data?id=schemareportcredentials) | 
 
 
 * * *
 
-### ReportGateway.forStaging() :id=reportgatewayforstaging
+### ReportGateway.forStaging(credentials) :id=reportgatewayforstaging
 > <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the staging environment.</p>
 
 **Kind**: static method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)  
 **Access**: public  
 
+| Param | Type |
+| --- | --- |
+| credentials | [<code>Schema.ReportCredentials</code>](/content/sdk/lib-data?id=schemareportcredentials) | 
+
+
 * * *
 
-### ReportGateway.forProduction() :id=reportgatewayforproduction
+### ReportGateway.forProduction(credentials) :id=reportgatewayforproduction
 > <p>Creates and starts a new [ReportGateway](/content/sdk/lib-gateway?id=reportgateway) for the production environment.</p>
 
 **Kind**: static method of [<code>ReportGateway</code>](#ReportGateway)  
 **Returns**: [<code>Promise.&lt;ReportGateway&gt;</code>](#ReportGateway)  
 **Access**: public  
+
+| Param | Type |
+| --- | --- |
+| credentials | [<code>Schema.ReportCredentials</code>](/content/sdk/lib-data?id=schemareportcredentials) | 
+
 
 * * *
 
@@ -235,9 +245,7 @@
 | protocol | <code>String</code> | <p>The protocol to use (either HTTP or HTTPS).</p> |
 | host | <code>String</code> | <p>The host name of the Events web service.</p> |
 | port | <code>Number</code> | <p>The TCP port number of the Events web service.</p> |
-| credentials | <code>Object</code> | <p>The credentials for the API.</p> |
-| credentials.username | <code>String</code> | <p>The username for the API.</p> |
-| credentials.password | <code>String</code> | <p>The password for the API.</p> |
+| credentials | [<code>Schema.ReportCredentials</code>](/content/sdk/lib-data?id=schemareportcredentials) | <p>The credentials for authenticate.</p> |
 
 
 * * *

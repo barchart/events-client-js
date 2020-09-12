@@ -1,5 +1,3 @@
-## Overview
-
 Depending on your environment, you will either work with JavaScript objects or JSON data. Regardless, [Schema.Event](content/sdk/lib-data?id=schemaevent) defines five basic attributes:
 
 * Customer
@@ -34,7 +32,7 @@ Each event must be associated with a known product. Known products are enumerate
 When constructing a JavaScript object use an enumeration item for the ```product``` property, as follows:
 
 ```js
-const CustomerType = require('@barchart/events-api-common/lib/data/ProductType');
+const ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
 const event = { };
 event.product = ProductType.WATCHLIST;
@@ -125,7 +123,7 @@ const event = { };
 event.timestamp = Timestamp.now();
 ```
 
-For JSON, use the serialized form of a Timestamp (i.e. milliseconds since epoch):
+For JSON, use the serialized form of a Timestamp (i.e. a number representing the millisecond-style [Unix time](https://en.wikipedia.org/wiki/Unix_time)):
 
 ```json
 {"timestamp":1599482731026}
@@ -144,7 +142,7 @@ const event = {
 	customer: CustomerType.BARCHART,
 	product: ProductType.WATCHLIST,
 	type: EventType.WATCHLIST_SYMBOL_ADDED,
-	timestamp: 1599482731026,
+	timestamp: Timestamp.parse(1599482731026),
 	context: [
 		"user-id-123",
 		"watchlist-id-456",

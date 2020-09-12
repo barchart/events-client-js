@@ -6,6 +6,7 @@
 * [Schema](#Schema) : <code>object</code>
     * _static_
         * [.Event](#SchemaEvent) : <code>Object</code>
+        * [.ReportCredentials](#SchemaReportCredentials) : <code>Object</code>
         * [.ReportFilter](#SchemaReportFilter) : <code>Object</code>
         * [.ReportStatus](#SchemaReportStatus) : <code>Object</code>
         * [.ServiceMetadata](#SchemaServiceMetadata) : <code>Object</code>
@@ -26,6 +27,20 @@
 | type | <code>EventType</code> | <p>The type of event.</p> |
 | timestamp | <code>Timestamp</code> | <p>The time of the event's occurrence.</p> |
 | context | <code>Array.&lt;String&gt;</code> | <p>Additional data which is appropriate for the event's type.</p> |
+
+
+* * *
+
+### Schema.ReportCredentials :id=schemareportcredentials
+> <p>Credentials required to access reporting features.</p>
+
+**Kind**: static typedef of [<code>Schema</code>](#Schema)  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| username | <code>String</code> | 
+| password | <code>String</code> | 
 
 
 * * *

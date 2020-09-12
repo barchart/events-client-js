@@ -61,11 +61,13 @@ const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'
 	ProductType = require('@barchart/events-api-common/lib/data/ProductType'),
 	EventType = require('@barchart/events-api-common/lib/data/EventType');
 
+const Timestamp = require('@barchart/common-js/lang/Timestamp');
+
 const event = { 
 	customer: CustomerType.BARCHART,
 	product: ProductType.WATCHLIST,
 	type: EventType.WATCHLIST_SYMBOL_ADDED,
-	timestamp: 1599482731026,
+	timestamp: Timestamp.parse(1599482731026),
 	context: [
 		"user-123",
 		"watchlist-456",
