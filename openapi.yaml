@@ -23,22 +23,23 @@ components:
       properties:
         customer:
           type: string
-          description: A name of a customer.
+          description: Code for customer using the software which generated the event.
           example: BARCHART
         product:
           type: string
-          description: A title of a product
+          description: Code for software system which generated the event.
           example: PORTFOLIO
         type:
           type: string
-          description: An event type
+          description: Code for event type.
           example: PORTFOLIO-APPLICATION-LOADED
         timestamp:
           type: number
+          description: The time of the event's occurrence — milliseconds since epoch.
           example: 1568381886060
         context:
           type: array
-          description: An array of context items.
+          description: An of additional data which qualifies the event's type.
           items:
             type: string
       required:
@@ -47,34 +48,38 @@ components:
         - type
         - timestamp
         - context
+
     EventFull:
       type: object
       properties:
         customer:
           type: string
-          description: A name of a customer.
+          description: Code for customer using the software which generated the event.
           example: BARCHART
         product:
           type: string
-          description: A title of a product.
+          description: Code for software system which generated the event.
           example: PORTFOLIO
         type:
           type: string
-          description: An event type
+          description: Code for event type.
           example: PORTFOLIO-APPLICATION-LOADED
         timestamp:
           type: number
+          description: The time of the event's occurrence — milliseconds since epoch.
           example: 1568381886060
         context:
           type: array
-          description: An array of context items.
+          description: An of additional data which qualifies the event's type.
           items:
             type: string
         sequence:
           type: number
+          description: The event's order within the batch. Irrelevant to most consumers.
           example: 1
         batch:
           type: string
+          description: The identifier for the batch this event was inserted with. Irrelevant to most consumers.
           format: uuid
       required:
         - customer
@@ -84,44 +89,45 @@ components:
         - context
         - batch
         - sequence
-    Filter:
+
+    ReportFilter:
       type: object
       properties:
         customer:
           type: string
-          description: A name of a customer.
+          description: The customer code to extract events for.
           example: BARCHART
         product:
           type: string
-          description: A title of a product.
+          description: The code of the sortware system to extract events for.
           example: PORTFOLIO
         start:
           type: string
-          description: Start timestamp.
+          description: The time of the first event to extract — milliseconds since epoch.
           example: 1571029200000
         end:
           type: string
-          description: End timestamp.
+          description: The time of the final event to extract — milliseconds since epoch.
           example: 1571115600000
       required:
         - customer
         - product
 
-    Job:
+    ReportStatus:
       type: object
       properties:
         job:
           type: string
-          description: A job uuid.
+          description: Short identifier for job. Irrelevant to most consumers.
           format: uuid
           example: 0527e342-c92c-45ec-a3cf-fd93f87cb068
         source:
           type: string
-          description: The identifier of the export job.
+          description: Identifier for job. Used in other API calls to refer to job.
           example: JOB-0527e342-c92c-45ec-a3cf-fd93f87cb068
         status:
           type: string
-          description: A status of the job.
+          description: Current status of report generation job.
           example: "RUNNING"
         filter:
           $ref: '#/components/schemas/Filter'
@@ -130,10 +136,16 @@ components:
           properties:
             day:
               type: string
+              description: The day the report was started.
               example: 2019-10-14
             start:
               type: number
+              description: The moment the report was started — milliseconds since epoch.
               example: 1571073977278
+            start:
+              type: number
+              description: The moment the report was finished — milliseconds since epoch.
+              example: 1571073977279
       required: 
         - job
         - filter
@@ -192,7 +204,7 @@ paths:
   /events:
     post:
       summary: Create events.
-      description: Accepts new events, adds them to SQS for async ingestion
+      description: Accepts and saves new events.
       tags:
         - Events
       requestBody:
@@ -217,7 +229,7 @@ paths:
 
   /reports:
     post:
-      summary: Start Report
+      summary: Start New Report
       description: Notifies the system to begin generation of a new export file. This processing happens asynchronously. In other words, once you make the request, report processing will begin and receive an immediate response with the identifier for the job that's in progress. You will need to check back periodically to determine if the job has completed.
       tags:
         - Reports
@@ -230,14 +242,40 @@ paths:
               type: object
               properties:
                 filter:
-                  $ref: '#/components/schemas/Filter'
+                  $ref: '#/components/schemas/ReportFilter'
       responses:
         '200':
           description: A JSON object of the job.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Job'
+                $ref: '#/components/schemas/ReportStatus'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /reports/{source}/availability:
+    get:
+      summary: Check Report Status
+      description: Once you have started an export, you will need to check its status (before attempting a download).
+      tags:
+        - Reports
+      parameters:
+        - name: source
+          in: path
+          description: The identifier of the export job (see source property of ReportStatus).
+          required: true
+          schema:
+            type: string
+            example: JOB-0527e342-c92c-45ec-a3cf-fd93f87cb068
+      responses:
+        '200':
+          description: Job object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportStatus'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -245,8 +283,8 @@ paths:
 
   /reports/{source}:
     get:
-      summary: Download Report
-      description: Download the report.
+      summary: Get Report Download Link.
+      description: Gets a temporary link which can be used to download the report.
       tags:
         - Reports
       security:
@@ -254,7 +292,7 @@ paths:
       parameters:
         - name: source
           in: path
-          description: The identifier of the export job.
+          description: The identifier of the export job (see source property of ReportStatus).
           required: true
           schema:
             type: string
@@ -275,33 +313,8 @@ paths:
                 properties:
                   link:
                     type: string
+                    description: A link which can be used to used to download the report (good for 15 minutes only).
                     example: https://.../file.csv
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '500':
-          $ref: '#/components/responses/ServerError'
-
-  /reports/{source}/availability:
-    get:
-      summary: Check Export Status
-      description: Once you have started an export, you will need to check its status (before attempting a download).
-      tags:
-        - Reports
-      parameters:
-        - name: source
-          in: path
-          description: The identifier of the export job.
-          required: true
-          schema:
-            type: string
-            example: JOB-0527e342-c92c-45ec-a3cf-fd93f87cb068
-      responses:
-        '200':
-          description: Job object.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Job'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '500':
@@ -309,8 +322,8 @@ paths:
 
   /system/version:
     get:
-      summary: Get Version.
-      description: Returns current application version
+      summary: Gets Version
+      description: Gets version of remote service.
       tags:
         - System
       security:
