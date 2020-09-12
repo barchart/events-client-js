@@ -39,7 +39,7 @@ components:
           example: 1568381886060
         context:
           type: array
-          description: An of additional data which qualifies the event's type.
+          description: An array data which qualifies the event (differnt items are required based on event's type).
           items:
             type: string
       required:
