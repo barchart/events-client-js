@@ -1,5 +1,10 @@
 # Release Notes
 
+## 2.0.2
+**Other**
+
+* Update SDK documentation (adding `Import` and `File` attributes).
+
 ## 2.0.1
 **Other**
 

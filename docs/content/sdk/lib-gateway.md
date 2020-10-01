@@ -14,6 +14,8 @@
 **Kind**: global class  
 **Extends**: <code>Disposable</code>  
 **Access**: public  
+**Import**: @barchart/events-client-js/lib/gateway/EventGateway  
+**File**: /lib/gateway/EventGateway.js  
 
 * [EventGateway](#EventGateway) ⇐ <code>Disposable</code>
     * _instance_
@@ -115,6 +117,8 @@
 **Kind**: global class  
 **Extends**: <code>Disposable</code>  
 **Access**: public  
+**Import**: @barchart/events-client-js/lib/gateway/ReportGateway  
+**File**: /lib/gateway/ReportGateway.js  
 
 * [ReportGateway](#ReportGateway) ⇐ <code>Disposable</code>
     * _instance_

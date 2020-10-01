@@ -13,6 +13,8 @@
 
 **Kind**: global class  
 **Access**: public  
+**Import**: @barchart/events-client-js/lib/engine/EventBatcher  
+**File**: /lib/engine/EventBatcher.js  
 
 * [EventBatcher](#EventBatcher)
     * _instance_
@@ -81,6 +83,8 @@
 
 **Kind**: global class  
 **Access**: public  
+**Import**: @barchart/events-client-js/lib/engine/EventFactory  
+**File**: /lib/engine/EventFactory.js  
 
 * [EventFactory](#EventFactory)
     * _instance_
