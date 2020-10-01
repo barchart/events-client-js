@@ -258,6 +258,7 @@ module.exports = (() => {
    * report when completed.
    *
    * @public
+   * @exported
    * @extends {Disposable}
    * @param {String} protocol - The protocol to use (either HTTP or HTTPS).
    * @param {String} host - The host name of the Events web service.
@@ -496,7 +497,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '2.0.1'
+    version: '2.0.2'
   };
 })();
 

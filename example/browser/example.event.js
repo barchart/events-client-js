@@ -219,6 +219,7 @@ module.exports = (() => {
    * transmits them to backend in batches.
    *
    * @public
+   * @exported
    * @param {EventGateway}
    * @param {Function=} callback
    */
@@ -350,6 +351,7 @@ module.exports = (() => {
    * statistics to the backend).
    *
    * @public
+   * @exported
    * @extends {Disposable}
    * @param {String} protocol - The protocol to use (either HTTP or HTTPS).
    * @param {String} host - The host name of the Events web service.
@@ -516,7 +518,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '2.0.1'
+    version: '2.0.2'
   };
 })();
 

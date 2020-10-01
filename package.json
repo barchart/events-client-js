@@ -1,6 +1,6 @@
 {
 	"name": "@barchart/events-client-js",
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"description": "JavaScript SDK for Barchart's Event Tracking Service",
 	"author": {
 		"name": "Bryan Ingle",
