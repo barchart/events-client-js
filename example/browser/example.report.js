@@ -497,7 +497,7 @@ module.exports = (() => {
   'use strict';
 
   return {
-    version: '2.0.2'
+    version: '2.1.0'
   };
 })();
 
@@ -571,10 +571,15 @@ module.exports = (() => {
 
     format() {
       const reasons = this._head.toJSObj(item => {
-        return {
-          code: item ? item.type.code : null,
-          message: item ? item.format(this._data) : null
-        };
+        const formatted = {};
+        formatted.code = item ? item.type.code : null;
+        formatted.message = item ? item.format(this._data) : null;
+
+        if (item && item.type.verbose) {
+          formatted.data = item.data;
+        }
+
+        return formatted;
       });
 
       return reasons.children;
@@ -626,6 +631,19 @@ module.exports = (() => {
 
     toJSON() {
       return this.format();
+    }
+    /**
+     * @public
+     * @static
+     * @param {FailureType} type
+     * @param {Object=} data
+     * @returns {FailureReason}
+     */
+
+
+    static from(type, data) {
+      const reason = new FailureReason();
+      return reason.addItem(type, data);
     }
     /**
      * Factory function for creating instances of {@link FailureReason}.
@@ -761,6 +779,17 @@ module.exports = (() => {
       return this._type;
     }
     /**
+     * The data.
+     *
+     * @public
+     * @return {Object}
+     */
+
+
+    get data() {
+      return this._data;
+    }
+    /**
      * Formats a human-readable message, describing the failure.
      *
      * @public
@@ -828,14 +857,16 @@ module.exports = (() => {
    * @param {String} template - The template string for formatting human-readable messages.
    * @param {Boolean=} severe - Indicates if the failure is severe (default is true).
    * @param {Number=} error - The HTTP error code which should be used as part of an HTTP response.
+   * @param {Boolean=} verbose - Indicates if data object should be included when serialized.
    */
 
   class FailureType extends Enum {
-    constructor(code, template, severe, error) {
+    constructor(code, template, severe, error, verbose) {
       super(code, code);
       assert.argumentIsRequired(template, 'template', String);
       assert.argumentIsOptional(severe, 'severe', Boolean);
       assert.argumentIsOptional(error, 'error', Number);
+      assert.argumentIsOptional(verbose, 'verbose', Boolean);
       this._template = template;
 
       if (is.boolean(severe)) {
@@ -845,6 +876,7 @@ module.exports = (() => {
       }
 
       this._error = error || null;
+      this._verbose = verbose || false;
     }
     /**
      * The template string for formatting human-readable messages.
@@ -878,6 +910,17 @@ module.exports = (() => {
 
     get error() {
       return this._error;
+    }
+    /**
+     * Indicates if data object should be included when serialized.
+     *
+     * @public
+     * @return {boolean}
+     */
+
+
+    get verbose() {
+      return this._verbose;
     }
     /**
      * One or more data points is missing.
@@ -976,6 +1019,18 @@ module.exports = (() => {
       return requestGeneralFailure;
     }
     /**
+     * Insufficient permission level to access the resource.
+     *
+     * @public
+     * @static
+     * @returns {FailureType}
+     */
+
+
+    static get ENTITLEMENTS_FAILED() {
+      return entitlementsFailed;
+    }
+    /**
      * Returns an HTTP status code that would be suitable for use with the
      * failure type.
      *
@@ -1015,6 +1070,7 @@ module.exports = (() => {
   const requestInputMalformed = new FailureType('REQUEST_INPUT_MALFORMED', 'An attempt to {L|root.endpoint.description} failed, the data structure is invalid.');
   const schemaValidationFailure = new FailureType('SCHEMA_VALIDATION_FAILURE', 'An attempt to read {U|schema} data failed (found "{L|key}" when expecting "{L|name}")');
   const requestGeneralFailure = new FailureType('REQUEST_GENERAL_FAILURE', 'An attempt to {L|root.endpoint.description} failed for unspecified reason(s).');
+  const entitlementsFailed = new FailureType('ENTITLEMENTS_FAILED', 'Action blocked. The current user requires elevated permissions or the current user has exceeded a quota.', false, 403, true);
   return FailureType;
 })();
 
@@ -5478,7 +5534,8 @@ module.exports = (() => {
     },
 
     /**
-     * Set difference operation (using strict equality).
+     * Set difference operation, returning any item in "a" that is not
+     * contained in "b" (using strict equality).
      *
      * @static
      * @param {Array} a
@@ -5490,7 +5547,8 @@ module.exports = (() => {
     },
 
     /**
-     * Set difference operation, where the uniqueness is determined by a delegate.
+     * Set difference operation, returning any item in "a" that is not
+     * contained in "b" (where the uniqueness is determined by a delegate).
      *
      * @static
      * @param {Array} a
@@ -7826,6 +7884,10 @@ module.exports = (() => {
 			return cmdtyViewLogout;
 		}
 
+		static get ENTITLEMWENTS_AUTHORIZATION_FAILED() {
+			return entitlementsAuthorizationFailed;
+		}
+
 		/**
 		 * Get all context keys for productType.
 		 *
@@ -7902,6 +7964,10 @@ module.exports = (() => {
 	const cmdtyViewLogin = new EventType('CMDTYVIEW-LOGIN', 'User logged in', ProductType.PORTFOLIO, ['userId', 'sessionId']);
 	const cmdtyViewLogout = new EventType('CMDTYVIEW-LOGOUT', 'User logged out', ProductType.PORTFOLIO, ['userId', 'sessionId']);
 
+	// Entitlements
+
+	const entitlementsAuthorizationFailed = new EventType('ENTITLEMENTS_AUTHORIZATION_FAILED', 'Authorization Failed', ProductType.ENTITLEMENTS, ['userId', 'operation']);
+
 	return EventType;
 })();
 
@@ -7935,9 +8001,9 @@ module.exports = (() => {
 		static parse(code) {
 			return Enum.fromCode(ProductType, code);
 		}
-		
+
 		/**
-		 * The portfolio system.
+		 * The portfolio service.
 		 *
 		 * @public
 		 * @static
@@ -7948,7 +8014,7 @@ module.exports = (() => {
 		}
 
 		/**
-		 * The watchlist system.
+		 * The watchlist service.
 		 *
 		 * @public
 		 * @static
@@ -7969,6 +8035,17 @@ module.exports = (() => {
 			return cmdtyView;
 		}
 
+		/**
+		 * The entitlements service.
+		 *
+		 * @public
+		 * @static
+		 * @returns {ProductType}
+		 */
+		static get ENTITLEMENTS() {
+			return entitlements;
+		}
+
 		toString() {
 			return `[ProductType (code=${this.code})]`;
 		}
@@ -7977,12 +8054,13 @@ module.exports = (() => {
 	const portfolio = new ProductType('PORTFOLIO', 'PORTFOLIO');
 	const watchlist = new ProductType('WATCHLIST', 'WATCHLIST');
 	const cmdtyView = new ProductType('CMDTYVIEW', 'CMDTYVIEW');
+	const entitlements = new ProductType('ENTITLEMENTS', 'ENTITLEMENTS');
 
 	return ProductType;
 })();
 
 },{"@barchart/common-js/lang/Enum":34}],53:[function(require,module,exports){
-(function (process){
+(function (process){(function (){
 const assert = require('@barchart/common-js/lang/assert'),
 	DataType = require('@barchart/common-js/serialization/json/DataType'),
 	Enum = require('@barchart/common-js/lang/Enum'),
@@ -8090,7 +8168,7 @@ module.exports = (() => {
 	return EventJobSchema;
 })();
 
-}).call(this,require('_process'))
+}).call(this)}).call(this,require('_process'))
 },{"../CustomerType":49,"../EventJobStatus":50,"../ProductType":52,"@barchart/common-js/lang/Enum":34,"@barchart/common-js/lang/assert":38,"@barchart/common-js/serialization/json/DataType":44,"@barchart/common-js/serialization/json/Schema":46,"@barchart/common-js/serialization/json/builders/SchemaBuilder":48,"_process":81}],54:[function(require,module,exports){
 module.exports = require('./lib/axios');
 },{"./lib/axios":56}],55:[function(require,module,exports){
@@ -8859,7 +8937,7 @@ module.exports = function transformData(data, headers, fns) {
 };
 
 },{"./../utils":79}],69:[function(require,module,exports){
-(function (process){
+(function (process){(function (){
 'use strict';
 
 var utils = require('./utils');
@@ -8958,7 +9036,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-}).call(this,require('_process'))
+}).call(this)}).call(this,require('_process'))
 },{"./adapters/http":55,"./adapters/xhr":55,"./helpers/normalizeHeaderName":76,"./utils":79,"_process":81}],70:[function(require,module,exports){
 'use strict';
 
