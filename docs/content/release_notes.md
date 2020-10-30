@@ -1,5 +1,10 @@
 # Release Notes
 
+## 2.1.0
+**New Feature**
+
+* Added support for `ENTITLEMENTS` product.
+
 ## 2.0.2
 **Other**
 
