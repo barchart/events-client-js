@@ -14,10 +14,11 @@ module.exports = (() => {
     version: version,
     stages: ['staging', 'production'],
     customers: [CustomerType.BARCHART, CustomerType.TGAM],
-    products: [ProductType.PORTFOLIO, ProductType.WATCHLIST],
+    products: [ProductType.PORTFOLIO, ProductType.WATCHLIST, ProductType.ENTITLEMENTS],
     types: {
       [ProductType.PORTFOLIO.code]: Enum.getItems(EventType).filter(eventType => eventType.product === ProductType.PORTFOLIO),
-      [ProductType.WATCHLIST.code]: Enum.getItems(EventType).filter(eventType => eventType.product === ProductType.WATCHLIST)
+      [ProductType.WATCHLIST.code]: Enum.getItems(EventType).filter(eventType => eventType.product === ProductType.WATCHLIST),
+      [ProductType.ENTITLEMENTS.code]: Enum.getItems(EventType).filter(eventType => eventType.product === ProductType.ENTITLEMENTS)
     }
   };
 })();
@@ -26,8 +27,7 @@ module.exports = (() => {
 const ReportGateway = require('./../../../lib/gateway/ReportGateway');
 
 const CustomerType = require('@barchart/events-api-common/lib/data/CustomerType'),
-      ProductType = require('@barchart/events-api-common/lib/data/ProductType'),
-      EventType = require('@barchart/events-api-common/lib/data/EventType');
+      ProductType = require('@barchart/events-api-common/lib/data/ProductType');
 
 const EventJobStatus = require('@barchart/events-api-common/lib/data/EventJobStatus');
 
@@ -175,7 +175,7 @@ module.exports = (() => {
   }
 })();
 
-},{"./../../../lib/gateway/ReportGateway":4,"./example.config":1,"@barchart/common-js/api/failures/FailureType":8,"@barchart/events-api-common/lib/data/CustomerType":49,"@barchart/events-api-common/lib/data/EventJobStatus":50,"@barchart/events-api-common/lib/data/EventType":51,"@barchart/events-api-common/lib/data/ProductType":52}],3:[function(require,module,exports){
+},{"./../../../lib/gateway/ReportGateway":4,"./example.config":1,"@barchart/common-js/api/failures/FailureType":8,"@barchart/events-api-common/lib/data/CustomerType":49,"@barchart/events-api-common/lib/data/EventJobStatus":50,"@barchart/events-api-common/lib/data/ProductType":52}],3:[function(require,module,exports){
 module.exports = (() => {
   'use strict';
   /**
