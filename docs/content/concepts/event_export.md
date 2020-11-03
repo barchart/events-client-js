@@ -215,3 +215,8 @@ Export files are pipe-delimited, plain text files which have "csv" file extensio
 * [9] dividendStrategy - Indicates "dividend strategy" associated with the event.
 * [10] cashAdjustmentStrategy - Indicates "cash adjustment" strategy associated with the event.
 
+**ENTITLEMENTS COLUMNS:**
+
+* [3] userId - The identifier of the user who triggered the event (or ```anonymous``` when no active user exists).
+* [4] operation - A description of the operation for which authorization was sought.
+
