@@ -174,7 +174,8 @@ gulp.task('release', gulp.series(
 	'build-example-bundles',
 	'commit-changes',
 	'push-changes',
-	'create-tag'
+	'create-tag',
+	'deploy-examples'
 ));
 
 gulp.task('watch', () => {
